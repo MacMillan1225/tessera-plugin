@@ -1,0 +1,89 @@
+{
+  "settings": {
+    "title": "TesseraScript 配置",
+    "description": "配置可用的组件及其默认设置。",
+    "usage": "使用方法",
+    "usageDesc": "在 dataviewjs 代码块中使用 tessera 组件：",
+    "reloadNotice": "设置已保存。点击「应用并重载」以应用更改。",
+    "reloadButton": "应用并重载"
+  },
+  "components": {
+    "card": {
+      "name": "卡片",
+      "desc": "用于仪表板和面板的通用卡片组件"
+    },
+    "heatmap": {
+      "name": "热力图",
+      "desc": "GitHub 风格的贡献热力图"
+    },
+    "progressbar": {
+      "name": "进度条",
+      "desc": "用于显示进度的进度条组件"
+    }
+  },
+  "fields": {
+    "flags.showHeader": "显示头部",
+    "flags.headerSep": "头部分隔线",
+    "flags.showTitle": "显示标题",
+    "flags.showMeta": "显示元数据",
+    "flags.showValue": "显示数值",
+    "layout.maxWidth": "最大宽度",
+    "layout.padding": "内边距",
+    "layout.radius": "圆角半径",
+    "layout.gap": "间距",
+    "layout.bodyGap": "内容间距",
+    "colors.light.background": "亮色背景",
+    "colors.light.border": "亮色边框",
+    "colors.light.shadow": "亮色阴影",
+    "colors.dark.background": "暗色背景",
+    "colors.dark.border": "暗色边框",
+    "colors.dark.shadow": "暗色阴影",
+    "flags.showWeekLabels": "显示周标签",
+    "flags.showMonthLabels": "显示月份标签",
+    "flags.showLegend": "显示图例",
+    "flags.enableTooltip": "启用提示框",
+    "flags.mondayFirst": "周一为起始日",
+    "settings.locale": "语言区域",
+    "settings.rangeMode": "范围模式",
+    "settings.minWeeks": "最小周数",
+    "settings.fixedDays": "固定天数",
+    "settings.legend": "图例模板",
+    "layout.cellSize": "单元格大小",
+    "layout.cellGap": "单元格间距",
+    "layout.cellRadius": "单元格圆角",
+    "layout.weekLabelWidth": "周标签宽度",
+    "layout.monthLabelHeight": "月份标签高度",
+    "layout.monthLabelSize": "月份标签大小",
+    "layout.weekLabelSize": "周标签大小",
+    "colors.light.dayBg": "亮色日期背景",
+    "colors.light.tooltip": "亮色提示文字",
+    "colors.light.tooltipBg": "亮色提示背景",
+    "colors.dark.dayBg": "暗色日期背景",
+    "colors.dark.tooltip": "暗色提示文字",
+    "colors.dark.tooltipBg": "暗色提示背景",
+    "showLabel": "显示标签",
+    "labelFormat": "标签格式",
+    "min": "最小值",
+    "max": "最大值",
+    "flags.showGlow": "显示发光效果",
+    "flags.striped": "条纹样式",
+    "flags.animated": "动画效果",
+    "layout.width": "宽度",
+    "layout.height": "高度",
+    "layout.trackOpacity": "轨道透明度",
+    "colors.light.track": "亮色轨道颜色",
+    "colors.light.fill": "亮色填充颜色",
+    "colors.light.label": "亮色标签颜色",
+    "colors.dark.track": "暗色轨道颜色",
+    "colors.dark.fill": "暗色填充颜色",
+    "colors.dark.label": "暗色标签颜色"
+  },
+  "groups": {
+    "flags": "标志",
+    "layout": "布局",
+    "settings": "设置",
+    "colors": "颜色",
+    "colors.light": "亮色主题",
+    "colors.dark": "暗色主题"
+  }
+}

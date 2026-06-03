@@ -1,0 +1,89 @@
+{
+  "settings": {
+    "title": "TesseraScript 設定",
+    "description": "利用可能なコンポーネントとそのデフォルト設定を構成します。",
+    "usage": "使用方法",
+    "usageDesc": "dataviewjs コードブロックで tessera コンポーネントを使用：",
+    "reloadNotice": "設定が保存されました。「適用してリロード」をクリックして変更を適用してください。",
+    "reloadButton": "適用してリロード"
+  },
+  "components": {
+    "card": {
+      "name": "カード",
+      "desc": "ダッシュボードとパネル用の汎用カードコンポーネント"
+    },
+    "heatmap": {
+      "name": "ヒートマップ",
+      "desc": "GitHub スタイルの貢献ヒートマップ"
+    },
+    "progressbar": {
+      "name": "プログレスバー",
+      "desc": "進捗を表示するプログレスバーコンポーネント"
+    }
+  },
+  "fields": {
+    "flags.showHeader": "ヘッダーを表示",
+    "flags.headerSep": "ヘッダー区切り",
+    "flags.showTitle": "タイトルを表示",
+    "flags.showMeta": "メタデータを表示",
+    "flags.showValue": "値を表示",
+    "layout.maxWidth": "最大幅",
+    "layout.padding": "パディング",
+    "layout.radius": "角の半径",
+    "layout.gap": "間隔",
+    "layout.bodyGap": "コンテンツ間隔",
+    "colors.light.background": "ライト背景",
+    "colors.light.border": "ライトボーダー",
+    "colors.light.shadow": "ライトシャドウ",
+    "colors.dark.background": "ダーク背景",
+    "colors.dark.border": "ダークボーダー",
+    "colors.dark.shadow": "ダークシャドウ",
+    "flags.showWeekLabels": "週ラベルを表示",
+    "flags.showMonthLabels": "月ラベルを表示",
+    "flags.showLegend": "凡例を表示",
+    "flags.enableTooltip": "ツールチップを有効化",
+    "flags.mondayFirst": "月曜日開始",
+    "settings.locale": "ロケール",
+    "settings.rangeMode": "範囲モード",
+    "settings.minWeeks": "最小週数",
+    "settings.fixedDays": "固定日数",
+    "settings.legend": "凡例テンプレート",
+    "layout.cellSize": "セルサイズ",
+    "layout.cellGap": "セル間隔",
+    "layout.cellRadius": "セル角の半径",
+    "layout.weekLabelWidth": "週ラベル幅",
+    "layout.monthLabelHeight": "月ラベル高さ",
+    "layout.monthLabelSize": "月ラベルサイズ",
+    "layout.weekLabelSize": "週ラベルサイズ",
+    "colors.light.dayBg": "ライト日付背景",
+    "colors.light.tooltip": "ライトツールチップ文字",
+    "colors.light.tooltipBg": "ライトツールチップ背景",
+    "colors.dark.dayBg": "ダーク日付背景",
+    "colors.dark.tooltip": "ダークツールチップ文字",
+    "colors.dark.tooltipBg": "ダークツールチップ背景",
+    "showLabel": "ラベルを表示",
+    "labelFormat": "ラベル形式",
+    "min": "最小値",
+    "max": "最大値",
+    "flags.showGlow": "グロー効果を表示",
+    "flags.striped": "ストライプ",
+    "flags.animated": "アニメーション",
+    "layout.width": "幅",
+    "layout.height": "高さ",
+    "layout.trackOpacity": "トラック透明度",
+    "colors.light.track": "ライトトラック色",
+    "colors.light.fill": "ライト塗りつぶし色",
+    "colors.light.label": "ライトラベル色",
+    "colors.dark.track": "ダークトラック色",
+    "colors.dark.fill": "ダーク塗りつぶし色",
+    "colors.dark.label": "ダークラベル色"
+  },
+  "groups": {
+    "flags": "フラグ",
+    "layout": "レイアウト",
+    "settings": "設定",
+    "colors": "カラー",
+    "colors.light": "ライトテーマ",
+    "colors.dark": "ダークテーマ"
+  }
+}
