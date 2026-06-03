@@ -1,0 +1,64 @@
+/* TesseraScript Component: Heatmap */
+
+.ts-heatmap {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ts-heatmap__grid {
+	display: grid;
+	grid-template-columns: repeat(53, var(--ts-heatmap-cell-size, 12px));
+	gap: var(--ts-heatmap-cell-gap, 2px);
+}
+
+.ts-heatmap__cell {
+	border-radius: 2px;
+	background: var(--ts-heatmap-empty-light);
+	transition: background 0.2s ease;
+}
+
+body.theme-dark .ts-heatmap__cell {
+	background: var(--ts-heatmap-empty-dark);
+}
+
+/* Level 1 */
+.ts-heatmap__cell[data-level="1"] {
+	background: var(--ts-heatmap-level-1-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="1"] {
+	background: var(--ts-heatmap-level-1-dark);
+}
+
+/* Level 2 */
+.ts-heatmap__cell[data-level="2"] {
+	background: var(--ts-heatmap-level-2-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="2"] {
+	background: var(--ts-heatmap-level-2-dark);
+}
+
+/* Level 3 */
+.ts-heatmap__cell[data-level="3"] {
+	background: var(--ts-heatmap-level-3-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="3"] {
+	background: var(--ts-heatmap-level-3-dark);
+}
+
+/* Level 4 */
+.ts-heatmap__cell[data-level="4"] {
+	background: var(--ts-heatmap-level-4-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="4"] {
+	background: var(--ts-heatmap-level-4-dark);
+}
+
+.ts-heatmap__cell:hover {
+	outline: 1px solid var(--text-muted);
+	outline-offset: -1px;
+}

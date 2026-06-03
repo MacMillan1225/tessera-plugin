@@ -1,0 +1,31 @@
+{
+	"data": {},
+	"cellSize": 12,
+	"cellGap": 2,
+	"colors": {
+		"light": {
+			"empty": "rgba(0, 0, 0, 0.05)",
+			"levels": [
+				"rgba(0, 109, 44, 0.15)",
+				"rgba(0, 109, 44, 0.4)",
+				"rgba(0, 109, 44, 0.65)",
+				"rgba(0, 109, 44, 0.85)"
+			]
+		},
+		"dark": {
+			"empty": "rgba(255, 255, 255, 0.05)",
+			"levels": [
+				"rgba(0, 200, 80, 0.15)",
+				"rgba(0, 200, 80, 0.4)",
+				"rgba(0, 200, 80, 0.65)",
+				"rgba(0, 200, 80, 0.85)"
+			]
+		}
+	},
+	"labels": {
+		"showMonths": true,
+		"showDays": true,
+		"monthFormat": "short",
+		"dayFormat": "narrow"
+	}
+}

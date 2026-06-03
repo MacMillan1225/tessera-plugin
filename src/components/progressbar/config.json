@@ -1,0 +1,19 @@
+{
+	"value": 0,
+	"max": 100,
+	"min": 0,
+	"showLabel": true,
+	"labelFormat": "{value}%",
+	"colors": {
+		"light": {
+			"background": "rgba(0, 0, 0, 0.08)",
+			"fill": "var(--interactive-accent)",
+			"label": "var(--text-normal)"
+		},
+		"dark": {
+			"background": "rgba(255, 255, 255, 0.08)",
+			"fill": "var(--interactive-accent)",
+			"label": "var(--text-normal)"
+		}
+	}
+}

@@ -1,0 +1,59 @@
+/* TesseraScript Component: Example */
+
+.ts-example {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ts-example-gap, 12px);
+	padding: var(--ts-example-padding, 16px);
+	border-radius: var(--ts-example-radius, 12px);
+	background: var(--ts-example-background-light);
+	border: 1px solid var(--ts-example-border-light);
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+body.theme-light .ts-example {
+	background: var(--ts-example-background-light);
+	border-color: var(--ts-example-border-light);
+}
+
+body.theme-dark .ts-example {
+	background: var(--ts-example-background-dark);
+	border-color: var(--ts-example-border-dark);
+}
+
+.ts-example__eyebrow {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--ts-example-eyebrow-light);
+}
+
+body.theme-dark .ts-example__eyebrow {
+	color: var(--ts-example-eyebrow-dark);
+}
+
+.ts-example__title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--ts-example-title-light);
+}
+
+body.theme-dark .ts-example__title {
+	color: var(--ts-example-title-dark);
+}
+
+.ts-example__text {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ts-example-text-light);
+}
+
+body.theme-dark .ts-example__text {
+	color: var(--ts-example-text-dark);
+}
+
+.ts-example__body {
+	font-size: 14px;
+	line-height: 1.6;
+}
