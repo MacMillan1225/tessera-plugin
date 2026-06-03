@@ -121,6 +121,288 @@ export interface HeatmapOptions {
 }
 
 // ============================================================================
+// Configuration Manager
+// ============================================================================
+
+interface HeatmapConfig {
+	data: null;
+	startDate: null;
+	endDate: null;
+	flags: {
+		showWeekLabels: boolean;
+		showMonthLabels: boolean;
+		showLegend: boolean;
+		enableTooltip: boolean;
+		mondayFirst: boolean;
+	};
+	settings: {
+		rangeMode: "adaptive" | "fixed-days" | "fixed-range";
+		minWeeks: number;
+		fixedDays: number;
+		locale: string;
+		monthNames: string[];
+		weekLabels: string[];
+		legend: string | false | null;
+		tooltipId: string;
+	};
+	layout: {
+		maxWidth: string;
+		cellSize: number;
+		cellGap: number;
+		cellRadius: string;
+		weekLabelWidth: string;
+		weekLabelGap: string;
+		monthLabelHeight: string;
+		monthOffset: string;
+		gridTopOffset: string;
+		monthLabelSize: string;
+		weekLabelSize: string;
+		legendGap: string;
+		legendTop: string;
+		legendSwatchSize: string;
+	};
+	colors: ThemeColors;
+	styles: {
+		root: Record<string, unknown> | null;
+		months: Record<string, unknown> | null;
+		weeks: Record<string, unknown> | null;
+		grid: Record<string, unknown> | null;
+		legend: Record<string, unknown> | null;
+	};
+}
+
+// Deep merge utility
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	return Object.prototype.toString.call(value) === "[object Object]";
+}
+
+function cloneValue<T>(value: T): T {
+	if (Array.isArray(value)) {
+		return value.map(cloneValue) as T;
+	}
+
+	if (isPlainObject(value)) {
+		return Object.fromEntries(
+			Object.entries(value).map(([key, item]) => [key, cloneValue(item)])
+		) as T;
+	}
+
+	return value;
+}
+
+function mergeConfig<T extends Record<string, unknown>>(base: T, override: Partial<T>): T {
+	if (override == null) {
+		return cloneValue(base);
+	}
+
+	if (base == null) {
+		return cloneValue(override) as T;
+	}
+
+	if (Array.isArray(base) || Array.isArray(override)) {
+		return cloneValue(override) as T;
+	}
+
+	if (!isPlainObject(base) || !isPlainObject(override)) {
+		return cloneValue(override) as T;
+	}
+
+	const merged = cloneValue(base);
+
+	Object.entries(override).forEach(([key, value]) => {
+		if (value === undefined) {
+			return;
+		}
+
+		(merged as Record<string, unknown>)[key] = key in merged
+			? mergeConfig((merged as Record<string, unknown>)[key] as Record<string, unknown>, value as Record<string, unknown>)
+			: cloneValue(value);
+	});
+
+	return merged as T;
+}
+
+// Configuration state
+let configLoaded = false;
+let configLoading: Promise<HeatmapConfig> | null = null;
+let cachedConfig: HeatmapConfig | null = null;
+
+// Default configuration (Chinese localization)
+const defaultConfig: HeatmapConfig = {
+	data: null,
+	startDate: null,
+	endDate: null,
+	flags: {
+		showWeekLabels: true,
+		showMonthLabels: true,
+		showLegend: true,
+		enableTooltip: true,
+		mondayFirst: true,
+	},
+	settings: {
+		rangeMode: "adaptive",
+		minWeeks: 12,
+		fixedDays: 84,
+		locale: "zh-CN",
+		monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+		weekLabels: ["一", "", "三", "", "五", "", "日"],
+		legend: "少 $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ 多",
+		tooltipId: "ts-heatmap-tooltip",
+	},
+	layout: {
+		maxWidth: "100%",
+		cellSize: 11,
+		cellGap: 2,
+		cellRadius: "3px",
+		weekLabelWidth: "20px",
+		weekLabelGap: "9px",
+		monthLabelHeight: "18px",
+		monthOffset: "28px",
+		gridTopOffset: "4px",
+		monthLabelSize: "9px",
+		weekLabelSize: "9px",
+		legendGap: "3px",
+		legendTop: "6px",
+		legendSwatchSize: "9px",
+	},
+	colors: {
+		light: {
+			dayBg: "#f1f5f9",
+			tooltip: "#ffffff",
+			tooltipBg: "#0f172a",
+			levels: [
+				"#f1f5f9",
+				"#dcfce7",
+				"#bbf7d0",
+				"#86efac",
+				"#4ade80",
+				"#22c55e",
+				"#16a34a",
+				"#15803d",
+				"#14532d",
+			],
+		},
+		dark: {
+			dayBg: "#334155",
+			tooltip: "#0f172a",
+			tooltipBg: "#f1f5f9",
+			levels: [
+				"#334155",
+				"#064e3b",
+				"#065f46",
+				"#047857",
+				"#059669",
+				"#10b981",
+				"#34d399",
+				"#6ee7b7",
+				"#a7f3d0",
+			],
+		},
+	},
+	styles: {
+		root: null,
+		months: null,
+		weeks: null,
+		grid: null,
+		legend: null,
+	},
+};
+
+// Load config from JSON file
+async function loadConfigFromFile(): Promise<HeatmapConfig> {
+	try {
+		// Try to load config.json from the same directory
+		// In Obsidian plugin context, we need to use the vault API
+		// For now, we'll use a simple fetch approach
+		const configPath = "components/heatmap/config.json";
+
+		// Try to read from vault using Obsidian API
+		// This is a simplified version - in production, you'd use the vault adapter
+		const response = await fetch(configPath);
+		if (response.ok) {
+			const userConfig = await response.json() as Partial<HeatmapConfig>;
+			return mergeConfig(defaultConfig as unknown as Record<string, unknown>, userConfig as unknown as Record<string, unknown>) as unknown as HeatmapConfig;
+		}
+	} catch {
+		// Silently fall back to default config
+	}
+
+	return cloneValue(defaultConfig);
+}
+
+/**
+ * Load heatmap configuration from config.json
+ * Call this function to preload configuration before creating heatmap instances
+ * 
+ * @param options - Loading options
+ * @returns Promise that resolves with the loaded configuration
+ * 
+ * @example
+ * ```dataviewjs
+ * // Preload config (optional - will auto-load on first use)
+ * await tessera.heatmap.loadConfig();
+ * 
+ * // Now create heatmap with loaded config
+ * dv.container.appendChild(tessera.heatmap({
+ *   data: { "2024-01-01": 5, "2024-01-02": 3 }
+ * }));
+ * ```
+ */
+export async function loadConfig(options: { force?: boolean } = {}): Promise<HeatmapConfig> {
+	if (configLoaded && !options.force) {
+		return cloneValue(cachedConfig!);
+	}
+
+	if (configLoading && !options.force) {
+		return configLoading;
+	}
+
+	configLoading = loadConfigFromFile()
+		.then((config) => {
+			cachedConfig = config;
+			configLoaded = true;
+			return cloneValue(config);
+		})
+		.catch((error) => {
+			console.warn("[Tessera] Failed to load heatmap config:", error);
+			cachedConfig = cloneValue(defaultConfig);
+			configLoaded = true;
+			return cloneValue(cachedConfig);
+		})
+		.finally(() => {
+			configLoading = null;
+		});
+
+	return configLoading;
+}
+
+/**
+ * Get current heatmap configuration
+ * Returns loaded config if available, otherwise returns default config
+ * 
+ * @returns Current configuration
+ */
+export function getConfig(): HeatmapConfig {
+	if (cachedConfig) {
+		return cloneValue(cachedConfig);
+	}
+	return cloneValue(defaultConfig);
+}
+
+/**
+ * Resolve configuration by merging: default config + loaded config + user options
+ * Priority: user options > loaded config > default config
+ * 
+ * @param userOptions - User-provided options
+ * @returns Merged configuration
+ */
+function resolveConfig(userOptions: HeatmapOptions = {}): HeatmapConfig {
+	const baseConfig = cachedConfig || defaultConfig;
+	const merged = mergeConfig(baseConfig as unknown as Record<string, unknown>, userOptions as unknown as Record<string, unknown>);
+	return merged as unknown as HeatmapConfig;
+}
+
+// ============================================================================
 // Helper Functions
 // ============================================================================
 
@@ -514,69 +796,6 @@ function renderLegend(
 // Default Configuration
 // ============================================================================
 
-const defaultTheme: ThemeColors = {
-	light: {
-		dayBg: "#f1f5f9",
-		tooltip: "#ffffff",
-		tooltipBg: "#0f172a",
-		levels: [
-			"#f1f5f9",
-			"#dcfce7",
-			"#bbf7d0",
-			"#86efac",
-			"#4ade80",
-			"#22c55e",
-			"#16a34a",
-			"#15803d",
-			"#14532d",
-		],
-	},
-	dark: {
-		dayBg: "#334155",
-		tooltip: "#0f172a",
-		tooltipBg: "#f1f5f9",
-		levels: [
-			"#334155",
-			"#064e3b",
-			"#065f46",
-			"#047857",
-			"#059669",
-			"#10b981",
-			"#34d399",
-			"#6ee7b7",
-			"#a7f3d0",
-		],
-	},
-};
-
-const defaultSettings = {
-	rangeMode: "adaptive" as const,
-	minWeeks: 12,
-	fixedDays: 84,
-	locale: "zh-CN",
-	monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-	weekLabels: ["M", "", "W", "", "F", "", "S"],
-	legend: "Less $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ More",
-	tooltipId: "ts-heatmap-tooltip",
-};
-
-const defaultLayout = {
-	maxWidth: "100%",
-	cellSize: 11,
-	cellGap: 2,
-	cellRadius: "3px",
-	weekLabelWidth: "20px",
-	weekLabelGap: "9px",
-	monthLabelHeight: "18px",
-	monthOffset: "28px",
-	gridTopOffset: "4px",
-	monthLabelSize: "9px",
-	weekLabelSize: "9px",
-	legendGap: "3px",
-	legendTop: "6px",
-	legendSwatchSize: "9px",
-};
-
 // ============================================================================
 // Parts interface
 // ============================================================================
@@ -607,22 +826,24 @@ interface HeatmapWithParts extends HTMLElement {
 // ============================================================================
 
 export function heatmap(options: HeatmapOptions = {}): HTMLElement {
-	// Resolve options
-	const flags = options.flags || {};
-	const settings = { ...defaultSettings, ...options.settings };
-	const layout = { ...defaultLayout, ...options.layout };
-	const styles = options.styles || {};
+	// Resolve configuration: default config + loaded config + user options
+	const resolvedConfig = resolveConfig(options);
+	const flags = { ...resolvedConfig.flags, ...options.flags };
+	const settings = { ...resolvedConfig.settings, ...options.settings };
+	const layout = { ...resolvedConfig.layout, ...options.layout };
+	// Resolve styles with null-to-undefined conversion
+	const styles = {
+		root: options.styles?.root ?? resolvedConfig.styles.root ?? undefined,
+		months: options.styles?.months ?? resolvedConfig.styles.months ?? undefined,
+		weeks: options.styles?.weeks ?? resolvedConfig.styles.weeks ?? undefined,
+		grid: options.styles?.grid ?? resolvedConfig.styles.grid ?? undefined,
+		legend: options.styles?.legend ?? resolvedConfig.styles.legend ?? undefined,
+	};
 
-	// Resolve theme colors
+	// Resolve theme colors with deep merge
 	const colors: ThemeColors = {
-		light: {
-			...defaultTheme.light,
-			...options.colors?.light,
-		},
-		dark: {
-			...defaultTheme.dark,
-			...options.colors?.dark,
-		},
+		light: { ...resolvedConfig.colors.light, ...options.colors?.light },
+		dark: { ...resolvedConfig.colors.dark, ...options.colors?.dark },
 	};
 
 	// Merge flat color overrides
@@ -640,7 +861,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	}
 
 	const locale = settings.locale;
-	const tooltipId = settings.tooltipId || defaultSettings.tooltipId;
+	const tooltipId = settings.tooltipId || defaultConfig.settings.tooltipId;
 
 	// Create parts
 	const monthsEl = createElement("div", {
@@ -743,7 +964,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 			return;
 		}
 
-		(settings.weekLabels || defaultSettings.weekLabels).forEach((label) => {
+		(settings.weekLabels || defaultConfig.settings.weekLabels).forEach((label) => {
 			weeksEl.appendChild(
 				createElement("div", {
 					className: "ts-heatmap__week-label",
@@ -807,7 +1028,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		const range = buildRange();
 		const dataMap = await resolveData();
 		const current = cloneDate(range.start);
-		const monthNames = settings.monthNames || defaultSettings.monthNames;
+		const monthNames = settings.monthNames || defaultConfig.settings.monthNames;
 
 		gridEl.textContent = "";
 		monthsEl.textContent = "";
