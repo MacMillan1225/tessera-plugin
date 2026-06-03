@@ -681,3 +681,123 @@ body.theme-dark .ts-example__text {
 	margin: 8px 0;
 	overflow-x: auto;
 }
+
+/* ==========================================================================
+   Settings Tab Styles
+   ========================================================================== */
+
+.tessera-settings-desc {
+	color: var(--text-muted);
+	margin-bottom: 16px;
+}
+
+.tessera-reload-section {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	margin-bottom: 12px;
+	overflow: hidden;
+	background: var(--background-secondary);
+}
+
+.tessera-reload-section .setting-item {
+	border: none;
+}
+
+.tessera-settings-section {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	margin-bottom: 12px;
+	overflow: hidden;
+}
+
+.tessera-settings-section .setting-item {
+	border: none;
+}
+
+.tessera-collapse-btn {
+	cursor: pointer;
+	margin-right: 8px;
+	font-size: 10px;
+	color: var(--text-muted);
+	user-select: none;
+	width: 16px;
+	display: inline-block;
+}
+
+.tessera-collapse-btn:hover {
+	color: var(--text-normal);
+}
+
+.tessera-settings-content {
+	padding: 0 16px 16px;
+}
+
+.tessera-settings-content .setting-item {
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.tessera-group-header {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 12px 0 4px;
+	margin-top: 8px;
+}
+
+.tessera-group-header:first-child {
+	margin-top: 0;
+	padding-top: 4px;
+}
+
+.tessera-code-block {
+	background: var(--background-secondary);
+	padding: 12px;
+	border-radius: 6px;
+	overflow-x: auto;
+}
+
+.tessera-tooltip-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: var(--color-base-50);
+	color: var(--background-primary);
+	font-size: 10px;
+	font-weight: 700;
+	margin-left: 6px;
+	vertical-align: middle;
+	position: relative;
+}
+
+.tessera-tooltip-icon::after {
+	content: attr(aria-label);
+	position: absolute;
+	bottom: calc(100% + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: var(--background-modifier-cover);
+	color: var(--text-normal);
+	padding: 8px 12px;
+	border-radius: 6px;
+	font-size: 12px;
+	font-weight: 400;
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+	z-index: 1000;
+	box-shadow: var(--shadow-s);
+}
+
+.tessera-tooltip-icon:hover::after {
+	opacity: 1;
+}
+
+.tessera-hidden {
+	display: none;
+}

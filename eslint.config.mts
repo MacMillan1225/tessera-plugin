@@ -14,6 +14,7 @@ export default tseslint.config(
 		'package.json',
 		'package-lock.json',
 		'tsconfig.json',
+		'docs/**',  // Ignore reference documentation
 	]),
 	{
 		languageOptions: {

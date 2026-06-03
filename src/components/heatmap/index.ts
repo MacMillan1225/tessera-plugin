@@ -3,6 +3,8 @@
  * Calendar heatmap component with tooltip and legend support
  */
 
+import { requestUrl } from "obsidian";
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -219,7 +221,7 @@ function mergeConfig<T extends Record<string, unknown>>(base: T, override: Parti
 			: cloneValue(value);
 	});
 
-	return merged as T;
+	return merged;
 }
 
 // Configuration state
@@ -316,11 +318,10 @@ async function loadConfigFromFile(): Promise<HeatmapConfig> {
 		// For now, we'll use a simple fetch approach
 		const configPath = "components/heatmap/config.json";
 
-		// Try to read from vault using Obsidian API
-		// This is a simplified version - in production, you'd use the vault adapter
-		const response = await fetch(configPath);
-		if (response.ok) {
-			const userConfig = await response.json() as Partial<HeatmapConfig>;
+		// Use Obsidian's requestUrl API instead of fetch
+		const response = await requestUrl({ url: configPath });
+		if (response.status === 200) {
+			const userConfig = response.json as Partial<HeatmapConfig>;
 			return mergeConfig(defaultConfig as unknown as Record<string, unknown>, userConfig as unknown as Record<string, unknown>) as unknown as HeatmapConfig;
 		}
 	} catch {
@@ -583,7 +584,7 @@ function normalizeMap(source: unknown): Map<string, HeatmapEntry> {
 	const map = new Map<string, HeatmapEntry>();
 
 	if (source instanceof Map) {
-		source.forEach((value, key) => {
+		source.forEach((value: unknown, key: string) => {
 			if (typeof value === "number") {
 				map.set(key, { value });
 			} else if (value && typeof value === "object") {
@@ -594,7 +595,7 @@ function normalizeMap(source: unknown): Map<string, HeatmapEntry> {
 	}
 
 	if (Array.isArray(source)) {
-		source.forEach(([key, value]) => {
+		source.forEach(([key, value]: [string, unknown]) => {
 			if (typeof value === "number") {
 				map.set(key, { value });
 			} else if (value && typeof value === "object") {

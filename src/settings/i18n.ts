@@ -2,7 +2,7 @@
  * i18n utilities with validation
  */
 
-import type { Translations, SettingField, ComponentDefinition, PluginSettings } from "./types";
+import type { Translations, ComponentDefinition, PluginSettings } from "./types";
 
 // Import translation files
 import enTranslations from "../i18n/en.json";
@@ -14,9 +14,9 @@ import jaTranslations from "../i18n/ja.json";
 // ============================================================================
 
 const TRANSLATIONS: Record<string, Translations> = {
-	en: enTranslations as Translations,
-	zh: zhTranslations as Translations,
-	ja: jaTranslations as Translations,
+	en: enTranslations,
+	zh: zhTranslations,
+	ja: jaTranslations,
 };
 
 // ============================================================================
@@ -27,7 +27,12 @@ const TRANSLATIONS: Record<string, Translations> = {
  * Get current Obsidian locale
  */
 export function getLocale(): string {
-	return (window as any)?.moment?.locale?.() || "en";
+	// Obsidian exposes moment.js globally
+	interface WindowWithMoment extends Window {
+		moment?: { locale(): string };
+	}
+	const win = window as unknown as WindowWithMoment;
+	return win.moment?.locale() ?? "en";
 }
 
 /**

@@ -39,13 +39,13 @@ export default class TesseraPlugin extends Plugin {
 			version: "1.0.0",
 			// Wrap each component to inject settings config as defaults
 			card: this.settings.card.enabled 
-				? ((options: any) => card({ ...this.settings.card.config, ...options }))
+				? ((options) => card({ ...this.settings.card.config, ...options }))
 				: undefined,
 			heatmap: this.settings.heatmap.enabled 
-				? ((options: any) => heatmap({ ...this.settings.heatmap.config, ...options }))
+				? ((options) => heatmap({ ...this.settings.heatmap.config, ...options }))
 				: undefined,
 			progressbar: this.settings.progressbar.enabled 
-				? ((options: any) => progressbar({ ...this.settings.progressbar.config, ...options }))
+				? ((options) => progressbar({ ...this.settings.progressbar.config, ...options }))
 				: undefined,
 			example,
 		};
@@ -84,7 +84,7 @@ export default class TesseraPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		const loaded = await this.loadData();
+		const loaded = await this.loadData() as Partial<PluginSettings> | null;
 		this.settings = {
 			card: {
 				enabled: loaded?.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
@@ -106,7 +106,7 @@ export default class TesseraPlugin extends Plugin {
 	}
 
 	async resetSettings() {
-		this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+		this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as PluginSettings;
 		await this.saveSettings();
 	}
 

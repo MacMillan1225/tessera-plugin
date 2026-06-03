@@ -6,7 +6,7 @@ import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
 import type { PluginSettings, SettingField, ComponentDefinition, Translations } from "./types";
 import { getTranslations, getFieldLabel, getTooltipText, getGroupLabel, getComponentName, getComponentDesc, logValidationWarnings } from "./i18n";
 import { rgbaToHex, hexToRgba, extractAlpha, isColorLike } from "./color-utils";
-import { COMPONENTS, DEFAULT_SETTINGS } from "./fields";
+import { COMPONENTS } from "./fields";
 
 // ============================================================================
 // Settings Tab Class
@@ -16,6 +16,13 @@ interface TesseraPluginLike extends Plugin {
 	settings: PluginSettings;
 	saveSettings(): Promise<void>;
 	resetSettings(): Promise<void>;
+}
+
+// Interface for Obsidian's internal command API
+interface AppWithCommands extends App {
+	commands?: {
+		executeCommandById(id: string): void;
+	};
 }
 
 export class TesseraSettingTab extends PluginSettingTab {
@@ -37,9 +44,6 @@ export class TesseraSettingTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		// Add custom styles for collapsible sections
-		this.addCustomStyles();
 
 		// Header
 		new Setting(containerEl).setName(this.t.settings.title).setHeading();
@@ -85,6 +89,10 @@ export class TesseraSettingTab extends PluginSettingTab {
 		const section = containerEl.createDiv({ cls: "tessera-reload-section" });
 		this.reloadContainerEl = section;
 
+		if (!this.needsReload) {
+			section.classList.add("tessera-hidden");
+		}
+
 		const setting = new Setting(section);
 		setting.setName(this.t.settings.reloadButton);
 		setting.setDesc(this.t.settings.reloadNotice);
@@ -92,15 +100,11 @@ export class TesseraSettingTab extends PluginSettingTab {
 			btn.setButtonText(this.t.settings.reloadButton);
 			btn.setCta();
 			btn.onClick(() => {
-				// @ts-ignore - Internal Obsidian API
-				this.app.commands.executeCommandById("app:reload");
+				// Use Obsidian's internal command API to reload the app
+				const appWithCommands = this.app as AppWithCommands;
+				appWithCommands.commands?.executeCommandById("app:reload");
 			});
 		});
-
-		// Hide initially if no changes
-		if (!this.needsReload) {
-			section.style.display = "none";
-		}
 	}
 
 	private renderRestoreSection(containerEl: HTMLElement): void {
@@ -121,7 +125,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 	private showReloadButton(): void {
 		this.needsReload = true;
 		if (this.reloadContainerEl) {
-			this.reloadContainerEl.style.display = "block";
+			this.reloadContainerEl.classList.remove("tessera-hidden");
 		}
 	}
 
@@ -146,6 +150,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		headerSetting.setDesc(getComponentDesc(this.t, definition.componentKey));
 
 		// Add collapse button
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
 		const collapseBtn = document.createElement("span");
 		collapseBtn.className = "tessera-collapse-btn";
 		collapseBtn.textContent = isCollapsed ? "▶" : "▼";
@@ -242,6 +247,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		if (!tooltipText) return;
 
 		// Create tooltip icon
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
 		const tooltipEl = document.createElement("span");
 		tooltipEl.className = "tessera-tooltip-icon";
 		tooltipEl.textContent = "?";
@@ -325,7 +331,8 @@ export class TesseraSettingTab extends PluginSettingTab {
 			picker.setValue(hexValue);
 			picker.onChange(async (value) => {
 				// Preserve alpha if original was rgba
-				const alpha = extractAlpha(String(currentValue ?? ""));
+				const currentColor = typeof currentValue === "string" ? currentValue : "#000000";
+				const alpha = extractAlpha(currentColor);
 				const colorValue = alpha < 1 ? hexToRgba(value, alpha) : value;
 				this.setNestedValue(config, field.key, colorValue);
 				await this.plugin.saveSettings();
@@ -338,13 +345,14 @@ export class TesseraSettingTab extends PluginSettingTab {
 			const alpha = extractAlpha(String(currentValue));
 			if (alpha < 1) {
 				const alphaSetting = new Setting(container);
-				alphaSetting.setName("  └ Alpha");
+				alphaSetting.setName("  └ alpha");
 				alphaSetting.addSlider((slider) => {
 					slider.setLimits(0, 1, 0.01);
 					slider.setValue(alpha);
 					slider.setDynamicTooltip();
 					slider.onChange(async (value) => {
-						const hex = rgbaToHex(String(this.getNestedValue(config, field.key)));
+						const currentColorValue = this.getNestedValue(config, field.key);
+						const hex = rgbaToHex(typeof currentColorValue === "string" ? currentColorValue : "#000000");
 						this.setNestedValue(config, field.key, hexToRgba(hex, value));
 						await this.plugin.saveSettings();
 						this.showReloadButton();
@@ -366,7 +374,8 @@ export class TesseraSettingTab extends PluginSettingTab {
 					dropdown.addOption(option.value, option.label);
 				}
 			}
-			dropdown.setValue(String(currentValue ?? ""));
+			const selectValue = typeof currentValue === "string" ? currentValue : "";
+			dropdown.setValue(selectValue);
 			dropdown.onChange(async (value) => {
 				this.setNestedValue(config, field.key, value);
 				await this.plugin.saveSettings();
@@ -403,7 +412,12 @@ export class TesseraSettingTab extends PluginSettingTab {
 		currentValue: unknown
 	): void {
 		setting.addText((text) => {
-			text.setValue(String(currentValue ?? ""));
+			const displayValue = typeof currentValue === "string" 
+				? currentValue 
+				: typeof currentValue === "number" 
+					? String(currentValue) 
+					: "";
+			text.setValue(displayValue);
 			if (field.placeholder) {
 				text.setPlaceholder(field.placeholder);
 			}
@@ -427,7 +441,12 @@ export class TesseraSettingTab extends PluginSettingTab {
 		currentValue: unknown
 	): void {
 		setting.addTextArea((textarea) => {
-			textarea.setValue(String(currentValue ?? ""));
+			const displayValue = typeof currentValue === "string" 
+				? currentValue 
+				: typeof currentValue === "number" 
+					? String(currentValue) 
+					: "";
+			textarea.setValue(displayValue);
 			if (field.placeholder) {
 				textarea.setPlaceholder(field.placeholder);
 			}
@@ -471,107 +490,5 @@ export class TesseraSettingTab extends PluginSettingTab {
 		if (lastPart) {
 			current[lastPart] = value;
 		}
-	}
-
-	// ============================================================================
-	// Styles
-	// ============================================================================
-
-	private addCustomStyles(): void {
-		const styleId = "tessera-settings-styles";
-		if (document.getElementById(styleId)) return;
-
-		const style = document.createElement("style");
-		style.id = styleId;
-		style.textContent = `
-			.tessera-settings-desc {
-				color: var(--text-muted);
-				margin-bottom: 16px;
-			}
-
-			.tessera-reload-section {
-				border: 1px solid var(--background-modifier-border);
-				border-radius: 8px;
-				margin-bottom: 12px;
-				overflow: hidden;
-				background: var(--background-secondary);
-			}
-
-			.tessera-reload-section .setting-item {
-				border: none;
-			}
-
-			.tessera-settings-section {
-				border: 1px solid var(--background-modifier-border);
-				border-radius: 8px;
-				margin-bottom: 12px;
-				overflow: hidden;
-			}
-
-			.tessera-settings-section .setting-item {
-				border: none;
-			}
-
-			.tessera-collapse-btn {
-				cursor: pointer;
-				margin-right: 8px;
-				font-size: 10px;
-				color: var(--text-muted);
-				user-select: none;
-				width: 16px;
-				display: inline-block;
-			}
-
-			.tessera-collapse-btn:hover {
-				color: var(--text-normal);
-			}
-
-			.tessera-settings-content {
-				padding: 0 16px 16px;
-			}
-
-			.tessera-settings-content .setting-item {
-				border-top: 1px solid var(--background-modifier-border);
-			}
-
-			.tessera-group-header {
-				font-size: 11px;
-				font-weight: 600;
-				color: var(--text-muted);
-				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				padding: 12px 0 4px;
-				margin-top: 8px;
-			}
-
-			.tessera-group-header:first-child {
-				margin-top: 0;
-				padding-top: 4px;
-			}
-
-			.tessera-code-block {
-				background: var(--background-secondary);
-				padding: 12px;
-				border-radius: 6px;
-				overflow-x: auto;
-			}
-
-			.tessera-tooltip-icon {
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				width: 12px;
-				height: 12px;
-				border-radius: 50%;
-				background: var(--color-base-50);
-				color: var(--background-primary);
-				font-size: 10px;
-				font-weight: 700;
-				margin-left: 6px;
-				vertical-align: middle;
-				position: relative;
-			}
-		`;
-		document.head.appendChild(style);
 	}
 }
