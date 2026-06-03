@@ -25,6 +25,8 @@ interface Translations {
 		usageDesc: string;
 		reloadNotice: string;
 		reloadButton: string;
+		restoreButton: string;
+		restoreNotice: string;
 	};
 	components: {
 		card: { name: string; desc: string };
@@ -33,6 +35,7 @@ interface Translations {
 	};
 	fields: Record<string, string>;
 	groups: Record<string, string>;
+	tooltips: Record<string, string>;
 }
 
 const TRANSLATIONS: Record<string, Translations> = {
@@ -86,13 +89,22 @@ export interface PluginSettings {
 // Settings Field Definitions (Easy to extend!)
 // ============================================================================
 
-type FieldType = "toggle" | "text" | "number" | "textarea" | "color";
+type FieldType = "toggle" | "text" | "number" | "textarea" | "color" | "select" | "slider";
+
+interface SelectOption {
+	value: string;
+	label: string;
+}
 
 interface SettingField {
 	key: string;           // Path in config (e.g., "flags.showHeader")
 	type: FieldType;       // Input type
 	placeholder?: string;  // Optional placeholder
-	description?: string;  // Optional description
+	description?: string;  // Optional description (tooltip text)
+	options?: SelectOption[];  // For select type
+	min?: number;          // For slider type
+	max?: number;          // For slider type
+	step?: number;         // For slider type
 }
 
 interface ComponentDefinition {
@@ -106,7 +118,7 @@ interface ComponentDefinition {
  * To add a new field, simply add it to the appropriate component's `fields` array.
  * To add a new component, add a new entry to COMPONENTS.
  * 
- * Field types: "toggle", "text", "number", "textarea", "color"
+ * Field types: "toggle", "text", "number", "textarea", "color", "select", "slider"
  * Key format: dot-notation path (e.g., "flags.showHeader", "layout.padding")
  * Labels are automatically translated via i18n
  */
@@ -115,85 +127,100 @@ const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 		componentKey: "card",
 		fields: [
 			// Flags
-			{ key: "flags.showHeader", type: "toggle" },
-			{ key: "flags.headerSep", type: "toggle" },
-			{ key: "flags.showTitle", type: "toggle" },
-			{ key: "flags.showMeta", type: "toggle" },
-			{ key: "flags.showValue", type: "toggle" },
+			{ key: "flags.showHeader", type: "toggle", description: "tooltip.flags.showHeader" },
+			{ key: "flags.headerSep", type: "toggle", description: "tooltip.flags.headerSep" },
+			{ key: "flags.showTitle", type: "toggle", description: "tooltip.flags.showTitle" },
+			{ key: "flags.showMeta", type: "toggle", description: "tooltip.flags.showMeta" },
+			{ key: "flags.showValue", type: "toggle", description: "tooltip.flags.showValue" },
 			// Layout
-			{ key: "layout.maxWidth", type: "text" },
-			{ key: "layout.padding", type: "text" },
-			{ key: "layout.radius", type: "text" },
-			{ key: "layout.gap", type: "text" },
-			{ key: "layout.bodyGap", type: "text" },
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.padding", type: "text", description: "tooltip.layout.padding" },
+			{ key: "layout.radius", type: "text", description: "tooltip.layout.radius" },
+			{ key: "layout.gap", type: "text", description: "tooltip.layout.gap" },
+			{ key: "layout.bodyGap", type: "text", description: "tooltip.layout.bodyGap" },
 			// Colors (Light)
-			{ key: "colors.light.background", type: "color" },
-			{ key: "colors.light.border", type: "color" },
-			{ key: "colors.light.shadow", type: "text" },
+			{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.light.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.light.shadow", type: "color", description: "tooltip.colors.shadow" },
 			// Colors (Dark)
-			{ key: "colors.dark.background", type: "color" },
-			{ key: "colors.dark.border", type: "color" },
-			{ key: "colors.dark.shadow", type: "text" },
+			{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.dark.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.dark.shadow", type: "color", description: "tooltip.colors.shadow" },
 		],
 	},
 	heatmap: {
 		componentKey: "heatmap",
 		fields: [
 			// Flags
-			{ key: "flags.showWeekLabels", type: "toggle" },
-			{ key: "flags.showMonthLabels", type: "toggle" },
-			{ key: "flags.showLegend", type: "toggle" },
-			{ key: "flags.enableTooltip", type: "toggle" },
-			{ key: "flags.mondayFirst", type: "toggle" },
+			{ key: "flags.showWeekLabels", type: "toggle", description: "tooltip.heatmap.showWeekLabels" },
+			{ key: "flags.showMonthLabels", type: "toggle", description: "tooltip.heatmap.showMonthLabels" },
+			{ key: "flags.showLegend", type: "toggle", description: "tooltip.heatmap.showLegend" },
+			{ key: "flags.enableTooltip", type: "toggle", description: "tooltip.heatmap.enableTooltip" },
+			{ key: "flags.mondayFirst", type: "toggle", description: "tooltip.heatmap.mondayFirst" },
 			// Settings
-			{ key: "settings.locale", type: "text", placeholder: "zh-CN" },
-			{ key: "settings.rangeMode", type: "text", placeholder: "adaptive" },
-			{ key: "settings.minWeeks", type: "number" },
-			{ key: "settings.fixedDays", type: "number" },
-			{ key: "settings.legend", type: "text" },
+			{ key: "settings.locale", type: "select", description: "tooltip.heatmap.locale", options: [
+				{ value: "zh-CN", label: "中文 (简体)" },
+				{ value: "zh-TW", label: "中文 (繁體)" },
+				{ value: "en", label: "English" },
+				{ value: "ja", label: "日本語" },
+				{ value: "ko", label: "한국어" },
+				{ value: "fr", label: "Français" },
+				{ value: "de", label: "Deutsch" },
+				{ value: "es", label: "Español" },
+				{ value: "pt", label: "Português" },
+				{ value: "ru", label: "Русский" },
+			]},
+			{ key: "settings.rangeMode", type: "select", description: "tooltip.heatmap.rangeMode", options: [
+				{ value: "adaptive", label: "Adaptive" },
+				{ value: "fixed", label: "Fixed" },
+				{ value: "year", label: "Year" },
+			]},
+			{ key: "settings.minWeeks", type: "number", description: "tooltip.heatmap.minWeeks" },
+			{ key: "settings.fixedDays", type: "number", description: "tooltip.heatmap.fixedDays" },
+			{ key: "settings.legend", type: "text", description: "tooltip.heatmap.legend" },
 			// Layout
-			{ key: "layout.cellSize", type: "number" },
-			{ key: "layout.cellGap", type: "number" },
-			{ key: "layout.cellRadius", type: "text" },
-			{ key: "layout.weekLabelWidth", type: "text" },
-			{ key: "layout.monthLabelHeight", type: "text" },
-			{ key: "layout.monthLabelSize", type: "text" },
-			{ key: "layout.weekLabelSize", type: "text" },
+			{ key: "layout.cellSize", type: "number", description: "tooltip.heatmap.cellSize" },
+			{ key: "layout.cellGap", type: "number", description: "tooltip.heatmap.cellGap" },
+			{ key: "layout.cellRadius", type: "text", description: "tooltip.heatmap.cellRadius" },
+			{ key: "layout.weekLabelWidth", type: "text", description: "tooltip.heatmap.weekLabelWidth" },
+			{ key: "layout.monthLabelHeight", type: "text", description: "tooltip.heatmap.monthLabelHeight" },
+			{ key: "layout.monthLabelSize", type: "text", description: "tooltip.heatmap.monthLabelSize" },
+			{ key: "layout.weekLabelSize", type: "text", description: "tooltip.heatmap.weekLabelSize" },
 			// Colors (Light)
-			{ key: "colors.light.dayBg", type: "color" },
-			{ key: "colors.light.tooltip", type: "color" },
-			{ key: "colors.light.tooltipBg", type: "color" },
+			{ key: "colors.light.dayBg", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.light.tooltip", type: "color", description: "tooltip.colors.tooltipText" },
+			{ key: "colors.light.tooltipBg", type: "color", description: "tooltip.colors.tooltipBg" },
 			// Colors (Dark)
-			{ key: "colors.dark.dayBg", type: "color" },
-			{ key: "colors.dark.tooltip", type: "color" },
-			{ key: "colors.dark.tooltipBg", type: "color" },
+			{ key: "colors.dark.dayBg", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.dark.tooltip", type: "color", description: "tooltip.colors.tooltipText" },
+			{ key: "colors.dark.tooltipBg", type: "color", description: "tooltip.colors.tooltipBg" },
 		],
 	},
 	progressbar: {
 		componentKey: "progressbar",
 		fields: [
 			// Basic
-			{ key: "showLabel", type: "toggle" },
-			{ key: "labelFormat", type: "text", placeholder: "{value}%" },
-			{ key: "min", type: "number" },
-			{ key: "max", type: "number" },
+			{ key: "showLabel", type: "toggle", description: "tooltip.progressbar.showLabel" },
+			{ key: "labelFormat", type: "text", placeholder: "{value}%", description: "tooltip.progressbar.labelFormat" },
+			{ key: "min", type: "number", description: "tooltip.progressbar.min" },
+			{ key: "max", type: "number", description: "tooltip.progressbar.max" },
 			// Flags
-			{ key: "flags.showGlow", type: "toggle" },
-			{ key: "flags.striped", type: "toggle" },
-			{ key: "flags.animated", type: "toggle" },
+			{ key: "flags.showGlow", type: "toggle", description: "tooltip.progressbar.showGlow" },
+			{ key: "flags.striped", type: "toggle", description: "tooltip.progressbar.striped" },
+			{ key: "flags.animated", type: "toggle", description: "tooltip.progressbar.animated" },
 			// Layout
-			{ key: "layout.width", type: "text" },
-			{ key: "layout.height", type: "text" },
-			{ key: "layout.radius", type: "text" },
-			{ key: "layout.trackOpacity", type: "number" },
+			{ key: "layout.width", type: "text", description: "tooltip.layout.width" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			{ key: "layout.radius", type: "text", description: "tooltip.layout.radius" },
+			{ key: "layout.trackOpacity", type: "slider", min: 0, max: 1, step: 0.01, description: "tooltip.progressbar.trackOpacity" },
 			// Colors (Light)
-			{ key: "colors.light.track", type: "color" },
-			{ key: "colors.light.fill", type: "color" },
-			{ key: "colors.light.label", type: "color" },
+			{ key: "colors.light.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.light.fill", type: "color", description: "tooltip.colors.fill" },
+			{ key: "colors.light.label", type: "color", description: "tooltip.colors.label" },
 			// Colors (Dark)
-			{ key: "colors.dark.track", type: "color" },
-			{ key: "colors.dark.fill", type: "color" },
-			{ key: "colors.dark.label", type: "color" },
+			{ key: "colors.dark.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.dark.fill", type: "color", description: "tooltip.colors.fill" },
+			{ key: "colors.dark.label", type: "color", description: "tooltip.colors.label" },
 		],
 	},
 };
@@ -224,14 +251,14 @@ const DEFAULT_SETTINGS: PluginSettings = {
 				light: {
 					background: "rgba(245, 248, 252, 0.9)",
 					border: "rgba(120, 140, 160, 0.18)",
-					shadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
+					shadow: "rgba(15, 23, 42, 0.08)",
 					hoverAccent: "var(--interactive-accent)",
 					value: "var(--text-accent, var(--text-normal))",
 				},
 				dark: {
 					background: "rgba(30, 41, 59, 0.72)",
 					border: "rgba(148, 163, 184, 0.18)",
-					shadow: "0 16px 36px rgba(2, 6, 23, 0.28)",
+					shadow: "rgba(2, 6, 23, 0.28)",
 					hoverAccent: "var(--interactive-accent)",
 					value: "var(--text-accent, var(--text-normal))",
 				},
@@ -482,6 +509,11 @@ export default class TesseraPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
+	async resetSettings() {
+		this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+		await this.saveSettings();
+	}
+
 	private deepMerge(target: Record<string, unknown>, source?: Record<string, unknown>): Record<string, unknown> {
 		if (!source) return { ...target };
 		
@@ -552,6 +584,9 @@ class TesseraSettingTab extends PluginSettingTab {
 			);
 		}
 
+		// Restore defaults section
+		this.renderRestoreSection(containerEl);
+
 		// Usage section
 		new Setting(containerEl).setName(this.t.settings.usage).setHeading();
 		containerEl.createEl("p", {
@@ -586,6 +621,21 @@ class TesseraSettingTab extends PluginSettingTab {
 		if (!this.needsReload) {
 			section.style.display = "none";
 		}
+	}
+
+	private renderRestoreSection(containerEl: HTMLElement): void {
+		const setting = new Setting(containerEl);
+		setting.setName(this.t.settings.restoreButton);
+		setting.setDesc(this.t.settings.restoreNotice);
+		setting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.restoreButton);
+			btn.setWarning();
+			btn.onClick(async () => {
+				await this.plugin.resetSettings();
+				this.needsReload = true;
+				this.display();
+			});
+		});
 	}
 
 	private showReloadButton(): void {
@@ -699,6 +749,25 @@ class TesseraSettingTab extends PluginSettingTab {
 		}
 	}
 
+	private addTooltipToSetting(setting: Setting, tooltipKey?: string): void {
+		if (!tooltipKey) return;
+		
+		const tooltipText = this.t.tooltips[tooltipKey];
+		if (!tooltipText) return;
+
+		// Create tooltip icon
+		const tooltipEl = document.createElement("span");
+		tooltipEl.className = "tessera-tooltip-icon";
+		tooltipEl.textContent = "?";
+		tooltipEl.setAttribute("aria-label", tooltipText);
+		
+		// Add to setting name
+		const nameEl = setting.settingEl.querySelector(".setting-item-name");
+		if (nameEl) {
+			nameEl.appendChild(tooltipEl);
+		}
+	}
+
 	private renderField(
 		container: HTMLElement,
 		config: Record<string, unknown>,
@@ -707,9 +776,9 @@ class TesseraSettingTab extends PluginSettingTab {
 		const fieldLabel = this.t.fields[field.key] || field.key;
 		const setting = new Setting(container);
 		setting.setName(fieldLabel);
-		if (field.description) {
-			setting.setDesc(field.description);
-		}
+		
+		// Add tooltip if description exists
+		this.addTooltipToSetting(setting, field.description);
 
 		const currentValue = this.getNestedValue(config, field.key);
 
@@ -735,6 +804,58 @@ class TesseraSettingTab extends PluginSettingTab {
 						const alpha = extractAlpha(String(currentValue ?? ""));
 						const colorValue = alpha < 1 ? hexToRgba(value, alpha) : value;
 						this.setNestedValue(config, field.key, colorValue);
+						await this.plugin.saveSettings();
+						this.showReloadButton();
+					});
+				});
+				
+				// Add alpha slider if value has alpha
+				if (isColorLike(currentValue)) {
+					const alpha = extractAlpha(String(currentValue));
+					if (alpha < 1) {
+						const alphaSetting = new Setting(container);
+						alphaSetting.setName("  └ Alpha");
+						alphaSetting.addSlider((slider) => {
+							slider.setLimits(0, 1, 0.01);
+							slider.setValue(alpha);
+							slider.setDynamicTooltip();
+							slider.onChange(async (value) => {
+								const hex = rgbaToHex(String(this.getNestedValue(config, field.key)));
+								this.setNestedValue(config, field.key, hexToRgba(hex, value));
+								await this.plugin.saveSettings();
+								this.showReloadButton();
+							});
+						});
+					}
+				}
+				break;
+
+			case "select":
+				setting.addDropdown((dropdown) => {
+					if (field.options) {
+						for (const option of field.options) {
+							dropdown.addOption(option.value, option.label);
+						}
+					}
+					dropdown.setValue(String(currentValue ?? ""));
+					dropdown.onChange(async (value) => {
+						this.setNestedValue(config, field.key, value);
+						await this.plugin.saveSettings();
+						this.showReloadButton();
+					});
+				});
+				break;
+
+			case "slider":
+				setting.addSlider((slider) => {
+					const min = field.min ?? 0;
+					const max = field.max ?? 1;
+					const step = field.step ?? 0.01;
+					slider.setLimits(min, max, step);
+					slider.setValue(Number(currentValue ?? min));
+					slider.setDynamicTooltip();
+					slider.onChange(async (value) => {
+						this.setNestedValue(config, field.key, value);
 						await this.plugin.saveSettings();
 						this.showReloadButton();
 					});
@@ -891,6 +1012,47 @@ class TesseraSettingTab extends PluginSettingTab {
 				padding: 12px;
 				border-radius: 6px;
 				overflow-x: auto;
+			}
+
+			.tessera-tooltip-icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
+				height: 16px;
+				border-radius: 50%;
+				background: var(--text-muted);
+				color: var(--background-primary);
+				font-size: 10px;
+				font-weight: 700;
+				margin-left: 6px;
+				cursor: help;
+				vertical-align: middle;
+				position: relative;
+			}
+
+			.tessera-tooltip-icon::after {
+				content: attr(aria-label);
+				position: absolute;
+				bottom: calc(100% + 8px);
+				left: 50%;
+				transform: translateX(-50%);
+				background: var(--background-modifier-cover);
+				color: var(--text-normal);
+				padding: 8px 12px;
+				border-radius: 6px;
+				font-size: 12px;
+				font-weight: 400;
+				white-space: nowrap;
+				pointer-events: none;
+				opacity: 0;
+				transition: opacity 0.2s ease;
+				z-index: 1000;
+				box-shadow: var(--shadow-s);
+			}
+
+			.tessera-tooltip-icon:hover::after {
+				opacity: 1;
 			}
 		`;
 		document.head.appendChild(style);
