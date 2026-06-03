@@ -10,6 +10,295 @@ import { progressbar } from "./components/progressbar/index";
 import { example } from "./components/example/index";
 
 // ============================================================================
+// i18n Translations
+// ============================================================================
+
+interface Translations {
+	settings: {
+		title: string;
+		description: string;
+		usage: string;
+		usageDesc: string;
+		reloadNotice: string;
+		reloadButton: string;
+	};
+	components: {
+		card: { name: string; desc: string };
+		heatmap: { name: string; desc: string };
+		progressbar: { name: string; desc: string };
+	};
+	fields: Record<string, string>;
+	groups: Record<string, string>;
+}
+
+const TRANSLATIONS: Record<string, Translations> = {
+	en: {
+		settings: {
+			title: "TesseraScript Configuration",
+			description: "Configure which components are available and their default settings.",
+			usage: "Usage",
+			usageDesc: "Use tessera components in your dataviewjs code blocks:",
+			reloadNotice: "Settings saved. Click 'Apply & Reload' to apply changes.",
+			reloadButton: "Apply & Reload",
+		},
+		components: {
+			card: { name: "Card", desc: "General-purpose card component for dashboards and panels" },
+			heatmap: { name: "Heatmap", desc: "GitHub-style contribution heatmap" },
+			progressbar: { name: "Progressbar", desc: "Progress bar component for displaying progress" },
+		},
+		fields: {
+			// Card
+			"flags.showHeader": "Show Header",
+			"flags.headerSep": "Header Separator",
+			"flags.showTitle": "Show Title",
+			"flags.showMeta": "Show Meta",
+			"flags.showValue": "Show Value",
+			"layout.maxWidth": "Max Width",
+			"layout.padding": "Padding",
+			"layout.radius": "Border Radius",
+			"layout.gap": "Gap",
+			"layout.bodyGap": "Body Gap",
+			"colors.light.background": "Light Background",
+			"colors.light.border": "Light Border",
+			"colors.light.shadow": "Light Shadow",
+			"colors.dark.background": "Dark Background",
+			"colors.dark.border": "Dark Border",
+			"colors.dark.shadow": "Dark Shadow",
+			// Heatmap
+			"flags.showWeekLabels": "Show Week Labels",
+			"flags.showMonthLabels": "Show Month Labels",
+			"flags.showLegend": "Show Legend",
+			"flags.enableTooltip": "Enable Tooltip",
+			"flags.mondayFirst": "Monday First",
+			"settings.locale": "Locale",
+			"settings.rangeMode": "Range Mode",
+			"settings.minWeeks": "Min Weeks",
+			"settings.fixedDays": "Fixed Days",
+			"settings.legend": "Legend Template",
+			"layout.cellSize": "Cell Size",
+			"layout.cellGap": "Cell Gap",
+			"layout.cellRadius": "Cell Radius",
+			"layout.weekLabelWidth": "Week Label Width",
+			"layout.monthLabelHeight": "Month Label Height",
+			"layout.monthLabelSize": "Month Label Size",
+			"layout.weekLabelSize": "Week Label Size",
+			"colors.light.dayBg": "Light Day Background",
+			"colors.light.tooltip": "Light Tooltip Text",
+			"colors.light.tooltipBg": "Light Tooltip Background",
+			"colors.dark.dayBg": "Dark Day Background",
+			"colors.dark.tooltip": "Dark Tooltip Text",
+			"colors.dark.tooltipBg": "Dark Tooltip Background",
+			// Progressbar
+			"showLabel": "Show Label",
+			"labelFormat": "Label Format",
+			"min": "Min Value",
+			"max": "Max Value",
+			"flags.showGlow": "Show Glow",
+			"flags.striped": "Striped",
+			"flags.animated": "Animated",
+			"layout.width": "Width",
+			"layout.height": "Height",
+			"layout.trackOpacity": "Track Opacity",
+			"colors.light.track": "Light Track Color",
+			"colors.light.fill": "Light Fill Color",
+			"colors.light.label": "Light Label Color",
+			"colors.dark.track": "Dark Track Color",
+			"colors.dark.fill": "Dark Fill Color",
+			"colors.dark.label": "Dark Label Color",
+		},
+		groups: {
+			"flags": "Flags",
+			"layout": "Layout",
+			"settings": "Settings",
+			"colors": "Colors",
+			"colors.light": "Light Theme",
+			"colors.dark": "Dark Theme",
+		},
+	},
+	zh: {
+		settings: {
+			title: "TesseraScript 配置",
+			description: "配置可用的组件及其默认设置。",
+			usage: "使用方法",
+			usageDesc: "在 dataviewjs 代码块中使用 tessera 组件：",
+			reloadNotice: "设置已保存。点击「应用并重载」以应用更改。",
+			reloadButton: "应用并重载",
+		},
+		components: {
+			card: { name: "卡片", desc: "用于仪表板和面板的通用卡片组件" },
+			heatmap: { name: "热力图", desc: "GitHub 风格的贡献热力图" },
+			progressbar: { name: "进度条", desc: "用于显示进度的进度条组件" },
+		},
+		fields: {
+			// Card
+			"flags.showHeader": "显示头部",
+			"flags.headerSep": "头部分隔线",
+			"flags.showTitle": "显示标题",
+			"flags.showMeta": "显示元数据",
+			"flags.showValue": "显示数值",
+			"layout.maxWidth": "最大宽度",
+			"layout.padding": "内边距",
+			"layout.radius": "圆角半径",
+			"layout.gap": "间距",
+			"layout.bodyGap": "内容间距",
+			"colors.light.background": "亮色背景",
+			"colors.light.border": "亮色边框",
+			"colors.light.shadow": "亮色阴影",
+			"colors.dark.background": "暗色背景",
+			"colors.dark.border": "暗色边框",
+			"colors.dark.shadow": "暗色阴影",
+			// Heatmap
+			"flags.showWeekLabels": "显示周标签",
+			"flags.showMonthLabels": "显示月份标签",
+			"flags.showLegend": "显示图例",
+			"flags.enableTooltip": "启用提示框",
+			"flags.mondayFirst": "周一为起始日",
+			"settings.locale": "语言区域",
+			"settings.rangeMode": "范围模式",
+			"settings.minWeeks": "最小周数",
+			"settings.fixedDays": "固定天数",
+			"settings.legend": "图例模板",
+			"layout.cellSize": "单元格大小",
+			"layout.cellGap": "单元格间距",
+			"layout.cellRadius": "单元格圆角",
+			"layout.weekLabelWidth": "周标签宽度",
+			"layout.monthLabelHeight": "月份标签高度",
+			"layout.monthLabelSize": "月份标签大小",
+			"layout.weekLabelSize": "周标签大小",
+			"colors.light.dayBg": "亮色日期背景",
+			"colors.light.tooltip": "亮色提示文字",
+			"colors.light.tooltipBg": "亮色提示背景",
+			"colors.dark.dayBg": "暗色日期背景",
+			"colors.dark.tooltip": "暗色提示文字",
+			"colors.dark.tooltipBg": "暗色提示背景",
+			// Progressbar
+			"showLabel": "显示标签",
+			"labelFormat": "标签格式",
+			"min": "最小值",
+			"max": "最大值",
+			"flags.showGlow": "显示发光效果",
+			"flags.striped": "条纹样式",
+			"flags.animated": "动画效果",
+			"layout.width": "宽度",
+			"layout.height": "高度",
+			"layout.trackOpacity": "轨道透明度",
+			"colors.light.track": "亮色轨道颜色",
+			"colors.light.fill": "亮色填充颜色",
+			"colors.light.label": "亮色标签颜色",
+			"colors.dark.track": "暗色轨道颜色",
+			"colors.dark.fill": "暗色填充颜色",
+			"colors.dark.label": "暗色标签颜色",
+		},
+		groups: {
+			"flags": "标志",
+			"layout": "布局",
+			"settings": "设置",
+			"colors": "颜色",
+			"colors.light": "亮色主题",
+			"colors.dark": "暗色主题",
+		},
+	},
+	ja: {
+		settings: {
+			title: "TesseraScript 設定",
+			description: "利用可能なコンポーネントとそのデフォルト設定を構成します。",
+			usage: "使用方法",
+			usageDesc: "dataviewjs コードブロックで tessera コンポーネントを使用：",
+			reloadNotice: "設定が保存されました。「適用してリロード」をクリックして変更を適用してください。",
+			reloadButton: "適用してリロード",
+		},
+		components: {
+			card: { name: "カード", desc: "ダッシュボードとパネル用の汎用カードコンポーネント" },
+			heatmap: { name: "ヒートマップ", desc: "GitHub スタイルの貢献ヒートマップ" },
+			progressbar: { name: "プログレスバー", desc: "進捗を表示するプログレスバーコンポーネント" },
+		},
+		fields: {
+			"flags.showHeader": "ヘッダーを表示",
+			"flags.headerSep": "ヘッダー区切り",
+			"flags.showTitle": "タイトルを表示",
+			"flags.showMeta": "メタデータを表示",
+			"flags.showValue": "値を表示",
+			"layout.maxWidth": "最大幅",
+			"layout.padding": "パディング",
+			"layout.radius": "角の半径",
+			"layout.gap": "間隔",
+			"layout.bodyGap": "コンテンツ間隔",
+			"colors.light.background": "ライト背景",
+			"colors.light.border": "ライトボーダー",
+			"colors.light.shadow": "ライトシャドウ",
+			"colors.dark.background": "ダーク背景",
+			"colors.dark.border": "ダークボーダー",
+			"colors.dark.shadow": "ダークシャドウ",
+			"flags.showWeekLabels": "週ラベルを表示",
+			"flags.showMonthLabels": "月ラベルを表示",
+			"flags.showLegend": "凡例を表示",
+			"flags.enableTooltip": "ツールチップを有効化",
+			"flags.mondayFirst": "月曜日開始",
+			"settings.locale": "ロケール",
+			"settings.rangeMode": "範囲モード",
+			"settings.minWeeks": "最小週数",
+			"settings.fixedDays": "固定日数",
+			"settings.legend": "凡例テンプレート",
+			"layout.cellSize": "セルサイズ",
+			"layout.cellGap": "セル間隔",
+			"layout.cellRadius": "セル角の半径",
+			"layout.weekLabelWidth": "週ラベル幅",
+			"layout.monthLabelHeight": "月ラベル高さ",
+			"layout.monthLabelSize": "月ラベルサイズ",
+			"layout.weekLabelSize": "週ラベルサイズ",
+			"colors.light.dayBg": "ライト日付背景",
+			"colors.light.tooltip": "ライトツールチップ文字",
+			"colors.light.tooltipBg": "ライトツールチップ背景",
+			"colors.dark.dayBg": "ダーク日付背景",
+			"colors.dark.tooltip": "ダークツールチップ文字",
+			"colors.dark.tooltipBg": "ダークツールチップ背景",
+			"showLabel": "ラベルを表示",
+			"labelFormat": "ラベル形式",
+			"min": "最小値",
+			"max": "最大値",
+			"flags.showGlow": "グロー効果を表示",
+			"flags.striped": "ストライプ",
+			"flags.animated": "アニメーション",
+			"layout.width": "幅",
+			"layout.height": "高さ",
+			"layout.trackOpacity": "トラック透明度",
+			"colors.light.track": "ライトトラック色",
+			"colors.light.fill": "ライト塗りつぶし色",
+			"colors.light.label": "ライトラベル色",
+			"colors.dark.track": "ダークトラック色",
+			"colors.dark.fill": "ダーク塗りつぶし色",
+			"colors.dark.label": "ダークラベル色",
+		},
+		groups: {
+			"flags": "フラグ",
+			"layout": "レイアウト",
+			"settings": "設定",
+			"colors": "カラー",
+			"colors.light": "ライトテーマ",
+			"colors.dark": "ダークテーマ",
+		},
+	},
+};
+
+// Helper to get translations based on Obsidian locale
+function getTranslations(): Translations {
+	// Get Obsidian's locale (e.g., "en", "zh", "ja", "ko", etc.)
+	const locale = (window as any)?.moment?.locale?.() || "en";
+	
+	// Try exact match first, then language code, then fallback to English
+	if (TRANSLATIONS[locale]) {
+		return TRANSLATIONS[locale];
+	}
+	
+	const langCode = locale.split("-")[0];
+	if (TRANSLATIONS[langCode]) {
+		return TRANSLATIONS[langCode];
+	}
+	
+	return TRANSLATIONS.en!;
+}
+
+// ============================================================================
 // Types
 // ============================================================================
 
@@ -40,15 +329,13 @@ type FieldType = "toggle" | "text" | "number" | "textarea";
 
 interface SettingField {
 	key: string;           // Path in config (e.g., "flags.showHeader")
-	label: string;         // Display label
 	type: FieldType;       // Input type
-	description?: string;  // Optional description
 	placeholder?: string;  // Optional placeholder
+	description?: string;  // Optional description
 }
 
 interface ComponentDefinition {
-	name: string;
-	description: string;
+	componentKey: string;  // Key for i18n lookup (e.g., "card")
 	fields: SettingField[];
 }
 
@@ -60,94 +347,92 @@ interface ComponentDefinition {
  * 
  * Field types: "toggle", "text", "number", "textarea"
  * Key format: dot-notation path (e.g., "flags.showHeader", "layout.padding")
+ * Labels are automatically translated via i18n
  */
 const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 	card: {
-		name: "Card",
-		description: "General-purpose card component for dashboards and panels",
+		componentKey: "card",
 		fields: [
 			// Flags
-			{ key: "flags.showHeader", label: "Show Header", type: "toggle" },
-			{ key: "flags.headerSep", label: "Header Separator", type: "toggle" },
-			{ key: "flags.showTitle", label: "Show Title", type: "toggle" },
-			{ key: "flags.showMeta", label: "Show Meta", type: "toggle" },
-			{ key: "flags.showValue", label: "Show Value", type: "toggle" },
+			{ key: "flags.showHeader", type: "toggle" },
+			{ key: "flags.headerSep", type: "toggle" },
+			{ key: "flags.showTitle", type: "toggle" },
+			{ key: "flags.showMeta", type: "toggle" },
+			{ key: "flags.showValue", type: "toggle" },
 			// Layout
-			{ key: "layout.maxWidth", label: "Max Width", type: "text" },
-			{ key: "layout.padding", label: "Padding", type: "text" },
-			{ key: "layout.radius", label: "Border Radius", type: "text" },
-			{ key: "layout.gap", label: "Gap", type: "text" },
-			{ key: "layout.bodyGap", label: "Body Gap", type: "text" },
+			{ key: "layout.maxWidth", type: "text" },
+			{ key: "layout.padding", type: "text" },
+			{ key: "layout.radius", type: "text" },
+			{ key: "layout.gap", type: "text" },
+			{ key: "layout.bodyGap", type: "text" },
 			// Colors (Light)
-			{ key: "colors.light.background", label: "Light Background", type: "text" },
-			{ key: "colors.light.border", label: "Light Border", type: "text" },
-			{ key: "colors.light.shadow", label: "Light Shadow", type: "text" },
+			{ key: "colors.light.background", type: "text" },
+			{ key: "colors.light.border", type: "text" },
+			{ key: "colors.light.shadow", type: "text" },
 			// Colors (Dark)
-			{ key: "colors.dark.background", label: "Dark Background", type: "text" },
-			{ key: "colors.dark.border", label: "Dark Border", type: "text" },
-			{ key: "colors.dark.shadow", label: "Dark Shadow", type: "text" },
+			{ key: "colors.dark.background", type: "text" },
+			{ key: "colors.dark.border", type: "text" },
+			{ key: "colors.dark.shadow", type: "text" },
 		],
 	},
 	heatmap: {
-		name: "Heatmap",
-		description: "GitHub-style contribution heatmap",
+		componentKey: "heatmap",
 		fields: [
 			// Flags
-			{ key: "flags.showWeekLabels", label: "Show Week Labels", type: "toggle" },
-			{ key: "flags.showMonthLabels", label: "Show Month Labels", type: "toggle" },
-			{ key: "flags.showLegend", label: "Show Legend", type: "toggle" },
-			{ key: "flags.enableTooltip", label: "Enable Tooltip", type: "toggle" },
-			{ key: "flags.mondayFirst", label: "Monday First", type: "toggle" },
+			{ key: "flags.showWeekLabels", type: "toggle" },
+			{ key: "flags.showMonthLabels", type: "toggle" },
+			{ key: "flags.showLegend", type: "toggle" },
+			{ key: "flags.enableTooltip", type: "toggle" },
+			{ key: "flags.mondayFirst", type: "toggle" },
 			// Settings
-			{ key: "settings.locale", label: "Locale", type: "text", placeholder: "zh-CN" },
-			{ key: "settings.rangeMode", label: "Range Mode", type: "text", placeholder: "adaptive" },
-			{ key: "settings.minWeeks", label: "Min Weeks", type: "number" },
-			{ key: "settings.fixedDays", label: "Fixed Days", type: "number" },
-			{ key: "settings.legend", label: "Legend Template", type: "text" },
+			{ key: "settings.locale", type: "text", placeholder: "zh-CN" },
+			{ key: "settings.rangeMode", type: "text", placeholder: "adaptive" },
+			{ key: "settings.minWeeks", type: "number" },
+			{ key: "settings.fixedDays", type: "number" },
+			{ key: "settings.legend", type: "text" },
 			// Layout
-			{ key: "layout.cellSize", label: "Cell Size", type: "number" },
-			{ key: "layout.cellGap", label: "Cell Gap", type: "number" },
-			{ key: "layout.cellRadius", label: "Cell Radius", type: "text" },
-			{ key: "layout.weekLabelWidth", label: "Week Label Width", type: "text" },
-			{ key: "layout.monthLabelHeight", label: "Month Label Height", type: "text" },
-			{ key: "layout.monthLabelSize", label: "Month Label Size", type: "text" },
-			{ key: "layout.weekLabelSize", label: "Week Label Size", type: "text" },
+			{ key: "layout.cellSize", type: "number" },
+			{ key: "layout.cellGap", type: "number" },
+			{ key: "layout.cellRadius", type: "text" },
+			{ key: "layout.weekLabelWidth", type: "text" },
+			{ key: "layout.monthLabelHeight", type: "text" },
+			{ key: "layout.monthLabelSize", type: "text" },
+			{ key: "layout.weekLabelSize", type: "text" },
 			// Colors (Light)
-			{ key: "colors.light.dayBg", label: "Light Day Background", type: "text" },
-			{ key: "colors.light.tooltip", label: "Light Tooltip Text", type: "text" },
-			{ key: "colors.light.tooltipBg", label: "Light Tooltip Background", type: "text" },
+			{ key: "colors.light.dayBg", type: "text" },
+			{ key: "colors.light.tooltip", type: "text" },
+			{ key: "colors.light.tooltipBg", type: "text" },
 			// Colors (Dark)
-			{ key: "colors.dark.dayBg", label: "Dark Day Background", type: "text" },
-			{ key: "colors.dark.tooltip", label: "Dark Tooltip Text", type: "text" },
-			{ key: "colors.dark.tooltipBg", label: "Dark Tooltip Background", type: "text" },
+			{ key: "colors.dark.dayBg", type: "text" },
+			{ key: "colors.dark.tooltip", type: "text" },
+			{ key: "colors.dark.tooltipBg", type: "text" },
 		],
 	},
 	progressbar: {
-		name: "Progressbar",
-		description: "Progress bar component for displaying progress",
+		componentKey: "progressbar",
 		fields: [
 			// Basic
-			{ key: "showLabel", label: "Show Label", type: "toggle" },
-			{ key: "labelFormat", label: "Label Format", type: "text", placeholder: "{value}%" },
-			{ key: "min", label: "Min Value", type: "number" },
-			{ key: "max", label: "Max Value", type: "number" },
+			{ key: "showLabel", type: "toggle" },
+			{ key: "labelFormat", type: "text", placeholder: "{value}%" },
+			{ key: "min", type: "number" },
+			{ key: "max", type: "number" },
 			// Flags
-			{ key: "flags.showGlow", label: "Show Glow", type: "toggle" },
-			{ key: "flags.striped", label: "Striped", type: "toggle" },
-			{ key: "flags.animated", label: "Animated", type: "toggle" },
+			{ key: "flags.showGlow", type: "toggle" },
+			{ key: "flags.striped", type: "toggle" },
+			{ key: "flags.animated", type: "toggle" },
 			// Layout
-			{ key: "layout.width", label: "Width", type: "text" },
-			{ key: "layout.height", label: "Height", type: "text" },
-			{ key: "layout.radius", label: "Border Radius", type: "text" },
-			{ key: "layout.trackOpacity", label: "Track Opacity", type: "number" },
+			{ key: "layout.width", type: "text" },
+			{ key: "layout.height", type: "text" },
+			{ key: "layout.radius", type: "text" },
+			{ key: "layout.trackOpacity", type: "number" },
 			// Colors (Light)
-			{ key: "colors.light.track", label: "Light Track Color", type: "text" },
-			{ key: "colors.light.fill", label: "Light Fill Color", type: "text" },
-			{ key: "colors.light.label", label: "Light Label Color", type: "text" },
+			{ key: "colors.light.track", type: "text" },
+			{ key: "colors.light.fill", type: "text" },
+			{ key: "colors.light.label", type: "text" },
 			// Colors (Dark)
-			{ key: "colors.dark.track", label: "Dark Track Color", type: "text" },
-			{ key: "colors.dark.fill", label: "Dark Fill Color", type: "text" },
-			{ key: "colors.dark.label", label: "Dark Label Color", type: "text" },
+			{ key: "colors.dark.track", type: "text" },
+			{ key: "colors.dark.fill", type: "text" },
+			{ key: "colors.dark.label", type: "text" },
 		],
 	},
 };
@@ -301,12 +586,19 @@ export default class TesseraPlugin extends Plugin {
 			return;
 		}
 
-		// Create tessera API object with conditional components
+		// Create tessera API object with config injection
 		const tessera: TesseraAPI = {
 			version: "1.0.0",
-			card: this.settings.card.enabled ? card : undefined,
-			heatmap: this.settings.heatmap.enabled ? heatmap : undefined,
-			progressbar: this.settings.progressbar.enabled ? progressbar : undefined,
+			// Wrap each component to inject settings config as defaults
+			card: this.settings.card.enabled 
+				? ((options: any) => card({ ...this.settings.card.config, ...options }))
+				: undefined,
+			heatmap: this.settings.heatmap.enabled 
+				? ((options: any) => heatmap({ ...this.settings.heatmap.config, ...options }))
+				: undefined,
+			progressbar: this.settings.progressbar.enabled 
+				? ((options: any) => progressbar({ ...this.settings.progressbar.config, ...options }))
+				: undefined,
 			example,
 		};
 
@@ -399,24 +691,46 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 class TesseraSettingTab extends PluginSettingTab {
 	plugin: TesseraPlugin;
 	private collapsedSections: Set<string> = new Set();
+	private needsReload = false;
+	private t: Translations;
+	private reloadButtonEl: HTMLElement | null = null;
 
 	constructor(app: App, plugin: TesseraPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.t = getTranslations();
 	}
 
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
+		this.needsReload = false;
+		this.reloadButtonEl = null;
 
 		// Add custom styles for collapsible sections
 		this.addCustomStyles();
 
 		// Header
-		new Setting(containerEl).setName("TesseraScript Configuration").setHeading();
+		new Setting(containerEl).setName(this.t.settings.title).setHeading();
 		containerEl.createEl("p", {
-			text: "Configure which components are available and their default settings.",
+			text: this.t.settings.description,
 			cls: "tessera-settings-desc",
+		});
+
+		// Reload button (hidden by default)
+		const reloadSetting = new Setting(containerEl);
+		reloadSetting.setName(this.t.settings.reloadButton);
+		reloadSetting.setDesc(this.t.settings.reloadNotice);
+		reloadSetting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.reloadButton);
+			btn.setCta();
+			btn.onClick(() => {
+				// @ts-ignore - Internal Obsidian API
+				this.app.commands.executeCommandById("app:reload");
+			});
+			this.reloadButtonEl = btn.buttonEl;
+			// Hide initially
+			btn.buttonEl.style.display = "none";
 		});
 
 		// Render each component as a collapsible section
@@ -429,9 +743,9 @@ class TesseraSettingTab extends PluginSettingTab {
 		}
 
 		// Usage section
-		new Setting(containerEl).setName("Usage").setHeading();
+		new Setting(containerEl).setName(this.t.settings.usage).setHeading();
 		containerEl.createEl("p", {
-			text: "Use tessera components in your dataviewjs code blocks:",
+			text: this.t.settings.usageDesc,
 		});
 		const codeBlock = containerEl.createEl("pre", { cls: "tessera-code-block" });
 		codeBlock.createEl("code", {
@@ -442,6 +756,13 @@ class TesseraSettingTab extends PluginSettingTab {
 		});
 	}
 
+	private showReloadButton(): void {
+		if (this.reloadButtonEl) {
+			this.reloadButtonEl.style.display = "block";
+			this.needsReload = true;
+		}
+	}
+
 	private renderCollapsibleSection(
 		containerEl: HTMLElement,
 		key: keyof PluginSettings,
@@ -449,19 +770,22 @@ class TesseraSettingTab extends PluginSettingTab {
 	): void {
 		const componentConfig = this.plugin.settings[key];
 		const isCollapsed = this.collapsedSections.has(key);
+		const componentI18n = this.t.components[definition.componentKey as keyof typeof this.t.components];
 
 		// Create section container
 		const section = containerEl.createDiv({ cls: "tessera-settings-section" });
 
-		// Header row with toggle and collapse button
-		const header = section.createDiv({ cls: "tessera-settings-header" });
+		// Use Obsidian Setting API for the header (with built-in toggle)
+		const headerSetting = new Setting(section);
+		headerSetting.setName(componentI18n.name);
+		headerSetting.setDesc(componentI18n.desc);
 
-		// Collapse toggle button
-		const collapseBtn = header.createEl("span", {
-			cls: "tessera-collapse-btn",
-			text: isCollapsed ? "▶" : "▼",
-		});
-		collapseBtn.addEventListener("click", () => {
+		// Add collapse button
+		const collapseBtn = document.createElement("span");
+		collapseBtn.className = "tessera-collapse-btn";
+		collapseBtn.textContent = isCollapsed ? "▶" : "▼";
+		collapseBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
 			if (this.collapsedSections.has(key)) {
 				this.collapsedSections.delete(key);
 			} else {
@@ -469,37 +793,30 @@ class TesseraSettingTab extends PluginSettingTab {
 			}
 			this.display();
 		});
+		headerSetting.settingEl.prepend(collapseBtn);
 
-		// Component name and description
-		const titleContainer = header.createDiv({ cls: "tessera-title-container" });
-		titleContainer.createEl("span", { cls: "tessera-component-name", text: definition.name });
-		titleContainer.createEl("span", { cls: "tessera-component-desc", text: definition.description });
-
-		// Enable/disable toggle
-		const toggleContainer = header.createDiv({ cls: "tessera-toggle-container" });
-		const toggle = toggleContainer.createEl("input", { type: "checkbox" }) as HTMLInputElement;
-		toggle.checked = componentConfig.enabled;
-		toggle.classList.add("tessera-toggle");
-		toggle.addEventListener("change", async () => {
-			this.plugin.settings[key].enabled = toggle.checked;
-			await this.plugin.saveSettings();
-			this.display();
+		// Add toggle using Obsidian's API
+		headerSetting.addToggle((toggle) => {
+			toggle.setValue(componentConfig.enabled);
+			toggle.onChange(async (value) => {
+				this.plugin.settings[key].enabled = value;
+				await this.plugin.saveSettings();
+				this.showReloadButton();
+				this.display();
+			});
 		});
 
 		// Collapsible content
 		if (!isCollapsed && componentConfig.enabled) {
 			const content = section.createDiv({ cls: "tessera-settings-content" });
-			this.renderFields(content, componentConfig.config, definition.fields, async () => {
-				await this.plugin.saveSettings();
-			});
+			this.renderFields(content, componentConfig.config, definition.fields);
 		}
 	}
 
 	private renderFields(
 		container: HTMLElement,
 		config: Record<string, unknown>,
-		fields: SettingField[],
-		onSave: () => Promise<void>
+		fields: SettingField[]
 	): void {
 		// Group fields by their prefix (e.g., "flags", "layout", "settings", "colors.light")
 		const groups = new Map<string, SettingField[]>();
@@ -518,11 +835,12 @@ class TesseraSettingTab extends PluginSettingTab {
 		for (const [groupKey, groupFields] of groups) {
 			if (groupKey !== "_root") {
 				const groupHeader = container.createDiv({ cls: "tessera-group-header" });
-				groupHeader.createEl("span", { text: this.formatGroupLabel(groupKey) });
+				const groupLabel = this.t.groups[groupKey] || this.formatGroupLabel(groupKey);
+				groupHeader.createEl("span", { text: groupLabel });
 			}
 
 			for (const field of groupFields) {
-				this.renderField(container, config, field, onSave);
+				this.renderField(container, config, field);
 			}
 		}
 	}
@@ -530,11 +848,11 @@ class TesseraSettingTab extends PluginSettingTab {
 	private renderField(
 		container: HTMLElement,
 		config: Record<string, unknown>,
-		field: SettingField,
-		onSave: () => Promise<void>
+		field: SettingField
 	): void {
+		const fieldLabel = this.t.fields[field.key] || field.key;
 		const setting = new Setting(container);
-		setting.setName(field.label);
+		setting.setName(fieldLabel);
 		if (field.description) {
 			setting.setDesc(field.description);
 		}
@@ -547,7 +865,8 @@ class TesseraSettingTab extends PluginSettingTab {
 					toggle.setValue(Boolean(currentValue));
 					toggle.onChange(async (value) => {
 						this.setNestedValue(config, field.key, value);
-						await onSave();
+						await this.plugin.saveSettings();
+						this.showReloadButton();
 					});
 				});
 				break;
@@ -566,7 +885,8 @@ class TesseraSettingTab extends PluginSettingTab {
 						} else {
 							this.setNestedValue(config, field.key, value);
 						}
-						await onSave();
+						await this.plugin.saveSettings();
+						this.showReloadButton();
 					});
 				});
 				break;
@@ -579,7 +899,8 @@ class TesseraSettingTab extends PluginSettingTab {
 					}
 					textarea.onChange(async (value) => {
 						this.setNestedValue(config, field.key, value);
-						await onSave();
+						await this.plugin.saveSettings();
+						this.showReloadButton();
 					});
 				});
 				break;
@@ -642,81 +963,30 @@ class TesseraSettingTab extends PluginSettingTab {
 				overflow: hidden;
 			}
 
-			.tessera-settings-header {
-				display: flex;
-				align-items: center;
-				padding: 12px 16px;
-				background: var(--background-secondary);
-				cursor: pointer;
-				gap: 12px;
-			}
-
-			.tessera-settings-header:hover {
-				background: var(--background-secondary-alt);
+			.tessera-settings-section .setting-item {
+				border: none;
 			}
 
 			.tessera-collapse-btn {
+				cursor: pointer;
+				margin-right: 8px;
 				font-size: 10px;
-				width: 16px;
 				color: var(--text-muted);
 				user-select: none;
+				width: 16px;
+				display: inline-block;
 			}
 
-			.tessera-title-container {
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-				gap: 2px;
-			}
-
-			.tessera-component-name {
-				font-weight: 600;
-				font-size: 14px;
-			}
-
-			.tessera-component-desc {
-				font-size: 12px;
-				color: var(--text-muted);
-			}
-
-			.tessera-toggle-container {
-				display: flex;
-				align-items: center;
-			}
-
-			.tessera-toggle {
-				width: 40px;
-				height: 22px;
-				appearance: none;
-				background: var(--background-modifier-border);
-				border-radius: 11px;
-				position: relative;
-				cursor: pointer;
-				transition: background 0.2s;
-			}
-
-			.tessera-toggle:checked {
-				background: var(--interactive-accent);
-			}
-
-			.tessera-toggle::before {
-				content: "";
-				position: absolute;
-				width: 18px;
-				height: 18px;
-				border-radius: 50%;
-				background: white;
-				top: 2px;
-				left: 2px;
-				transition: transform 0.2s;
-			}
-
-			.tessera-toggle:checked::before {
-				transform: translateX(18px);
+			.tessera-collapse-btn:hover {
+				color: var(--text-normal);
 			}
 
 			.tessera-settings-content {
-				padding: 8px 16px 16px;
+				padding: 0 16px 16px;
+			}
+
+			.tessera-settings-content .setting-item {
+				border-top: 1px solid var(--background-modifier-border);
 			}
 
 			.tessera-group-header {
@@ -727,11 +997,9 @@ class TesseraSettingTab extends PluginSettingTab {
 				letter-spacing: 0.5px;
 				padding: 12px 0 4px;
 				margin-top: 8px;
-				border-top: 1px solid var(--background-modifier-border);
 			}
 
 			.tessera-group-header:first-child {
-				border-top: none;
 				margin-top: 0;
 				padding-top: 4px;
 			}
