@@ -571,26 +571,6 @@ export class TesseraSettingTab extends PluginSettingTab {
 				vertical-align: middle;
 				position: relative;
 			}
-
-			.tessera-tooltip-icon::after {
-				content: attr(aria-label);
-				position: absolute;
-				bottom: calc(100% + 8px);
-				left: 50%;
-				transform: translateX(-50%);
-				background: var(--background-modifier-cover);
-				color: var(--text-normal);
-				padding: 8px 12px;
-				border-radius: 6px;
-				font-size: 12px;
-				font-weight: 400;
-				white-space: nowrap;
-				pointer-events: none;
-				opacity: 0;
-				transition: opacity 0.2s ease;
-				z-index: 1000;
-				box-shadow: var(--shadow-s);
-			}
 		`;
 		document.head.appendChild(style);
 	}
