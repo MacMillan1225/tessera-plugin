@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "tessera-plugin",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Modular component library for DataviewJS - Build beautiful dashboards, cards, heatmaps, and more",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
@@ -10,7 +10,17 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"lint": "eslint ."
 	},
-	"keywords": [],
+	"keywords": [
+		"obsidian",
+		"dataview",
+		"dataviewjs",
+		"components",
+		"dashboard",
+		"card",
+		"heatmap",
+		"progressbar"
+	],
+	"author": "TesseraScript",
 	"license": "0-BSD",
 	"devDependencies": {
 		"@eslint/js": "^9.39.4",

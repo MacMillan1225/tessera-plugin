@@ -1,8 +1,290 @@
 /*
+ * TesseraScript Obsidian Plugin Styles
+ * Base styles for all TesseraScript components
+ */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+/* ==========================================================================
+   Base Container
+   ========================================================================== */
 
-If your plugin does not need CSS, delete this file.
+.ts-container {
+	font-family: var(--font-interface);
+	color: var(--text-normal);
+	line-height: 1.5;
+}
 
-*/
+.ts-container *,
+.ts-container *::before,
+.ts-container *::after {
+	box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Card Component
+   ========================================================================== */
+
+.ts-card {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ts-card-gap, 14px);
+	padding: var(--ts-card-padding, 16px);
+	border-radius: var(--ts-card-radius, 16px);
+	background: var(--ts-card-background-light);
+	border: 1px solid var(--ts-card-border-light);
+	box-shadow: var(--ts-card-shadow-light);
+	transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.theme-light .ts-card {
+	background: var(--ts-card-background-light);
+	border-color: var(--ts-card-border-light);
+	box-shadow: var(--ts-card-shadow-light);
+}
+
+body.theme-dark .ts-card {
+	background: var(--ts-card-background-dark);
+	border-color: var(--ts-card-border-dark);
+	box-shadow: var(--ts-card-shadow-dark);
+}
+
+.ts-card:hover {
+	border-color: var(--ts-card-hover-accent-light, var(--interactive-accent));
+}
+
+body.theme-dark .ts-card:hover {
+	border-color: var(--ts-card-hover-accent-dark, var(--interactive-accent));
+}
+
+.ts-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ts-card__header--sep {
+	padding-bottom: var(--ts-card-gap, 14px);
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ts-card__title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.ts-card__meta {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--text-muted);
+}
+
+.ts-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ts-card-body-gap, 12px);
+}
+
+.ts-card__value {
+	font-size: 32px;
+	font-weight: 700;
+	line-height: 1;
+	color: var(--ts-card-value-color-light, var(--text-accent, var(--text-normal)));
+}
+
+body.theme-dark .ts-card__value {
+	color: var(--ts-card-value-color-dark, var(--text-accent, var(--text-normal)));
+}
+
+.ts-card__empty {
+	font-size: 14px;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+/* ==========================================================================
+   Heatmap Component
+   ========================================================================== */
+
+.ts-heatmap {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ts-heatmap__grid {
+	display: grid;
+	grid-template-columns: repeat(53, var(--ts-heatmap-cell-size, 12px));
+	gap: var(--ts-heatmap-cell-gap, 2px);
+}
+
+.ts-heatmap__cell {
+	border-radius: 2px;
+	background: var(--ts-heatmap-empty-light);
+	transition: background 0.2s ease;
+}
+
+body.theme-dark .ts-heatmap__cell {
+	background: var(--ts-heatmap-empty-dark);
+}
+
+.ts-heatmap__cell[data-level="1"] {
+	background: var(--ts-heatmap-level-1-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="1"] {
+	background: var(--ts-heatmap-level-1-dark);
+}
+
+.ts-heatmap__cell[data-level="2"] {
+	background: var(--ts-heatmap-level-2-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="2"] {
+	background: var(--ts-heatmap-level-2-dark);
+}
+
+.ts-heatmap__cell[data-level="3"] {
+	background: var(--ts-heatmap-level-3-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="3"] {
+	background: var(--ts-heatmap-level-3-dark);
+}
+
+.ts-heatmap__cell[data-level="4"] {
+	background: var(--ts-heatmap-level-4-light);
+}
+
+body.theme-dark .ts-heatmap__cell[data-level="4"] {
+	background: var(--ts-heatmap-level-4-dark);
+}
+
+.ts-heatmap__cell:hover {
+	outline: 1px solid var(--text-muted);
+	outline-offset: -1px;
+}
+
+/* ==========================================================================
+   Progressbar Component
+   ========================================================================== */
+
+.ts-progressbar {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	width: 100%;
+}
+
+.ts-progressbar__bar {
+	height: 8px;
+	border-radius: 4px;
+	background: var(--ts-progressbar-background-light, rgba(0, 0, 0, 0.08));
+	overflow: hidden;
+}
+
+body.theme-dark .ts-progressbar__bar {
+	background: var(--ts-progressbar-background-dark, rgba(255, 255, 255, 0.08));
+}
+
+.ts-progressbar__fill {
+	height: 100%;
+	border-radius: 4px;
+	background: var(--ts-progressbar-fill-light, var(--interactive-accent));
+	transition: width 0.3s ease;
+}
+
+body.theme-dark .ts-progressbar__fill {
+	background: var(--ts-progressbar-fill-dark, var(--interactive-accent));
+}
+
+.ts-progressbar__label {
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--ts-progressbar-label-light, var(--text-normal));
+	text-align: right;
+}
+
+body.theme-dark .ts-progressbar__label {
+	color: var(--ts-progressbar-label-dark, var(--text-normal));
+}
+
+/* ==========================================================================
+   Example Component
+   ========================================================================== */
+
+.ts-example {
+	display: flex;
+	flex-direction: column;
+	gap: var(--ts-example-gap, 12px);
+	padding: var(--ts-example-padding, 16px);
+	border-radius: var(--ts-example-radius, 12px);
+	background: var(--ts-example-background-light);
+	border: 1px solid var(--ts-example-border-light);
+	transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+body.theme-light .ts-example {
+	background: var(--ts-example-background-light);
+	border-color: var(--ts-example-border-light);
+}
+
+body.theme-dark .ts-example {
+	background: var(--ts-example-background-dark);
+	border-color: var(--ts-example-border-dark);
+}
+
+.ts-example__eyebrow {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--ts-example-eyebrow-light);
+}
+
+body.theme-dark .ts-example__eyebrow {
+	color: var(--ts-example-eyebrow-dark);
+}
+
+.ts-example__title {
+	font-size: 16px;
+	font-weight: 600;
+	color: var(--ts-example-title-light);
+}
+
+body.theme-dark .ts-example__title {
+	color: var(--ts-example-title-dark);
+}
+
+.ts-example__text {
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--ts-example-text-light);
+}
+
+body.theme-dark .ts-example__text {
+	color: var(--ts-example-text-dark);
+}
+
+.ts-example__body {
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+/* ==========================================================================
+   Notification Styles
+   ========================================================================== */
+
+.tessera-notice {
+	font-family: var(--font-interface);
+}
+
+.tessera-notice pre {
+	background: var(--background-secondary);
+	padding: 8px;
+	border-radius: 4px;
+	margin: 8px 0;
+	overflow-x: auto;
+}

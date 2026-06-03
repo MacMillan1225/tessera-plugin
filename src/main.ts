@@ -1,114 +1,277 @@
-import {
-	Editor,
-	MarkdownView,
-	MarkdownFileInfo,
-	Modal,
-	Notice,
-	Plugin,
-} from 'obsidian';
-import {
-	DEFAULT_SETTINGS,
-	MyPluginSettings,
-	SampleSettingTab,
-} from './settings';
+/**
+ * TesseraScript Obsidian Plugin
+ * Modular component library for DataviewJS
+ */
 
-// Remember to rename these classes and interfaces!
+import { Notice, Plugin } from "obsidian";
+import { TesseraRuntime } from "./runtime/bootstrap";
+import { DataviewBridge } from "./dataview-bridge";
+import { StyleManager } from "./utils/style-manager";
+import { registerCoreModules } from "./core/index";
+import { registerComponents } from "./components/index";
 
-export default class MyPlugin extends Plugin {
-	settings!: MyPluginSettings;
+// ============================================================================
+// Types
+// ============================================================================
+
+interface TesseraPluginSettings {
+	enableLegacyMode: boolean;
+	enableDeprecationWarnings: boolean;
+	defaultTheme: "auto" | "light" | "dark";
+}
+
+const DEFAULT_SETTINGS: TesseraPluginSettings = {
+	enableLegacyMode: true,
+	enableDeprecationWarnings: true,
+	defaultTheme: "auto",
+};
+
+// ============================================================================
+// Plugin Class
+// ============================================================================
+
+export default class TesseraPlugin extends Plugin {
+	settings!: TesseraPluginSettings;
+	runtime!: TesseraRuntime;
+	dataviewBridge!: DataviewBridge;
+	styleManager!: StyleManager;
 
 	async onload() {
+		console.log("[TesseraScript] Loading plugin");
+
+		// Load settings
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		this.addRibbonIcon('dice', 'Sample', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+		// Initialize runtime
+		this.runtime = new TesseraRuntime();
+		this.runtime.initialize();
 
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status bar text');
-
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'open-modal-simple',
-			name: 'Open modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
-			},
-		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'replace-selected',
-			name: 'Replace selected content',
-			editorCallback: (
-				editor: Editor,
-				_ctx: MarkdownView | MarkdownFileInfo,
-			) => {
-				editor.replaceSelection('Sample editor command');
-			},
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-modal-complex',
-			name: 'Open modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView =
-					this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
+		// Initialize Dataview bridge
+		this.dataviewBridge = new DataviewBridge({
+			app: this.app,
+			onDataviewMissing: () => {
+				if (this.settings.enableDeprecationWarnings) {
+					new Notice(
+						"[TesseraScript] Dataview plugin is required. Please install and enable it.",
+						5000
+					);
 				}
-				return false;
 			},
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		// Register all modules
+		this.registerAllModules();
 
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(activeDocument, 'click', (_evt: MouseEvent) => {
-			new Notice('Click');
-		});
+		// Initialize style manager
+		this.styleManager = new StyleManager();
+		this.styleManager.load();
 
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(
-			window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000),
-		);
+		// Mount global API
+		this.mountGlobalAPI();
+
+		// Add commands
+		this.addCommands();
+
+		// Add settings tab
+		this.addSettingTab(new TesseraSettingTab(this.app, this));
+
+		console.log("[TesseraScript] Plugin loaded successfully");
 	}
 
-	onunload() {}
+	onunload() {
+		console.log("[TesseraScript] Unloading plugin");
+
+		// Unmount global API
+		this.unmountGlobalAPI();
+
+		// Cleanup styles
+		if (this.styleManager) {
+			this.styleManager.unload();
+		}
+	}
 
 	async loadSettings() {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MyPluginSettings>,
+			(await this.loadData()) as Partial<TesseraPluginSettings>
 		);
 	}
 
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
-}
 
-class SampleModal extends Modal {
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
+	private registerAllModules() {
+		// Register core modules
+		registerCoreModules(this.runtime.getTesseraObject());
+
+		// Register components
+		registerComponents(this.runtime.getTesseraObject());
+
+		console.log(
+			`[TesseraScript] Registered ${this.runtime.getModuleCount()} modules, ` +
+			`${this.runtime.getComponentCount()} components`
+		);
 	}
 
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
+	private mountGlobalAPI() {
+		// Mount Tessera to globalThis
+		this.runtime.mountGlobal();
+
+		// Also mount to window for compatibility
+		if (typeof window !== "undefined") {
+			(window as any).Tessera = this.runtime.getTesseraObject();
+		}
+	}
+
+	private unmountGlobalAPI() {
+		// Unmount from globalThis
+		this.runtime.unmountGlobal();
+
+		// Unmount from window
+		if (typeof window !== "undefined") {
+			delete (window as any).Tessera;
+		}
+	}
+
+	private addCommands() {
+		// Check status command
+		this.addCommand({
+			id: "tessera-check-status",
+			name: "Check TesseraScript Status",
+			callback: () => {
+				const status = {
+					dataviewAvailable: this.dataviewBridge.isAvailable(),
+					modulesLoaded: this.runtime.getModuleCount(),
+					componentsLoaded: this.runtime.getComponentCount(),
+				};
+
+				new Notice(
+					`TesseraScript Status:\n` +
+					`Dataview: ${status.dataviewAvailable ? "✓" : "✗"}\n` +
+					`Modules: ${status.modulesLoaded}\n` +
+					`Components: ${status.componentsLoaded}`,
+					5000
+				);
+			},
+		});
+
+		// List modules command
+		this.addCommand({
+			id: "tessera-list-modules",
+			name: "List TesseraScript Modules",
+			callback: () => {
+				const moduleIds = this.runtime.getModuleIds();
+				console.log("[TesseraScript] Registered modules:", moduleIds);
+				new Notice(
+					`TesseraScript Modules:\n${moduleIds.join("\n")}`,
+					10000
+				);
+			},
+		});
+
+		// Reload command
+		this.addCommand({
+			id: "tessera-reload",
+			name: "Reload TesseraScript",
+			callback: async () => {
+				// Unmount and re-mount
+				this.unmountGlobalAPI();
+				this.runtime = new TesseraRuntime();
+				this.runtime.initialize();
+				this.registerAllModules();
+				this.mountGlobalAPI();
+
+				new Notice("TesseraScript reloaded", 3000);
+			},
+		});
+	}
+}
+
+// ============================================================================
+// Settings Tab
+// ============================================================================
+
+import { App, PluginSettingTab, Setting } from "obsidian";
+
+class TesseraSettingTab extends PluginSettingTab {
+	plugin: TesseraPlugin;
+
+	constructor(app: App, plugin: TesseraPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const { containerEl } = this;
+		containerEl.empty();
+
+		containerEl.createEl("h2", { text: "TesseraScript Settings" });
+
+		// Legacy mode setting
+		new Setting(containerEl)
+			.setName("Enable Legacy Mode")
+			.setDesc("Allow loading modules via dv.view() (deprecated)")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.enableLegacyMode)
+					.onChange(async (value) => {
+						this.plugin.settings.enableLegacyMode = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		// Deprecation warnings setting
+		new Setting(containerEl)
+			.setName("Show Deprecation Warnings")
+			.setDesc("Show warnings when using deprecated features")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.enableDeprecationWarnings)
+					.onChange(async (value) => {
+						this.plugin.settings.enableDeprecationWarnings = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		// Theme setting
+		new Setting(containerEl)
+			.setName("Default Theme")
+			.setDesc("Default theme for components (auto follows Obsidian theme)")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("auto", "Auto")
+					.addOption("light", "Light")
+					.addOption("dark", "Dark")
+					.setValue(this.plugin.settings.defaultTheme)
+					.onChange(async (value: string) => {
+						this.plugin.settings.defaultTheme = value as "auto" | "light" | "dark";
+						await this.plugin.saveSettings();
+					})
+			);
+
+		// Info section
+		containerEl.createEl("h3", { text: "Usage" });
+		containerEl.createEl("p", {
+			text: "After enabling this plugin, you can use TesseraScript components in your DataviewJS code blocks.",
+		});
+
+		const codeBlock = containerEl.createEl("pre");
+		codeBlock.createEl("code", {
+			text: `const { card, heatmap, progressbar } = Tessera.use("components");
+
+dv.container.appendChild(card({
+  title: "Hello",
+  value: 42
+}));`,
+		});
+
+		containerEl.createEl("p", {
+			text: `Registered modules: ${this.plugin.runtime.getModuleCount()}`,
+		});
+		containerEl.createEl("p", {
+			text: `Registered components: ${this.plugin.runtime.getComponentCount()}`,
+		});
 	}
 }

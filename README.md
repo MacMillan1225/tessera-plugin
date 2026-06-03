@@ -1,92 +1,243 @@
-# Obsidian Sample Plugin
+# TesseraScript Obsidian Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A modular component library for Obsidian's DataviewJS. Build beautiful dashboards, cards, heatmaps, and more with simple, composable components.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+![TesseraScript](https://img.shields.io/badge/TesseraScript-v1.0.0-blue)
+![Obsidian](https://img.shields.io/badge/Obsidian-v1.5.0+-purple)
+![License](https://img.shields.io/badge/License-BSD-green)
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
+## Features
 
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and outputs a Notice on click.
-- Registers a global interval which logs 'setInterval' to the console.
+- 🎨 **Beautiful Components**: Pre-built card, heatmap, and progressbar components
+- 🎯 **TypeScript**: Full type safety and IntelliSense support
+- 🌓 **Dark Mode**: Automatic theme switching with Obsidian
+- ⚡ **Performance**: Lazy-loaded styles and optimized rendering
+- 🔧 **Configurable**: Deep customization for every component
+- 📦 **Modular**: Use only what you need
 
-## First time developing plugins?
+## Quick Start
 
-Quick starting guide for new plugin devs:
+### Installation
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `src/main.ts` to `main.js`.
-- Make changes to `src/main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+1. Open Obsidian Settings
+2. Go to Community Plugins
+3. Search for "TesseraScript"
+4. Install and enable
 
-## Releasing new releases
+### Basic Usage
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+```dataviewjs
+// Import components
+const { card, heatmap, progressbar } = Tessera.use("components");
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
-
-## Adding your plugin to the community plugin list
-
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- Make sure your NodeJS is at least v18 (`node --version`).
-- `npm i` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint
-
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code.
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-	"fundingUrl": "https://buymeacoffee.com"
-}
+// Create a simple card
+dv.container.appendChild(card({
+  title: "Hello World",
+  meta: "GREETING",
+  value: 42,
+  content: "This is a TesseraScript card!"
+}));
 ```
 
-If you have multiple URLs, you can also do:
+## Components
 
-```json
-{
-	"fundingUrl": {
-		"Buy Me a Coffee": "https://buymeacoffee.com",
-		"GitHub Sponsor": "https://github.com/sponsors",
-		"Patreon": "https://www.patreon.com/"
-	}
-}
+### Card
+
+```dataviewjs
+const { card } = Tessera.use("components");
+
+dv.container.appendChild(card({
+  title: "Today's Tasks",
+  meta: "TODO",
+  value: 5,
+  content: "Tasks completed today"
+}));
 ```
 
-## API Documentation
+### Heatmap
 
-See https://docs.obsidian.md
+```dataviewjs
+const { heatmap } = Tessera.use("components");
+
+const data = {};
+for (let i = 0; i < 365; i++) {
+  const date = new Date();
+  date.setDate(date.getDate() - i);
+  data[date.toISOString().split("T")[0]] = Math.floor(Math.random() * 10);
+}
+
+dv.container.appendChild(heatmap({ data }));
+```
+
+### Progressbar
+
+```dataviewjs
+const { progressbar } = Tessera.use("components");
+
+dv.container.appendChild(progressbar({
+  value: 75,
+  showLabel: true,
+  labelFormat: "{percentage}%"
+}));
+```
+
+## Advanced Usage
+
+### Custom Styling
+
+```dataviewjs
+dv.container.appendChild(card({
+  title: "Custom Card",
+  colors: {
+    light: {
+      background: "rgba(59, 130, 246, 0.1)",
+      border: "rgba(59, 130, 246, 0.3)"
+    },
+    dark: {
+      background: "rgba(59, 130, 246, 0.2)",
+      border: "rgba(59, 130, 246, 0.4)"
+    }
+  }
+}));
+```
+
+### Combining Components
+
+```dataviewjs
+const { card, progressbar } = Tessera.use("components");
+
+const dashboard = document.createElement("div");
+dashboard.style.display = "grid";
+dashboard.style.gridTemplateColumns = "repeat(3, 1fr)";
+dashboard.style.gap = "16px";
+
+for (let i = 0; i < 3; i++) {
+  dashboard.appendChild(card({
+    title: `Project ${i + 1}`,
+    children: progressbar({
+      value: Math.floor(Math.random() * 100),
+      labelFormat: "Progress {percentage}%"
+    })
+  }));
+}
+
+dv.container.appendChild(dashboard);
+```
+
+## Documentation
+
+- [User Guide](docs/README.md) - Complete usage documentation
+- [Development Guide](docs/DEVELOPMENT.md) - For contributors and custom component developers
+
+## Development
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/tessera-script/tessera-plugin.git
+
+# Install dependencies
+cd tessera-plugin
+npm install
+
+# Development mode
+npm run dev
+
+# Production build
+npm run build
+```
+
+### Project Structure
+
+```
+tessera-plugin/
+├── src/
+│   ├── main.ts              # Plugin entry point
+│   ├── runtime/
+│   │   └── bootstrap.ts     # Module system
+│   ├── core/
+│   │   ├── dom.ts           # DOM utilities
+│   │   ├── css.ts           # CSS management
+│   │   ├── config.ts        # Configuration
+│   │   └── file.ts          # File operations
+│   ├── components/
+│   │   ├── card/            # Card component
+│   │   ├── heatmap/         # Heatmap component
+│   │   ├── progressbar/     # Progressbar component
+│   │   └── index.ts         # Component registry
+│   └── utils/
+│       ├── logger.ts        # Logging utility
+│       └── style-manager.ts # Style management
+├── styles.css               # Base styles
+├── manifest.json            # Plugin manifest
+└── package.json             # Dependencies
+```
+
+## API Reference
+
+### Global Object
+
+```javascript
+// Import modules
+const module = Tessera.use("module-name");
+
+// Check if module exists
+Tessera.has("components/card"); // true
+
+// Get version
+Tessera.version; // "1.0.0"
+```
+
+### Component Options
+
+#### Card Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `title` | `string` | `""` | Card title |
+| `meta` | `string` | `""` | Meta information |
+| `value` | `any` | `null` | Main value |
+| `content` | `any` | `undefined` | Card content |
+| `flags.showHeader` | `boolean` | `true` | Show header |
+| `layout.padding` | `string` | `"16px"` | Padding |
+
+#### Heatmap Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `data` | `Record<string, number>` | `{}` | Date-value pairs |
+| `cellSize` | `number` | `12` | Cell size |
+| `cellGap` | `number` | `2` | Cell gap |
+
+#### Progressbar Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `value` | `number` | `0` | Current value |
+| `max` | `number` | `100` | Maximum value |
+| `showLabel` | `boolean` | `true` | Show label |
+| `labelFormat` | `string` | `"{value}%"` | Label format |
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+BSD License - see [LICENSE](LICENSE) file
+
+## Support
+
+- [GitHub Issues](https://github.com/tessera-script/tessera-plugin/issues)
+- [Documentation](https://github.com/tessera-script/tessera-plugin/wiki)
+
+## Acknowledgments
+
+- [Obsidian](https://obsidian.md/) - The knowledge base
+- [Dataview](https://blacksmithgu.github.io/obsidian-dataview/) - Data query engine
+- [Obsidian Plugin API](https://docs.obsidian.md/) - Plugin development
