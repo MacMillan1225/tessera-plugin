@@ -3,7 +3,7 @@
  * Provides vault file reading and resource URL generation
  */
 
-import type { App } from "obsidian";
+import { TFile, type App } from "obsidian";
 
 // ============================================================================
 // Types
@@ -16,12 +16,12 @@ export interface FileControllerContext {
 export interface FileController {
 	normalizePath(path: string): string;
 	exists(path: string): boolean;
-	getFile(path: string): any | null;
+	getFile(path: string): TFile | null;
 	getResourceUrl(path: string): string;
 	read(path: string, options?: { cached?: boolean }): Promise<string>;
 	readText(path: string, options?: { cached?: boolean }): Promise<string>;
 	readCss(path: string, options?: { cached?: boolean }): Promise<string>;
-	readJson(path: string, options?: { cached?: boolean }): Promise<any>;
+	readJson(path: string, options?: { cached?: boolean }): Promise<unknown>;
 }
 
 // ============================================================================
@@ -35,6 +35,8 @@ export function createFileController(context: FileControllerContext = {}): FileC
 		throw new Error("[file] App instance is required.");
 	}
 
+	// Store app in a const that TypeScript can track as defined
+	const vault = app.vault;
 	const cache = new Map<string, { content: string; timestamp: number }>();
 
 	function normalizePath(path: string): string {
@@ -45,23 +47,24 @@ export function createFileController(context: FileControllerContext = {}): FileC
 
 	function exists(path: string): boolean {
 		const normalizedPath = normalizePath(path);
-		return app.vault.getAbstractFileByPath(normalizedPath) !== null;
+		return vault.getAbstractFileByPath(normalizedPath) !== null;
 	}
 
-	function getFile(path: string): any | null {
+	function getFile(path: string): TFile | null {
 		const normalizedPath = normalizePath(path);
-		return app.vault.getAbstractFileByPath(normalizedPath);
+		const file = vault.getAbstractFileByPath(normalizedPath);
+		return file instanceof TFile ? file : null;
 	}
 
 	function getResourceUrl(path: string): string {
 		const normalizedPath = normalizePath(path);
-		const file = app.vault.getAbstractFileByPath(normalizedPath);
+		const file = vault.getAbstractFileByPath(normalizedPath);
 
-		if (!file) {
+		if (!file || !(file instanceof TFile)) {
 			throw new Error(`[file] File not found: ${normalizedPath}`);
 		}
 
-		return app.vault.getResourcePath(file);
+		return vault.getResourcePath(file);
 	}
 
 	async function read(path: string, options: { cached?: boolean } = {}): Promise<string> {
@@ -75,12 +78,12 @@ export function createFileController(context: FileControllerContext = {}): FileC
 			}
 		}
 
-		const file = app.vault.getAbstractFileByPath(normalizedPath);
-		if (!file) {
+		const abstractFile = vault.getAbstractFileByPath(normalizedPath);
+		if (!abstractFile || !(abstractFile instanceof TFile)) {
 			throw new Error(`[file] File not found: ${normalizedPath}`);
 		}
 
-		const content = await app.vault.read(file as any);
+		const content = await vault.read(abstractFile);
 
 		if (cached) {
 			cache.set(normalizedPath, {
@@ -100,12 +103,12 @@ export function createFileController(context: FileControllerContext = {}): FileC
 		return read(path, options);
 	}
 
-	async function readJson(path: string, options?: { cached?: boolean }): Promise<any> {
+	async function readJson(path: string, options?: { cached?: boolean }): Promise<unknown> {
 		const content = await read(path, options);
 		try {
 			return JSON.parse(content);
 		} catch (error) {
-			throw new Error(`[file] Failed to parse JSON from ${path}: ${error}`);
+			throw new Error(`[file] Failed to parse JSON from ${path}: ${String(error)}`);
 		}
 	}
 

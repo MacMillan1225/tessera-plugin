@@ -11,26 +11,26 @@ export interface TesseraModuleFactory {
 	(runtime: {
 		id: string;
 		require: RequireFunction;
-		module: { id: string; exports: any; loaded: boolean; loading: boolean };
-		exports: any;
+		module: { id: string; exports: unknown; loaded: boolean; loading: boolean };
+		exports: unknown;
 	}): void;
 }
 
 export interface RequireFunction {
-	(specifier: string): any;
+	(specifier: string): unknown;
 }
 
 export interface TesseraObject {
 	version: string;
-	define: (id: string, factory: (require: RequireFunction, module: any, exports: any) => void) => TesseraObject;
+	define: (id: string, factory: (require: RequireFunction, module: { exports: unknown }, exports: unknown) => void) => TesseraObject;
 	register: (id: string, factory: TesseraModuleFactory) => TesseraObject;
-	require: (specifier: string, from?: string) => any;
-	use: (name: string) => any;
+	require: (specifier: string, from?: string) => unknown;
+	use: (name: string) => unknown;
 	resolve: (specifier: string, from?: string) => string;
 	alias: (nameOrMap: string | Record<string, string>, target?: string) => TesseraObject;
 	has: (id: string) => boolean;
 	modules: Map<string, TesseraModuleFactory>;
-	cache: Map<string, { id: string; exports: any; loaded: boolean; loading: boolean }>;
+	cache: Map<string, { id: string; exports: unknown; loaded: boolean; loading: boolean }>;
 	aliases: Map<string, string>;
 	__initialized: boolean;
 }
@@ -132,7 +132,7 @@ function resolveRelative(specifier: string, from: string): string {
 
 export class TesseraRuntime {
 	private modules = new Map<string, TesseraModuleFactory>();
-	private cache = new Map<string, { id: string; exports: any; loaded: boolean; loading: boolean }>();
+	private cache = new Map<string, { id: string; exports: unknown; loaded: boolean; loading: boolean }>();
 	private aliases = new Map<string, string>();
 	private initialized = false;
 
@@ -183,7 +183,7 @@ export class TesseraRuntime {
 	 */
 	define(
 		id: string,
-		factory: (require: RequireFunction, module: { exports: any }, exports: any) => void
+		factory: (require: RequireFunction, module: { exports: unknown }, exports: unknown) => void
 	): TesseraRuntime {
 		if (typeof factory !== "function") {
 			fail(`Module factory must be a function: ${normalizeId(id) || id}`);
@@ -214,7 +214,7 @@ export class TesseraRuntime {
 	/**
 	 * Require a module by specifier
 	 */
-	require(specifier: string, from?: string): any {
+	require(specifier: string, from?: string): unknown {
 		const moduleId = this.resolve(specifier, from);
 
 		if (this.cache.has(moduleId)) {
@@ -239,7 +239,7 @@ export class TesseraRuntime {
 
 		this.cache.set(moduleId, module);
 
-		const localRequire = (childSpecifier: string): any => {
+		const localRequire = (childSpecifier: string): unknown => {
 			return this.requireModule(childSpecifier, moduleId);
 		};
 
@@ -263,14 +263,14 @@ export class TesseraRuntime {
 	/**
 	 * Internal require with from context
 	 */
-	private requireModule(specifier: string, from?: string): any {
+	private requireModule(specifier: string, from?: string): unknown {
 		return this.require(specifier, from);
 	}
 
 	/**
 	 * High-level user API for importing modules
 	 */
-	use(name: string): any {
+	use(name: string): unknown {
 		return this.require(name);
 	}
 
@@ -366,12 +366,21 @@ export class TesseraRuntime {
 	getTesseraObject(): TesseraObject {
 		return {
 			version: VERSION,
-			define: this.define.bind(this),
-			register: this.register.bind(this),
+			define: (id: string, factory: (require: RequireFunction, module: { exports: unknown }, exports: unknown) => void) => {
+				this.define(id, factory);
+				return this.getTesseraObject();
+			},
+			register: (id: string, factory: TesseraModuleFactory) => {
+				this.register(id, factory);
+				return this.getTesseraObject();
+			},
 			require: this.require.bind(this),
 			use: this.use.bind(this),
 			resolve: this.resolve.bind(this),
-			alias: this.alias.bind(this),
+			alias: (nameOrMap: string | Record<string, string>, target?: string) => {
+				this.alias(nameOrMap, target);
+				return this.getTesseraObject();
+			},
 			has: this.has.bind(this),
 			modules: this.modules,
 			cache: this.cache,
@@ -381,17 +390,17 @@ export class TesseraRuntime {
 	}
 
 	/**
-	 * Mount Tessera to globalThis
+	 * Mount Tessera to window
 	 */
 	mountGlobal(): void {
-		(globalThis as any).Tessera = this.getTesseraObject();
+		(window as unknown as Record<string, unknown>).Tessera = this.getTesseraObject();
 	}
 
 	/**
-	 * Unmount Tessera from globalThis
+	 * Unmount Tessera from window
 	 */
 	unmountGlobal(): void {
-		delete (globalThis as any).Tessera;
+		delete (window as unknown as Record<string, unknown>).Tessera;
 	}
 }
 

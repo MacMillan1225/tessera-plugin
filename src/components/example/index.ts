@@ -13,8 +13,8 @@ export interface ExampleOptions {
 	eyebrow?: string;
 	title?: string;
 	text?: string;
-	content?: any;
-	children?: any;
+	content?: unknown;
+	children?: unknown;
 	className?: string | string[];
 	flags?: {
 		showEyebrow?: boolean;
@@ -44,11 +44,11 @@ export interface ExampleOptions {
 		};
 	};
 	styles?: {
-		root?: Record<string, any>;
-		eyebrow?: Record<string, any>;
-		title?: Record<string, any>;
-		text?: Record<string, any>;
-		body?: Record<string, any>;
+		root?: Record<string, unknown>;
+		eyebrow?: Record<string, unknown>;
+		title?: Record<string, unknown>;
+		text?: Record<string, unknown>;
+		body?: Record<string, unknown>;
 	};
 }
 
@@ -110,6 +110,19 @@ export function getDefaultExampleConfig(): ExampleOptions {
 
 export function updateExampleConfig(config: Partial<ExampleOptions>): void {
 	exampleConfig = { ...exampleConfig, ...config };
+}
+
+// ============================================================================
+// Parts interface for type-safe parts exposure
+// ============================================================================
+
+interface ExampleWithParts extends HTMLElement {
+	parts: {
+		eyebrow: HTMLElement;
+		title: HTMLElement;
+		text: HTMLElement;
+		body: HTMLElement;
+	};
 }
 
 // ============================================================================
@@ -199,7 +212,7 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 
 	// Create root element
 	const root = createElement("section", {
-		className: ["ts-example", resolved.className],
+		className: ["ts-example", resolved.className].filter(Boolean) as string[],
 		style: {
 			...styles.root,
 			maxWidth: layout.maxWidth,
@@ -215,14 +228,15 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 	});
 
 	// Expose parts
-	(root as any).parts = {
-		eyebrow: children[0],
-		title: children[1],
-		text: children[2],
-		body: children[3],
+	const result = root as ExampleWithParts;
+	result.parts = {
+		eyebrow: children[0] as HTMLElement,
+		title: children[1] as HTMLElement,
+		text: children[2] as HTMLElement,
+		body: children[3] as HTMLElement,
 	};
 
-	return root;
+	return result;
 }
 
 // ============================================================================

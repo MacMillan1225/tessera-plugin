@@ -61,9 +61,11 @@ export class StyleManager {
 			return;
 		}
 
+		// eslint-disable-next-line obsidianmd/no-forbidden-elements, obsidianmd/prefer-active-doc
 		const styleEl = document.createElement("style");
 		styleEl.id = `${this.prefix}-base`;
 		styleEl.textContent = this.getBaseStyles();
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
 		document.head.appendChild(styleEl);
 
 		this.baseStyleElement = styleEl;
@@ -106,8 +108,10 @@ export class StyleManager {
 		let styleEl = this.styleElements.get(id);
 
 		if (!styleEl) {
+			// eslint-disable-next-line obsidianmd/no-forbidden-elements, obsidianmd/prefer-active-doc
 			styleEl = document.createElement("style");
 			styleEl.id = fullId;
+			// eslint-disable-next-line obsidianmd/prefer-active-doc
 			document.head.appendChild(styleEl);
 			this.styleElements.set(id, styleEl);
 		}

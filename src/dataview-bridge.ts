@@ -15,9 +15,18 @@ export interface DataviewBridgeOptions {
 }
 
 export interface DataviewAPI {
-	executeJs: (code: string, container: HTMLElement, context: any) => Promise<void>;
-	pages: (query: string) => any[];
+	executeJs: (code: string, container: HTMLElement, context: Record<string, unknown>) => Promise<void>;
+	pages: (query: string) => unknown[];
 	// Add more Dataview API methods as needed
+}
+
+interface PluginRegistry {
+	plugins: Record<string, unknown>;
+}
+
+interface DataviewPluginInstance {
+	api: DataviewAPI | null;
+	[key: string]: unknown;
 }
 
 // ============================================================================
@@ -27,7 +36,7 @@ export interface DataviewAPI {
 export class DataviewBridge {
 	private app: App;
 	private onDataviewMissing?: () => void;
-	private dataviewPlugin: any | null = null;
+	private dataviewPlugin: DataviewPluginInstance | null = null;
 
 	constructor(options: DataviewBridgeOptions) {
 		this.app = options.app;
@@ -38,13 +47,13 @@ export class DataviewBridge {
 	/**
 	 * Find and cache the Dataview plugin instance
 	 */
-	private findDataviewPlugin(): any | null {
-		const plugins = (this.app as any).plugins;
+	private findDataviewPlugin(): DataviewPluginInstance | null {
+		const plugins = (this.app as unknown as { plugins: PluginRegistry }).plugins;
 		if (!plugins) {
 			return null;
 		}
 
-		return plugins.plugins["dataview"] ?? null;
+		return plugins.plugins["dataview"] as DataviewPluginInstance ?? null;
 	}
 
 	/**
@@ -57,7 +66,7 @@ export class DataviewBridge {
 	/**
 	 * Get the Dataview plugin instance
 	 */
-	getDataviewPlugin(): any | null {
+	getDataviewPlugin(): DataviewPluginInstance | null {
 		return this.dataviewPlugin;
 	}
 

@@ -34,9 +34,9 @@ export interface HeatmapOptions {
 		dayFormat?: string;
 	};
 	styles?: {
-		root?: Record<string, any>;
-		cell?: Record<string, any>;
-		label?: Record<string, any>;
+		root?: Record<string, unknown>;
+		cell?: Record<string, unknown>;
+		label?: Record<string, unknown>;
 	};
 	className?: string | string[];
 }
@@ -121,7 +121,7 @@ function getDateRange(startDate?: string, endDate?: string): { start: Date; end:
 }
 
 function formatDate(date: Date): string {
-	return date.toISOString().split("T")[0];
+	return date.toISOString().split("T")[0] ?? "";
 }
 
 function getLevel(value: number, max: number): number {
@@ -129,6 +129,17 @@ function getLevel(value: number, max: number): number {
 	if (max === 0) return 1;
 	const ratio = value / max;
 	return Math.min(Math.ceil(ratio * 4), 4);
+}
+
+// ============================================================================
+// Parts interface for type-safe parts exposure
+// ============================================================================
+
+interface HeatmapWithParts extends HTMLElement {
+	parts: {
+		grid: HTMLElement;
+		cells: HTMLElement[];
+	};
 }
 
 // ============================================================================
@@ -142,7 +153,6 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	const cellSize = resolved.cellSize || 12;
 	const cellGap = resolved.cellGap || 2;
 	const colors = resolved.colors || defaultHeatmapColors;
-	const labels = resolved.labels || {};
 	const styles = resolved.styles || {};
 
 	// Resolve theme colors
@@ -205,7 +215,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	// Create root
 	const root = createElement("div", {
-		className: ["ts-heatmap", resolved.className],
+		className: ["ts-heatmap", resolved.className].filter(Boolean) as string[],
 		style: {
 			...styles.root,
 			"--ts-heatmap-cell-size": `${cellSize}px`,
@@ -215,12 +225,13 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	});
 
 	// Expose parts
-	(root as any).parts = {
+	const result = root as HeatmapWithParts;
+	result.parts = {
 		grid,
 		cells,
 	};
 
-	return root;
+	return result;
 }
 
 // ============================================================================

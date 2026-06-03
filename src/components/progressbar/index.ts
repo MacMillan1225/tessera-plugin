@@ -28,10 +28,10 @@ export interface ProgressbarOptions {
 		};
 	};
 	styles?: {
-		root?: Record<string, any>;
-		bar?: Record<string, any>;
-		fill?: Record<string, any>;
-		label?: Record<string, any>;
+		root?: Record<string, unknown>;
+		bar?: Record<string, unknown>;
+		fill?: Record<string, unknown>;
+		label?: Record<string, unknown>;
 	};
 	className?: string | string[];
 }
@@ -100,6 +100,18 @@ function calculatePercentage(value: number, max: number, min: number): number {
 }
 
 // ============================================================================
+// Parts interface for type-safe parts exposure
+// ============================================================================
+
+interface ProgressbarWithParts extends HTMLElement {
+	parts: {
+		bar: HTMLElement;
+		fill: HTMLElement;
+		label: HTMLElement | null;
+	};
+}
+
+// ============================================================================
 // Component Function
 // ============================================================================
 
@@ -155,19 +167,20 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 
 	// Create root
 	const root = createElement("div", {
-		className: ["ts-progressbar", resolved.className],
+		className: ["ts-progressbar", resolved.className].filter(Boolean) as string[],
 		style: styles.root,
 		children: [bar, label].filter(Boolean),
 	});
 
 	// Expose parts
-	(root as any).parts = {
+	const result = root as ProgressbarWithParts;
+	result.parts = {
 		bar,
 		fill,
 		label,
 	};
 
-	return root;
+	return result;
 }
 
 // ============================================================================

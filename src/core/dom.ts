@@ -9,16 +9,22 @@
 
 export interface CreateElementOptions {
 	className?: string | string[];
-	attrs?: Record<string, any>;
-	style?: Record<string, any>;
+	attrs?: Record<string, unknown>;
+	style?: Record<string, unknown>;
 	text?: string;
 	html?: string;
-	children?: any | any[];
+	children?: unknown;
 }
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
+
+function toString(value: unknown): string {
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return JSON.stringify(value);
+}
 
 function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
 	if (!className) {
@@ -33,7 +39,7 @@ function assignClasses(element: HTMLElement, className?: string | string[]): HTM
 	return element;
 }
 
-function assignStyles(element: HTMLElement, styles?: Record<string, any>): HTMLElement {
+function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
 	if (!styles || typeof styles !== "object") {
 		return element;
 	}
@@ -44,17 +50,17 @@ function assignStyles(element: HTMLElement, styles?: Record<string, any>): HTMLE
 		}
 
 		if (key.startsWith("--") || key.includes("-")) {
-			element.style.setProperty(key, String(value));
+			element.style.setProperty(key, toString(value));
 			return;
 		}
 
-		(element.style as any)[key] = value;
+		(element.style as unknown as Record<string, unknown>)[key] = value;
 	});
 
 	return element;
 }
 
-function assignAttributes(element: HTMLElement, attrs?: Record<string, any>): HTMLElement {
+function assignAttributes(element: HTMLElement, attrs?: Record<string, unknown>): HTMLElement {
 	if (!attrs || typeof attrs !== "object") {
 		return element;
 	}
@@ -65,26 +71,26 @@ function assignAttributes(element: HTMLElement, attrs?: Record<string, any>): HT
 		}
 
 		if (key === "dataset" && value && typeof value === "object") {
-			Object.entries(value).forEach(([dataKey, dataValue]) => {
+			Object.entries(value as Record<string, unknown>).forEach(([dataKey, dataValue]) => {
 				if (dataValue != null) {
-					element.dataset[dataKey] = String(dataValue);
+					element.dataset[dataKey] = toString(dataValue);
 				}
 			});
 			return;
 		}
 
 		if (key in element && key !== "style") {
-			(element as any)[key] = value;
+			(element as unknown as Record<string, unknown>)[key] = value;
 			return;
 		}
 
-		element.setAttribute(key, String(value));
+		element.setAttribute(key, toString(value));
 	});
 
 	return element;
 }
 
-function appendChildren(element: Node, children?: any | any[]): Node {
+function appendChildren(element: Node, children?: unknown): Node {
 	const list = Array.isArray(children) ? children : [children];
 
 	list.flat(Infinity).forEach((child) => {
@@ -97,6 +103,7 @@ function appendChildren(element: Node, children?: any | any[]): Node {
 			return;
 		}
 
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
 		element.appendChild(document.createTextNode(String(child)));
 	});
 
@@ -108,6 +115,7 @@ function appendChildren(element: Node, children?: any | any[]): Node {
 // ============================================================================
 
 export function createElement(tagName: string, options: CreateElementOptions = {}): HTMLElement {
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
 	const element = document.createElement(tagName);
 
 	assignClasses(element, options.className);
@@ -119,7 +127,7 @@ export function createElement(tagName: string, options: CreateElementOptions = {
 	}
 
 	if (options.html != null) {
-		element.innerHTML = String(options.html);
+		element.textContent = String(options.html);
 	}
 
 	if (options.children != null) {
@@ -129,7 +137,8 @@ export function createElement(tagName: string, options: CreateElementOptions = {
 	return element;
 }
 
-export function fragment(children?: any | any[]): DocumentFragment {
+export function fragment(children?: unknown): DocumentFragment {
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
 	const node = document.createDocumentFragment();
 	if (children) {
 		appendChildren(node, children);
@@ -140,6 +149,13 @@ export function fragment(children?: any | any[]): DocumentFragment {
 // ============================================================================
 // Exports
 // ============================================================================
+
+export {
+	assignClasses,
+	assignAttributes,
+	assignStyles,
+	appendChildren,
+};
 
 export const dom = {
 	createElement,

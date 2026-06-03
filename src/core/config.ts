@@ -5,55 +5,57 @@
 
 import { createFileController } from "./file";
 
+import type { App } from "obsidian";
+
 // ============================================================================
 // Types
 // ============================================================================
 
 export interface ConfigControllerContext {
-	app?: any;
+	app?: App;
 }
 
 export interface ConfigScope {
 	path: string;
-	load(options?: any): Promise<any>;
-	get(): any;
-	merge(overrides?: any): any;
+	load(options?: unknown): Promise<unknown>;
+	get(): unknown;
+	merge(overrides?: unknown): unknown;
 }
 
 export interface ConfigController {
 	normalizePath(path: string): string;
 	clone<T>(value: T): T;
-	merge(baseConfig: any, overrideConfig: any): any;
-	get(path: string, options?: any): any;
-	load(path: string, options?: any): Promise<any>;
-	resolve(path: string, overrides?: any, options?: any): any;
-	createScope(scopeOptions: { path: string; fallback?: any }): ConfigScope;
-	cache: Map<string, any>;
+	merge(baseConfig: unknown, overrideConfig: unknown): unknown;
+	get(path: string, options?: unknown): unknown;
+	load(path: string, options?: unknown): Promise<unknown>;
+	resolve(path: string, overrides?: unknown, options?: unknown): unknown;
+	createScope(scopeOptions: { path: string; fallback?: unknown }): ConfigScope;
+	cache: Map<string, unknown>;
 }
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
 
-function isPlainObject(value: any): boolean {
+function isPlainObject(value: unknown): boolean {
 	return Object.prototype.toString.call(value) === "[object Object]";
 }
 
 function cloneValue<T>(value: T): T {
 	if (Array.isArray(value)) {
-		return value.map(cloneValue) as any;
+		return value.map(cloneValue) as unknown as T;
 	}
 
 	if (isPlainObject(value)) {
 		return Object.fromEntries(
-			Object.entries(value).map(([key, item]) => [key, cloneValue(item)])
-		) as any;
+			Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, cloneValue(item)])
+		) as unknown as T;
 	}
 
 	return value;
 }
 
-function mergeConfig(baseConfig: any, overrideConfig: any): any {
+function mergeConfig(baseConfig: unknown, overrideConfig: unknown): unknown {
 	if (overrideConfig == null) {
 		return cloneValue(baseConfig);
 	}
@@ -70,9 +72,10 @@ function mergeConfig(baseConfig: any, overrideConfig: any): any {
 		return cloneValue(overrideConfig);
 	}
 
-	const merged = cloneValue(baseConfig);
+	const merged = cloneValue(baseConfig) as Record<string, unknown>;
+	const overrideObj = overrideConfig as Record<string, unknown>;
 
-	Object.entries(overrideConfig).forEach(([key, value]) => {
+	Object.entries(overrideObj).forEach(([key, value]) => {
 		if (value === undefined) {
 			return;
 		}
@@ -89,14 +92,13 @@ function mergeConfig(baseConfig: any, overrideConfig: any): any {
 
 export function createConfigController(context: ConfigControllerContext = {}): ConfigController {
 	const file = createFileController(context);
-	const cache = new Map<string, any>();
 
 	interface Entry {
 		path: string;
-		fallback: any;
-		value: any;
+		fallback: unknown;
+		value: unknown;
 		loaded: boolean;
-		loading: Promise<any> | null;
+		loading: Promise<unknown> | null;
 		error: Error | null;
 	}
 
@@ -106,7 +108,7 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 		return file.normalizePath(path);
 	}
 
-	function createEntry(path: string, fallback?: any): Entry {
+	function createEntry(path: string, fallback?: unknown): Entry {
 		const normalizedPath = normalizePath(path);
 		if (!normalizedPath) {
 			throw new Error("[config] path cannot be empty.");
@@ -137,7 +139,7 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 		return entry;
 	}
 
-	async function load(path: string, options: { fallback?: any; force?: boolean; cached?: boolean } = {}): Promise<any> {
+	async function load(path: string, options: { fallback?: unknown; force?: boolean; cached?: boolean; silent?: boolean } = {}): Promise<unknown> {
 		const entry = createEntry(path, options.fallback);
 
 		if (entry.loaded && options.force !== true) {
@@ -150,7 +152,7 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 
 		entry.loading = file
 			.readJson(entry.path, { cached: options.cached })
-			.then((json: any) => {
+			.then((json: unknown) => {
 				entry.value = mergeConfig(entry.fallback, json);
 				entry.loaded = true;
 				entry.error = null;
@@ -173,17 +175,17 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 		return entry.loading;
 	}
 
-	function get(path: string, options: { fallback?: any } = {}): any {
+	function get(path: string, options: { fallback?: unknown } = {}): unknown {
 		const entry = createEntry(path, options.fallback);
 		return cloneValue(entry.value);
 	}
 
-	function resolve(path: string, overrides: any = {}, options: { fallback?: any } = {}): any {
+	function resolve(path: string, overrides: unknown = {}, options: { fallback?: unknown } = {}): unknown {
 		const current = get(path, options);
 		return mergeConfig(current, overrides);
 	}
 
-	function createScope(scopeOptions: { path: string; fallback?: any }): ConfigScope {
+	function createScope(scopeOptions: { path: string; fallback?: unknown }): ConfigScope {
 		const scopePath = normalizePath(scopeOptions.path);
 		const scopeFallback = cloneValue(scopeOptions.fallback || {});
 
@@ -195,7 +197,7 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 
 		return {
 			path: scopePath,
-			load(loadOptions: any = {}) {
+			load(loadOptions: Record<string, unknown> = {}) {
 				return load(scopePath, {
 					...loadOptions,
 					fallback: scopeFallback,
@@ -204,7 +206,7 @@ export function createConfigController(context: ConfigControllerContext = {}): C
 			get() {
 				return get(scopePath, { fallback: scopeFallback });
 			},
-			merge(overrides: any = {}) {
+			merge(overrides: unknown = {}) {
 				return resolve(scopePath, overrides, { fallback: scopeFallback });
 			},
 		};

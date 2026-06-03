@@ -7,6 +7,7 @@ import { dom, createElement, fragment, appendChildren, assignClasses, assignAttr
 import { createFileController } from "./file";
 import { createCSSController, getSharedCSSController, ensureSharedStyle } from "./css";
 import { createConfigController, mergeConfigFn, cloneConfig } from "./config";
+import type { TesseraObject, RequireFunction } from "../runtime/bootstrap";
 
 // ============================================================================
 // Re-exports
@@ -43,40 +44,39 @@ export {
 /**
  * Register all core modules with Tessera runtime
  */
-export function registerCoreModules(tessera: any): void {
+export function registerCoreModules(tessera: TesseraObject): void {
 	// Core/dom
-	tessera.define("core/dom", function (require: any, module: any, exports: any) {
-		Object.assign(exports, {
-			createElement,
-			el: createElement,
-			fragment,
-			appendChildren,
-			assignClasses,
-			assignAttributes,
-			assignStyles,
-		});
+	tessera.define("core/dom", function (_require: RequireFunction, module: { exports: unknown }, _exports: unknown) {
+		const exp = module.exports as Record<string, unknown>;
+		exp.createElement = createElement;
+		exp.el = createElement;
+		exp.fragment = fragment;
+		exp.appendChildren = appendChildren;
+		exp.assignClasses = assignClasses;
+		exp.assignAttributes = assignAttributes;
+		exp.assignStyles = assignStyles;
 	});
 
 	// Core/file
-	tessera.define("core/file", function (require: any, module: any, exports: any) {
+	tessera.define("core/file", function (require: RequireFunction, module: { exports: unknown }, exports: unknown) {
 		module.exports = createFileController;
-		module.exports.createFileController = createFileController;
+		(module.exports as Record<string, unknown>).createFileController = createFileController;
 	});
 
 	// Core/css
-	tessera.define("core/css", function (require: any, module: any, exports: any) {
+	tessera.define("core/css", function (require: RequireFunction, module: { exports: unknown }, exports: unknown) {
 		module.exports = createCSSController;
-		module.exports.createCSSController = createCSSController;
-		module.exports.getSharedCSSController = getSharedCSSController;
-		module.exports.ensureSharedStyle = ensureSharedStyle;
+		(module.exports as Record<string, unknown>).createCSSController = createCSSController;
+		(module.exports as Record<string, unknown>).getSharedCSSController = getSharedCSSController;
+		(module.exports as Record<string, unknown>).ensureSharedStyle = ensureSharedStyle;
 	});
 
 	// Core/config
-	tessera.define("core/config", function (require: any, module: any, exports: any) {
+	tessera.define("core/config", function (require: RequireFunction, module: { exports: unknown }, exports: unknown) {
 		module.exports = createConfigController;
-		module.exports.createConfigController = createConfigController;
-		module.exports.mergeConfig = mergeConfigFn;
-		module.exports.cloneConfig = cloneConfig;
+		(module.exports as Record<string, unknown>).createConfigController = createConfigController;
+		(module.exports as Record<string, unknown>).mergeConfig = mergeConfigFn;
+		(module.exports as Record<string, unknown>).cloneConfig = cloneConfig;
 	});
 }
 

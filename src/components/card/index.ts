@@ -12,9 +12,9 @@ import { createElement } from "../../core/dom";
 export interface CardOptions {
 	title?: string;
 	meta?: string;
-	value?: any;
-	content?: any;
-	children?: any;
+	value?: unknown;
+	content?: unknown;
+	children?: unknown;
 	emptyText?: string;
 	className?: string | string[];
 	flags?: {
@@ -46,16 +46,16 @@ export interface CardOptions {
 			hoverAccent?: string;
 			value?: string;
 		};
-		[key: string]: any;
+		[key: string]: unknown;
 	};
 	styles?: {
-		card?: Record<string, any>;
-		header?: Record<string, any>;
-		title?: Record<string, any>;
-		meta?: Record<string, any>;
-		body?: Record<string, any>;
-		value?: Record<string, any>;
-		empty?: Record<string, any>;
+		card?: Record<string, unknown>;
+		header?: Record<string, unknown>;
+		title?: Record<string, unknown>;
+		meta?: Record<string, unknown>;
+		body?: Record<string, unknown>;
+		value?: Record<string, unknown>;
+		empty?: Record<string, unknown>;
 	};
 }
 
@@ -127,15 +127,15 @@ export function updateCardConfig(config: Partial<CardOptions>): void {
 // Helper Functions
 // ============================================================================
 
-function normalizeChildren(content: any): any[] {
+function normalizeChildren(content: unknown): unknown[] {
 	if (content == null) {
 		return [];
 	}
 	return Array.isArray(content) ? content : [content];
 }
 
-function mergeStyles(...styles: any[]): Record<string, any> {
-	return styles.reduce((result, style) => {
+function mergeStyles(...styles: unknown[]): Record<string, unknown> {
+	return styles.reduce<Record<string, unknown>>((result, style) => {
 		if (!style || typeof style !== "object") {
 			return result;
 		}
@@ -143,16 +143,16 @@ function mergeStyles(...styles: any[]): Record<string, any> {
 	}, {});
 }
 
-function pickSharedColors(colors: Record<string, any> = {}): Record<string, any> {
-	return themeColorKeys.reduce((result, key) => {
+function pickSharedColors(colors: Record<string, unknown> = {}): Record<string, unknown> {
+	return themeColorKeys.reduce<Record<string, unknown>>((result, key) => {
 		if (colors[key] !== undefined) {
 			result[key] = colors[key];
 		}
 		return result;
-	}, {} as Record<string, any>);
+	}, {});
 }
 
-function resolveThemeColors(colors: Record<string, any> = {}): { light: Record<string, any>; dark: Record<string, any> } {
+function resolveThemeColors(colors: Record<string, unknown> = {}): { light: Record<string, unknown>; dark: Record<string, unknown> } {
 	const sharedColors = pickSharedColors(colors);
 
 	return {
@@ -199,14 +199,15 @@ export function card(options: CardOptions = {}): HTMLElement {
 	}
 
 	// Build body children
-	const bodyChildren: any[] = [];
+	const bodyChildren: unknown[] = [];
 
 	if (flags.showValue !== false && valueContent != null) {
 		bodyChildren.push(
 			createElement("div", {
 				className: "ts-card__value",
 				style: styles.value,
-				text: String(valueContent),
+				// eslint-disable-next-line @typescript-eslint/no-base-to-string
+				text: typeof valueContent === "object" ? JSON.stringify(valueContent) : String(valueContent),
 			})
 		);
 	}
@@ -219,7 +220,7 @@ export function card(options: CardOptions = {}): HTMLElement {
 
 	// Create card element
 	return createElement("article", {
-		className: ["ts-card", resolved.className],
+		className: ["ts-card", resolved.className].filter(Boolean) as string[],
 		style: mergeStyles(
 			{
 				maxWidth: layout.maxWidth,
@@ -246,7 +247,7 @@ export function card(options: CardOptions = {}): HTMLElement {
 						className: [
 							"ts-card__header",
 							flags.headerSep !== false && "ts-card__header--sep",
-						],
+						].filter(Boolean) as string[],
 						style: styles.header,
 						children: headerChildren,
 					})

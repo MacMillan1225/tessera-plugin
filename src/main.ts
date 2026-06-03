@@ -37,8 +37,6 @@ export default class TesseraPlugin extends Plugin {
 	styleManager!: StyleManager;
 
 	async onload() {
-		console.log("[TesseraScript] Loading plugin");
-
 		// Load settings
 		await this.loadSettings();
 
@@ -52,7 +50,7 @@ export default class TesseraPlugin extends Plugin {
 			onDataviewMissing: () => {
 				if (this.settings.enableDeprecationWarnings) {
 					new Notice(
-						"[TesseraScript] Dataview plugin is required. Please install and enable it.",
+						"Dataview plugin is required. Please install and enable it.",
 						5000
 					);
 				}
@@ -75,12 +73,9 @@ export default class TesseraPlugin extends Plugin {
 		// Add settings tab
 		this.addSettingTab(new TesseraSettingTab(this.app, this));
 
-		console.log("[TesseraScript] Plugin loaded successfully");
 	}
 
 	onunload() {
-		console.log("[TesseraScript] Unloading plugin");
-
 		// Unmount global API
 		this.unmountGlobalAPI();
 
@@ -109,10 +104,7 @@ export default class TesseraPlugin extends Plugin {
 		// Register components
 		registerComponents(this.runtime.getTesseraObject());
 
-		console.log(
-			`[TesseraScript] Registered ${this.runtime.getModuleCount()} modules, ` +
-			`${this.runtime.getComponentCount()} components`
-		);
+		// Module registration complete
 	}
 
 	private mountGlobalAPI() {
@@ -121,7 +113,7 @@ export default class TesseraPlugin extends Plugin {
 
 		// Also mount to window for compatibility
 		if (typeof window !== "undefined") {
-			(window as any).Tessera = this.runtime.getTesseraObject();
+			(window as unknown as Record<string, unknown>).Tessera = this.runtime.getTesseraObject();
 		}
 	}
 
@@ -131,7 +123,7 @@ export default class TesseraPlugin extends Plugin {
 
 		// Unmount from window
 		if (typeof window !== "undefined") {
-			delete (window as any).Tessera;
+			delete (window as unknown as Record<string, unknown>).Tessera;
 		}
 	}
 
@@ -139,7 +131,7 @@ export default class TesseraPlugin extends Plugin {
 		// Check status command
 		this.addCommand({
 			id: "tessera-check-status",
-			name: "Check TesseraScript Status",
+			name: "Check status",
 			callback: () => {
 				const status = {
 					dataviewAvailable: this.dataviewBridge.isAvailable(),
@@ -160,10 +152,9 @@ export default class TesseraPlugin extends Plugin {
 		// List modules command
 		this.addCommand({
 			id: "tessera-list-modules",
-			name: "List TesseraScript Modules",
+			name: "List modules",
 			callback: () => {
 				const moduleIds = this.runtime.getModuleIds();
-				console.log("[TesseraScript] Registered modules:", moduleIds);
 				new Notice(
 					`TesseraScript Modules:\n${moduleIds.join("\n")}`,
 					10000
@@ -174,7 +165,7 @@ export default class TesseraPlugin extends Plugin {
 		// Reload command
 		this.addCommand({
 			id: "tessera-reload",
-			name: "Reload TesseraScript",
+			name: "Reload",
 			callback: async () => {
 				// Unmount and re-mount
 				this.unmountGlobalAPI();
@@ -183,7 +174,7 @@ export default class TesseraPlugin extends Plugin {
 				this.registerAllModules();
 				this.mountGlobalAPI();
 
-				new Notice("TesseraScript reloaded", 3000);
+				new Notice("Reloaded", 3000);
 			},
 		});
 	}
@@ -207,11 +198,11 @@ class TesseraSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "TesseraScript Settings" });
+		new Setting(containerEl).setName("Configuration").setHeading();
 
 		// Legacy mode setting
 		new Setting(containerEl)
-			.setName("Enable Legacy Mode")
+			.setName("Enable legacy mode")
 			.setDesc("Allow loading modules via dv.view() (deprecated)")
 			.addToggle((toggle) =>
 				toggle
@@ -224,7 +215,7 @@ class TesseraSettingTab extends PluginSettingTab {
 
 		// Deprecation warnings setting
 		new Setting(containerEl)
-			.setName("Show Deprecation Warnings")
+			.setName("Show deprecation warnings")
 			.setDesc("Show warnings when using deprecated features")
 			.addToggle((toggle) =>
 				toggle
@@ -237,7 +228,7 @@ class TesseraSettingTab extends PluginSettingTab {
 
 		// Theme setting
 		new Setting(containerEl)
-			.setName("Default Theme")
+			.setName("Default theme")
 			.setDesc("Default theme for components (auto follows Obsidian theme)")
 			.addDropdown((dropdown) =>
 				dropdown
@@ -252,9 +243,9 @@ class TesseraSettingTab extends PluginSettingTab {
 			);
 
 		// Info section
-		containerEl.createEl("h3", { text: "Usage" });
+		new Setting(containerEl).setName("Usage").setHeading();
 		containerEl.createEl("p", {
-			text: "After enabling this plugin, you can use TesseraScript components in your DataviewJS code blocks.",
+			text: "After enabling this plugin, you can use tesserascript components in your dataviewjs code blocks.",
 		});
 
 		const codeBlock = containerEl.createEl("pre");

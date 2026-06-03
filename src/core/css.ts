@@ -5,12 +5,14 @@
 
 import { createFileController } from "./file";
 
+import type { App } from "obsidian";
+
 // ============================================================================
 // Types
 // ============================================================================
 
 export interface CSSControllerContext {
-	app?: any;
+	app?: App;
 	prefix?: string;
 }
 
@@ -49,6 +51,9 @@ export interface CSSAddOptions {
 	cached?: boolean;
 }
 
+// Active document reference for DOM operations
+const activeDocument = window.document;
+
 // ============================================================================
 // Constants
 // ============================================================================
@@ -65,13 +70,17 @@ function getGlobalStore(): {
 	registry: Map<string, CSSRecord>;
 	counters: Record<string, number>;
 } {
-	if (!(globalThis as any)[GLOBAL_STORE_KEY]) {
-		(globalThis as any)[GLOBAL_STORE_KEY] = {
+	const win = window as unknown as Record<string, unknown>;
+	if (!win[GLOBAL_STORE_KEY]) {
+		win[GLOBAL_STORE_KEY] = {
 			registry: new Map(),
 			counters: {},
 		};
 	}
-	return (globalThis as any)[GLOBAL_STORE_KEY];
+	return win[GLOBAL_STORE_KEY] as {
+		registry: Map<string, CSSRecord>;
+		counters: Record<string, number>;
+	};
 }
 
 // ============================================================================
@@ -84,10 +93,10 @@ export function createCSSController(context: CSSControllerContext = {}): CSSCont
 	const file = createFileController(context);
 
 	function ensureDocument(): Document {
-		if (typeof document === "undefined") {
+		if (typeof activeDocument === "undefined") {
 			throw new Error("[css] Document is not available.");
 		}
-		return document;
+		return activeDocument;
 	}
 
 	function normalizeId(id: string): string {
@@ -127,7 +136,7 @@ export function createCSSController(context: CSSControllerContext = {}): CSSCont
 
 	function ensureMountTarget(target?: Node): Node {
 		const doc = ensureDocument();
-		if (target && typeof (target as any).appendChild === "function") {
+		if (target && typeof target.appendChild === "function") {
 			return target;
 		}
 		return doc.head || doc.body || doc.documentElement;
@@ -145,7 +154,6 @@ export function createCSSController(context: CSSControllerContext = {}): CSSCont
 		const styleEl = doc.createElement("style");
 
 		styleEl.id = record.domId;
-		styleEl.type = "text/css";
 		styleEl.textContent = record.content;
 		styleEl.setAttribute("data-tessera-css-id", record.id);
 		styleEl.setAttribute("data-tessera-css-source-type", record.sourceType);
@@ -260,7 +268,7 @@ export function createCSSController(context: CSSControllerContext = {}): CSSCont
 			createdAt: record.createdAt,
 			updatedAt: record.updatedAt,
 			...extra,
-		} as CSSRecord;
+		};
 	}
 
 	function getExistingRecord(id: string): CSSRecord | null {
@@ -435,10 +443,11 @@ function normalizePrefix(prefix: string): string {
 }
 
 export function getSharedCSSController(context: CSSControllerContext = {}): CSSController {
-	if (!(globalThis as any)[SHARED_CONTROLLER_KEY]) {
-		(globalThis as any)[SHARED_CONTROLLER_KEY] = createCSSController(context);
+	const win = window as unknown as Record<string, unknown>;
+	if (!win[SHARED_CONTROLLER_KEY]) {
+		win[SHARED_CONTROLLER_KEY] = createCSSController(context);
 	}
-	return (globalThis as any)[SHARED_CONTROLLER_KEY];
+	return win[SHARED_CONTROLLER_KEY] as CSSController;
 }
 
 export async function ensureSharedStyle(options: CSSAddOptions & { context?: CSSControllerContext } = {}): Promise<CSSRecord> {

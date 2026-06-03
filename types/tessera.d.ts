@@ -3,31 +3,33 @@
  * Modular component library for Obsidian DataviewJS
  */
 
+import type { TFile } from "obsidian";
+
 // ============================================================================
 // Core Types
 // ============================================================================
 
 export interface TesseraModule {
 	id: string;
-	exports: any;
+	exports: unknown;
 	loaded: boolean;
 	loading: boolean;
 }
 
 export interface TesseraModuleFactory {
-	(require: RequireFunction, module: { exports: any }, exports: any): void;
+	(require: RequireFunction, module: { exports: unknown }, exports: unknown): void;
 }
 
 export interface RequireFunction {
-	(specifier: string): any;
+	(specifier: string): unknown;
 }
 
 export interface TesseraObject {
 	version: string;
 	define(id: string, factory: TesseraModuleFactory): TesseraObject;
 	register(id: string, factory: TesseraModuleFactory): TesseraObject;
-	require(specifier: string, from?: string): any;
-	use(name: string): any;
+	require(specifier: string, from?: string): unknown;
+	use(name: string): unknown;
 	resolve(specifier: string, from?: string): string;
 	alias(nameOrMap: string | Record<string, string>, target?: string): TesseraObject;
 	has(id: string): boolean;
@@ -43,21 +45,21 @@ export interface TesseraObject {
 
 export interface CreateElementOptions {
 	className?: string | string[];
-	attrs?: Record<string, any>;
-	style?: Record<string, any>;
+	attrs?: Record<string, unknown>;
+	style?: Record<string, unknown>;
 	text?: string;
 	html?: string;
-	children?: any | any[];
+	children?: unknown;
 }
 
 export interface DomModule {
 	createElement(tagName: string, options?: CreateElementOptions): HTMLElement;
 	el(tagName: string, options?: CreateElementOptions): HTMLElement;
-	fragment(children: any | any[]): DocumentFragment;
-	appendChildren(element: Node, children: any | any[]): Node;
+	fragment(children: unknown): DocumentFragment;
+	appendChildren(element: Node, children: unknown): Node;
 	assignClasses(element: HTMLElement, className: string | string[]): HTMLElement;
-	assignAttributes(element: HTMLElement, attrs: Record<string, any>): HTMLElement;
-	assignStyles(element: HTMLElement, styles: Record<string, any>): HTMLElement;
+	assignAttributes(element: HTMLElement, attrs: Record<string, unknown>): HTMLElement;
+	assignStyles(element: HTMLElement, styles: Record<string, unknown>): HTMLElement;
 }
 
 // ============================================================================
@@ -65,7 +67,7 @@ export interface DomModule {
 // ============================================================================
 
 export interface CSSControllerContext {
-	app?: any;
+	app?: unknown;
 	prefix?: string;
 }
 
@@ -111,25 +113,25 @@ export type CreateCSSController = (context?: CSSControllerContext) => CSSControl
 // ============================================================================
 
 export interface ConfigControllerContext {
-	app?: any;
+	app?: unknown;
 }
 
 export interface ConfigScope {
 	path: string;
-	load(options?: any): Promise<any>;
-	get(): any;
-	merge(overrides?: any): any;
+	load(options?: unknown): Promise<unknown>;
+	get(): unknown;
+	merge(overrides?: unknown): unknown;
 }
 
 export interface ConfigController {
 	normalizePath(path: string): string;
 	clone<T>(value: T): T;
-	merge(baseConfig: any, overrideConfig: any): any;
-	get(path: string, options?: any): any;
-	load(path: string, options?: any): Promise<any>;
-	resolve(path: string, overrides?: any, options?: any): any;
-	createScope(scopeOptions: { path: string; fallback?: any }): ConfigScope;
-	cache: Map<string, any>;
+	merge(baseConfig: unknown, overrideConfig: unknown): unknown;
+	get(path: string, options?: unknown): unknown;
+	load(path: string, options?: unknown): Promise<unknown>;
+	resolve(path: string, overrides?: unknown, options?: unknown): unknown;
+	createScope(scopeOptions: { path: string; fallback?: unknown }): ConfigScope;
+	cache: Map<string, unknown>;
 }
 
 export type CreateConfigController = (context?: ConfigControllerContext) => ConfigController;
@@ -139,18 +141,18 @@ export type CreateConfigController = (context?: ConfigControllerContext) => Conf
 // ============================================================================
 
 export interface FileControllerContext {
-	app?: any;
+	app?: unknown;
 }
 
 export interface FileController {
 	normalizePath(path: string): string;
 	exists(path: string): boolean;
-	getFile(path: string): any | null;
+	getFile(path: string): TFile | null;
 	getResourceUrl(path: string): string;
 	read(path: string, options?: { cached?: boolean }): Promise<string>;
 	readText(path: string, options?: { cached?: boolean }): Promise<string>;
 	readCss(path: string, options?: { cached?: boolean }): Promise<string>;
-	readJson(path: string, options?: { cached?: boolean }): Promise<any>;
+	readJson(path: string, options?: { cached?: boolean }): Promise<unknown>;
 }
 
 export type CreateFileController = (context?: FileControllerContext) => FileController;
@@ -162,9 +164,9 @@ export type CreateFileController = (context?: FileControllerContext) => FileCont
 export interface CardOptions {
 	title?: string;
 	meta?: string;
-	value?: any;
-	content?: any;
-	children?: any;
+	value?: unknown;
+	content?: unknown;
+	children?: unknown;
 	emptyText?: string;
 	className?: string | string[];
 	flags?: {
@@ -184,16 +186,16 @@ export interface CardOptions {
 	colors?: {
 		light?: Record<string, string>;
 		dark?: Record<string, string>;
-		[key: string]: any;
+		[key: string]: unknown;
 	};
 	styles?: {
-		card?: Record<string, any>;
-		header?: Record<string, any>;
-		title?: Record<string, any>;
-		meta?: Record<string, any>;
-		body?: Record<string, any>;
-		value?: Record<string, any>;
-		empty?: Record<string, any>;
+		card?: Record<string, unknown>;
+		header?: Record<string, unknown>;
+		title?: Record<string, unknown>;
+		meta?: Record<string, unknown>;
+		body?: Record<string, unknown>;
+		value?: Record<string, unknown>;
+		empty?: Record<string, unknown>;
 	};
 }
 
@@ -222,9 +224,9 @@ export interface HeatmapOptions {
 		dayFormat?: string;
 	};
 	styles?: {
-		root?: Record<string, any>;
-		cell?: Record<string, any>;
-		label?: Record<string, any>;
+		root?: Record<string, unknown>;
+		cell?: Record<string, unknown>;
+		label?: Record<string, unknown>;
 	};
 }
 
@@ -247,10 +249,10 @@ export interface ProgressbarOptions {
 		};
 	};
 	styles?: {
-		root?: Record<string, any>;
-		bar?: Record<string, any>;
-		fill?: Record<string, any>;
-		label?: Record<string, any>;
+		root?: Record<string, unknown>;
+		bar?: Record<string, unknown>;
+		fill?: Record<string, unknown>;
+		label?: Record<string, unknown>;
 	};
 }
 
