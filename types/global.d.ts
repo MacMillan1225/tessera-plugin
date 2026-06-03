@@ -2,15 +2,30 @@
  * Global type declarations for TesseraScript
  */
 
-import type { TesseraObject } from "./tessera";
+import type { CardOptions } from "../src/components/card/index";
+import type { HeatmapOptions } from "../src/components/heatmap/index";
+import type { ProgressbarOptions } from "../src/components/progressbar/index";
+import type { ExampleOptions } from "../src/components/example/index";
+
+// ============================================================================
+// Tessera API Types
+// ============================================================================
+
+export interface TesseraAPI {
+	version: string;
+	card(options?: CardOptions): HTMLElement;
+	heatmap(options?: HeatmapOptions): HTMLElement;
+	progressbar(options?: ProgressbarOptions): HTMLElement;
+	example(options?: ExampleOptions): HTMLElement;
+}
+
+// ============================================================================
+// Global Declarations
+// ============================================================================
 
 declare global {
 	interface Window {
-		Tessera?: TesseraObject;
-	}
-
-	interface GlobalThis {
-		Tessera?: TesseraObject;
+		tessera?: TesseraAPI;
 	}
 
 	// CSS module declarations

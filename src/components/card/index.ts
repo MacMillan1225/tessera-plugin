@@ -3,8 +3,6 @@
  * General-purpose card component for dashboards and panels
  */
 
-import { createElement } from "../../core/dom";
-
 // ============================================================================
 // Types
 // ============================================================================
@@ -60,6 +58,94 @@ export interface CardOptions {
 }
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+function toString(value: unknown): string {
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return JSON.stringify(value);
+}
+
+function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
+	if (!className) {
+		return element;
+	}
+
+	const classes = Array.isArray(className)
+		? className.flatMap((item) => String(item || "").split(/\s+/))
+		: String(className).split(/\s+/);
+
+	classes.filter(Boolean).forEach((name) => element.classList.add(name));
+	return element;
+}
+
+function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
+	if (!styles || typeof styles !== "object") {
+		return element;
+	}
+
+	Object.entries(styles).forEach(([key, value]) => {
+		if (value == null) {
+			return;
+		}
+
+		if (key.startsWith("--") || key.includes("-")) {
+			element.style.setProperty(key, toString(value));
+			return;
+		}
+
+		(element.style as unknown as Record<string, unknown>)[key] = value;
+	});
+
+	return element;
+}
+
+function appendChildren(element: Node, children?: unknown): Node {
+	const list = Array.isArray(children) ? children : [children];
+
+	list.flat(Infinity).forEach((child) => {
+		if (child == null || child === false) {
+			return;
+		}
+
+		if (child instanceof Node) {
+			element.appendChild(child);
+			return;
+		}
+
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
+		element.appendChild(document.createTextNode(String(child)));
+	});
+
+	return element;
+}
+
+function createElement(tagName: string, options: {
+	className?: string | string[];
+	attrs?: Record<string, unknown>;
+	style?: Record<string, unknown>;
+	text?: string;
+	children?: unknown;
+} = {}): HTMLElement {
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
+	const element = document.createElement(tagName);
+
+	assignClasses(element, options.className);
+	assignStyles(element, options.style);
+
+	if (options.text != null) {
+		element.textContent = String(options.text);
+	}
+
+	if (options.children != null) {
+		appendChildren(element, options.children);
+	}
+
+	return element;
+}
+
+// ============================================================================
 // Default Configuration
 // ============================================================================
 
@@ -81,47 +167,6 @@ const defaultCardColors = {
 		value: "var(--text-accent, var(--text-normal))",
 	},
 };
-
-const defaultCardConfig: CardOptions = {
-	title: "",
-	meta: "",
-	value: null,
-	emptyText: "No content",
-	flags: {
-		showHeader: true,
-		headerSep: true,
-		showTitle: true,
-		showMeta: true,
-		showValue: true,
-	},
-	layout: {
-		maxWidth: "100%",
-		padding: "16px",
-		radius: "16px",
-		gap: "14px",
-		bodyGap: "12px",
-	},
-	colors: defaultCardColors,
-	styles: {},
-};
-
-// ============================================================================
-// Configuration Management
-// ============================================================================
-
-let cardConfig = { ...defaultCardConfig };
-
-export function loadCardConfig(): CardOptions {
-	return { ...cardConfig };
-}
-
-export function getDefaultCardConfig(): CardOptions {
-	return { ...defaultCardConfig };
-}
-
-export function updateCardConfig(config: Partial<CardOptions>): void {
-	cardConfig = { ...cardConfig, ...config };
-}
 
 // ============================================================================
 // Helper Functions
@@ -166,17 +211,16 @@ function resolveThemeColors(colors: Record<string, unknown> = {}): { light: Reco
 // ============================================================================
 
 export function card(options: CardOptions = {}): HTMLElement {
-	const resolved = { ...defaultCardConfig, ...options };
-	const flags = resolved.flags || {};
-	const layout = resolved.layout || {};
-	const themeColors = resolveThemeColors(resolved.colors || {});
-	const styles = resolved.styles || {};
+	const flags = options.flags || {};
+	const layout = options.layout || {};
+	const themeColors = resolveThemeColors(options.colors || {});
+	const styles = options.styles || {};
 
 	// Build header children
 	const headerChildren: HTMLElement[] = [];
-	const titleText = resolved.title;
-	const metaText = resolved.meta;
-	const valueContent = resolved.value;
+	const titleText = options.title;
+	const metaText = options.meta;
+	const valueContent = options.value;
 
 	if (flags.showTitle !== false && titleText) {
 		headerChildren.push(
@@ -214,13 +258,13 @@ export function card(options: CardOptions = {}): HTMLElement {
 
 	bodyChildren.push(
 		...normalizeChildren(
-			resolved.content !== undefined ? resolved.content : resolved.children
+			options.content !== undefined ? options.content : options.children
 		)
 	);
 
 	// Create card element
 	return createElement("article", {
-		className: ["ts-card", resolved.className].filter(Boolean) as string[],
+		className: ["ts-card", options.className].filter(Boolean) as string[],
 		style: mergeStyles(
 			{
 				maxWidth: layout.maxWidth,
@@ -261,7 +305,7 @@ export function card(options: CardOptions = {}): HTMLElement {
 					: createElement("div", {
 							className: "ts-card__empty",
 							style: styles.empty,
-							text: resolved.emptyText,
+							text: options.emptyText || "No content",
 						}),
 			}),
 		],

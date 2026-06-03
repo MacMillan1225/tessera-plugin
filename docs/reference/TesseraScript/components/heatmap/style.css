@@ -1,0 +1,272 @@
+.ts-heatmap {
+  --ts-heatmap-empty-current: var(--ts-heatmap-light-empty);
+  --ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
+  --ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  color: var(--text-normal);
+  font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
+}
+
+.ts-heatmap.theme-dark {
+  --ts-heatmap-empty-current: var(--ts-heatmap-dark-empty);
+  --ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
+  --ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
+}
+
+body.theme-light .ts-heatmap {
+  --ts-heatmap-empty-current: var(--ts-heatmap-light-empty);
+  --ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
+  --ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
+}
+
+body.theme-dark .ts-heatmap {
+  --ts-heatmap-empty-current: var(--ts-heatmap-dark-empty);
+  --ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
+  --ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
+}
+
+.ts-heatmap__months {
+  display: flex;
+  height: var(--ts-heatmap-month-label-height, 18px);
+  margin-left: var(--ts-heatmap-month-offset, 28px);
+  pointer-events: none;
+}
+
+.ts-heatmap__month-slot {
+  flex: 0 0 calc(var(--ts-heatmap-cell-size, 11px) + var(--ts-heatmap-cell-gap, 2px));
+  height: 100%;
+  position: relative;
+}
+
+.ts-heatmap__month-label {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  text-align: center;
+  min-width: max-content;
+  font-size: var(--ts-heatmap-month-label-size, 9px);
+  font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.ts-heatmap__body {
+  display: flex;
+  align-items: flex-start;
+}
+
+.ts-heatmap__weeks {
+  display: flex;
+  flex-direction: column;
+  width: var(--ts-heatmap-week-label-width, 20px);
+  margin-top: 5px;
+  margin-right: var(--ts-heatmap-week-label-gap, 9px);
+  flex-shrink: 0;
+}
+
+.ts-heatmap__week-label {
+  height: var(--ts-heatmap-cell-size, 11px);
+  margin-bottom: var(--ts-heatmap-cell-gap, 2px);
+  font-size: var(--ts-heatmap-week-label-size, 9px);
+  font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+  line-height: 1;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.ts-heatmap__grid {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+  min-width: 0;
+  margin-top: var(--ts-heatmap-grid-top-offset, 4px);
+}
+
+.ts-heatmap__week-column {
+  display: flex;
+  flex-direction: column;
+  margin-right: var(--ts-heatmap-cell-gap, 2px);
+}
+
+.ts-heatmap__cell {
+  width: var(--ts-heatmap-cell-size, 11px);
+  height: var(--ts-heatmap-cell-size, 11px);
+  margin-bottom: var(--ts-heatmap-cell-gap, 2px);
+  border-radius: var(--ts-heatmap-cell-radius, 3px);
+  background-color: var(--ts-heatmap-empty-current);
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.ts-heatmap__cell:hover {
+  transform: scale(1.35);
+  border-color: var(--background-modifier-border);
+  z-index: 1;
+}
+
+.ts-heatmap__cell.is-level-0 {
+  background-color: var(--ts-heatmap-empty-current);
+}
+
+body.theme-light .ts-heatmap__cell.is-level-0,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-0 {
+  background-color: var(--ts-heatmap-light-level-0, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-0,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-0 {
+  background-color: var(--ts-heatmap-dark-level-0, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-1,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-1 {
+  background-color: var(--ts-heatmap-light-level-1, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-1,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-1 {
+  background-color: var(--ts-heatmap-dark-level-1, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-2,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-2 {
+  background-color: var(--ts-heatmap-light-level-2, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-2,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-2 {
+  background-color: var(--ts-heatmap-dark-level-2, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-3,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-3 {
+  background-color: var(--ts-heatmap-light-level-3, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-3,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-3 {
+  background-color: var(--ts-heatmap-dark-level-3, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-4,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-4 {
+  background-color: var(--ts-heatmap-light-level-4, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-4,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-4 {
+  background-color: var(--ts-heatmap-dark-level-4, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-5,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-5 {
+  background-color: var(--ts-heatmap-light-level-5, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-5,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-5 {
+  background-color: var(--ts-heatmap-dark-level-5, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-6,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-6 {
+  background-color: var(--ts-heatmap-light-level-6, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-6,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-6 {
+  background-color: var(--ts-heatmap-dark-level-6, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-7,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-7 {
+  background-color: var(--ts-heatmap-light-level-7, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-7,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-7 {
+  background-color: var(--ts-heatmap-dark-level-7, var(--ts-heatmap-dark-empty));
+}
+
+body.theme-light .ts-heatmap__cell.is-level-8,
+.ts-heatmap.theme-light .ts-heatmap__cell.is-level-8 {
+  background-color: var(--ts-heatmap-light-level-8, var(--ts-heatmap-light-empty));
+}
+
+body.theme-dark .ts-heatmap__cell.is-level-8,
+.ts-heatmap.theme-dark .ts-heatmap__cell.is-level-8 {
+  background-color: var(--ts-heatmap-dark-level-8, var(--ts-heatmap-dark-empty));
+}
+
+.ts-heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--ts-heatmap-legend-gap, 3px);
+  margin-top: var(--ts-heatmap-legend-top, 6px);
+  margin-bottom: 5px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+  line-height: 1;
+  flex-wrap: wrap;
+}
+
+.ts-heatmap__legend-swatch {
+  width: var(--ts-heatmap-legend-swatch-size, 9px);
+  height: var(--ts-heatmap-legend-swatch-size, 9px);
+  border-radius: 2px;
+  flex: 0 0 auto;
+}
+
+.ts-heatmap__legend-text {
+  white-space: pre-wrap;
+}
+
+.ts-heatmap-tooltip {
+  --ts-heatmap-tooltip-fg: #ffffff;
+  --ts-heatmap-tooltip-bg: #0f172a;
+  position: fixed !important;
+  z-index: 9999;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background-color: var(--ts-heatmap-tooltip-bg);
+  color: var(--ts-heatmap-tooltip-fg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 12px;
+  font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
+  line-height: 1.4;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.ts-heatmap-tooltip.is-active {
+  opacity: 1;
+}
+
+.ts-heatmap-tooltip__main,
+.ts-heatmap-tooltip__date {
+  display: block;
+}
+
+.ts-heatmap-tooltip__main + .ts-heatmap-tooltip__main {
+  margin-top: 2px;
+}
+
+.ts-heatmap-tooltip__date {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: var(--ts-font-mono, var(--font-monospace));
+  opacity: 0.82;
+}
+
+@media (max-width: 640px) {
+  .ts-heatmap {
+    overflow-x: auto;
+  }
+}

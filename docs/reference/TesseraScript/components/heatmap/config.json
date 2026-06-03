@@ -1,0 +1,59 @@
+{
+  "data": null,
+  "startDate": null,
+  "endDate": null,
+  "flags": {
+    "showWeekLabels": true,
+    "showMonthLabels": true,
+    "showLegend": true,
+    "enableTooltip": true,
+    "mondayFirst": true
+  },
+  "settings": {
+    "rangeMode": "adaptive",
+    "minWeeks": 12,
+    "fixedDays": 84,
+    "locale": "zh-CN",
+    "monthNames": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+    "weekLabels": ["一", "", "三", "", "五", "", "日"],
+    "legend": "少 $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ 多",
+    "tooltipId": "ts-heatmap-tooltip"
+  },
+  "layout": {
+    "maxWidth": "100%",
+    "cellSize": 11,
+    "cellGap": 2,
+    "cellRadius": "3px",
+    "weekLabelWidth": "20px",
+    "weekLabelGap": "9px",
+    "monthLabelHeight": "18px",
+    "monthOffset": "28px",
+    "gridTopOffset": "4px",
+    "monthLabelSize": "9px",
+    "weekLabelSize": "9px",
+    "legendGap": "3px",
+    "legendTop": "6px",
+    "legendSwatchSize": "9px"
+  },
+  "colors": {
+    "light": {
+      "dayBg": "#f1f5f9",
+      "tooltip": "#ffffff",
+      "tooltipBg": "#0f172a",
+      "levels": ["#f1f5f9", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d", "#14532d"]
+    },
+    "dark": {
+      "dayBg": "#334155",
+      "tooltip": "#0f172a",
+      "tooltipBg": "#f1f5f9",
+      "levels": ["#334155", "#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"]
+    }
+  },
+  "styles": {
+    "root": null,
+    "months": null,
+    "weeks": null,
+    "grid": null,
+    "legend": null
+  }
+}

@@ -3,8 +3,6 @@
  * Calendar heatmap component for data visualization
  */
 
-import { createElement } from "../../core/dom";
-
 // ============================================================================
 // Types
 // ============================================================================
@@ -37,8 +35,105 @@ export interface HeatmapOptions {
 		root?: Record<string, unknown>;
 		cell?: Record<string, unknown>;
 		label?: Record<string, unknown>;
+		grid?: Record<string, unknown>;
 	};
 	className?: string | string[];
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function toString(value: unknown): string {
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return JSON.stringify(value);
+}
+
+function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
+	if (!className) {
+		return element;
+	}
+
+	const classes = Array.isArray(className)
+		? className.flatMap((item) => String(item || "").split(/\s+/))
+		: String(className).split(/\s+/);
+
+	classes.filter(Boolean).forEach((name) => element.classList.add(name));
+	return element;
+}
+
+function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
+	if (!styles || typeof styles !== "object") {
+		return element;
+	}
+
+	Object.entries(styles).forEach(([key, value]) => {
+		if (value == null) {
+			return;
+		}
+
+		if (key.startsWith("--") || key.includes("-")) {
+			element.style.setProperty(key, toString(value));
+			return;
+		}
+
+		(element.style as unknown as Record<string, unknown>)[key] = value;
+	});
+
+	return element;
+}
+
+function appendChildren(element: Node, children?: unknown): Node {
+	const list = Array.isArray(children) ? children : [children];
+
+	list.flat(Infinity).forEach((child) => {
+		if (child == null || child === false) {
+			return;
+		}
+
+		if (child instanceof Node) {
+			element.appendChild(child);
+			return;
+		}
+
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
+		element.appendChild(document.createTextNode(String(child)));
+	});
+
+	return element;
+}
+
+function createElement(tagName: string, options: {
+	className?: string | string[];
+	attrs?: Record<string, unknown>;
+	style?: Record<string, unknown>;
+	text?: string;
+	children?: unknown;
+} = {}): HTMLElement {
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
+	const element = document.createElement(tagName);
+
+	assignClasses(element, options.className);
+	assignStyles(element, options.style);
+
+	if (options.attrs) {
+		Object.entries(options.attrs).forEach(([key, value]) => {
+			if (value != null) {
+				element.setAttribute(key, toString(value));
+			}
+		});
+	}
+
+	if (options.text != null) {
+		element.textContent = String(options.text);
+	}
+
+	if (options.children != null) {
+		appendChildren(element, options.children);
+	}
+
+	return element;
 }
 
 // ============================================================================
@@ -47,58 +142,34 @@ export interface HeatmapOptions {
 
 const defaultHeatmapColors = {
 	light: {
-		empty: "rgba(0, 0, 0, 0.05)",
+		empty: "#f1f5f9",
 		levels: [
-			"rgba(0, 109, 44, 0.15)",
-			"rgba(0, 109, 44, 0.4)",
-			"rgba(0, 109, 44, 0.65)",
-			"rgba(0, 109, 44, 0.85)",
+			"#f1f5f9",
+			"#dcfce7",
+			"#bbf7d0",
+			"#86efac",
+			"#4ade80",
+			"#22c55e",
+			"#16a34a",
+			"#15803d",
+			"#14532d",
 		],
 	},
 	dark: {
-		empty: "rgba(255, 255, 255, 0.05)",
+		empty: "#334155",
 		levels: [
-			"rgba(0, 200, 80, 0.15)",
-			"rgba(0, 200, 80, 0.4)",
-			"rgba(0, 200, 80, 0.65)",
-			"rgba(0, 200, 80, 0.85)",
+			"#334155",
+			"#064e3b",
+			"#065f46",
+			"#047857",
+			"#059669",
+			"#10b981",
+			"#34d399",
+			"#6ee7b7",
+			"#a7f3d0",
 		],
 	},
 };
-
-const defaultHeatmapConfig: HeatmapOptions = {
-	data: {},
-	startDate: undefined,
-	endDate: undefined,
-	cellSize: 12,
-	cellGap: 2,
-	colors: defaultHeatmapColors,
-	labels: {
-		showMonths: true,
-		showDays: true,
-		monthFormat: "short",
-		dayFormat: "narrow",
-	},
-	styles: {},
-};
-
-// ============================================================================
-// Configuration Management
-// ============================================================================
-
-let heatmapConfig = { ...defaultHeatmapConfig };
-
-export function loadHeatmapConfig(): HeatmapOptions {
-	return { ...heatmapConfig };
-}
-
-export function getDefaultHeatmapConfig(): HeatmapOptions {
-	return { ...defaultHeatmapConfig };
-}
-
-export function updateHeatmapConfig(config: Partial<HeatmapOptions>): void {
-	heatmapConfig = { ...heatmapConfig, ...config };
-}
 
 // ============================================================================
 // Helper Functions
@@ -128,7 +199,7 @@ function getLevel(value: number, max: number): number {
 	if (value === 0) return 0;
 	if (max === 0) return 1;
 	const ratio = value / max;
-	return Math.min(Math.ceil(ratio * 4), 4);
+	return Math.min(Math.ceil(ratio * 8), 8);
 }
 
 // ============================================================================
@@ -147,13 +218,12 @@ interface HeatmapWithParts extends HTMLElement {
 // ============================================================================
 
 export function heatmap(options: HeatmapOptions = {}): HTMLElement {
-	const resolved = { ...defaultHeatmapConfig, ...options };
-	const data = normalizeData(resolved.data || {});
-	const { start, end } = getDateRange(resolved.startDate, resolved.endDate);
-	const cellSize = resolved.cellSize || 12;
-	const cellGap = resolved.cellGap || 2;
-	const colors = resolved.colors || defaultHeatmapColors;
-	const styles = resolved.styles || {};
+	const data = normalizeData(options.data || {});
+	const { start, end } = getDateRange(options.startDate, options.endDate);
+	const cellSize = options.cellSize || 11;
+	const cellGap = options.cellGap || 2;
+	const colors = options.colors || defaultHeatmapColors;
+	const styles = options.styles || {};
 
 	// Resolve theme colors
 	const lightColors = { ...defaultHeatmapColors.light, ...colors.light };
@@ -173,28 +243,10 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		const level = getLevel(value, max);
 
 		const cell = createElement("div", {
-			className: "ts-heatmap__cell",
-			style: {
-				...styles.cell,
-				width: `${cellSize}px`,
-				height: `${cellSize}px`,
-				"--ts-heatmap-cell-size": `${cellSize}px`,
-				"--ts-heatmap-level": level,
-				"--ts-heatmap-empty-light": lightColors.empty,
-				"--ts-heatmap-empty-dark": darkColors.empty,
-				"--ts-heatmap-level-1-light": lightColors.levels[0],
-				"--ts-heatmap-level-2-light": lightColors.levels[1],
-				"--ts-heatmap-level-3-light": lightColors.levels[2],
-				"--ts-heatmap-level-4-light": lightColors.levels[3],
-				"--ts-heatmap-level-1-dark": darkColors.levels[0],
-				"--ts-heatmap-level-2-dark": darkColors.levels[1],
-				"--ts-heatmap-level-3-dark": darkColors.levels[2],
-				"--ts-heatmap-level-4-dark": darkColors.levels[3],
-			},
+			className: ["ts-heatmap__cell", `is-level-${level}`],
+			style: styles.cell,
 			attrs: {
-				"data-date": dateStr,
-				"data-value": String(value),
-				"title": `${dateStr}: ${value}`,
+				"aria-label": dateStr,
 			},
 		});
 
@@ -202,26 +254,40 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		current.setDate(current.getDate() + 1);
 	}
 
-	// Create grid
+	// Create grid with week columns
 	const grid = createElement("div", {
 		className: "ts-heatmap__grid",
-		style: {
-			display: "grid",
-			gridTemplateColumns: `repeat(53, ${cellSize}px)`,
-			gap: `${cellGap}px`,
-		},
-		children: cells,
+		style: styles.grid,
 	});
 
-	// Create root
+	// Group cells into week columns (7 days each)
+	for (let i = 0; i < cells.length; i += 7) {
+		const weekColumn = createElement("div", {
+			className: "ts-heatmap__week-column",
+			children: cells.slice(i, i + 7),
+		});
+		grid.appendChild(weekColumn);
+	}
+
+	// Create root with CSS variables for colors
 	const root = createElement("div", {
-		className: ["ts-heatmap", resolved.className].filter(Boolean) as string[],
+		className: ["ts-heatmap", options.className].filter(Boolean) as string[],
 		style: {
 			...styles.root,
 			"--ts-heatmap-cell-size": `${cellSize}px`,
 			"--ts-heatmap-cell-gap": `${cellGap}px`,
+			"--ts-heatmap-light-empty": lightColors.empty,
+			"--ts-heatmap-dark-empty": darkColors.empty,
 		},
 		children: [grid],
+	});
+
+	// Set level colors as CSS variables
+	lightColors.levels.forEach((color, index) => {
+		root.style.setProperty(`--ts-heatmap-light-level-${index}`, color);
+	});
+	darkColors.levels.forEach((color, index) => {
+		root.style.setProperty(`--ts-heatmap-dark-level-${index}`, color);
 	});
 
 	// Expose parts

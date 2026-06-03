@@ -3,8 +3,6 @@
  * Template component for creating new components
  */
 
-import { createElement } from "../../core/dom";
-
 // ============================================================================
 // Types
 // ============================================================================
@@ -53,6 +51,93 @@ export interface ExampleOptions {
 }
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+function toString(value: unknown): string {
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return JSON.stringify(value);
+}
+
+function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
+	if (!className) {
+		return element;
+	}
+
+	const classes = Array.isArray(className)
+		? className.flatMap((item) => String(item || "").split(/\s+/))
+		: String(className).split(/\s+/);
+
+	classes.filter(Boolean).forEach((name) => element.classList.add(name));
+	return element;
+}
+
+function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
+	if (!styles || typeof styles !== "object") {
+		return element;
+	}
+
+	Object.entries(styles).forEach(([key, value]) => {
+		if (value == null) {
+			return;
+		}
+
+		if (key.startsWith("--") || key.includes("-")) {
+			element.style.setProperty(key, toString(value));
+			return;
+		}
+
+		(element.style as unknown as Record<string, unknown>)[key] = value;
+	});
+
+	return element;
+}
+
+function appendChildren(element: Node, children?: unknown): Node {
+	const list = Array.isArray(children) ? children : [children];
+
+	list.flat(Infinity).forEach((child) => {
+		if (child == null || child === false) {
+			return;
+		}
+
+		if (child instanceof Node) {
+			element.appendChild(child);
+			return;
+		}
+
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
+		element.appendChild(document.createTextNode(String(child)));
+	});
+
+	return element;
+}
+
+function createElement(tagName: string, options: {
+	className?: string | string[];
+	style?: Record<string, unknown>;
+	text?: string;
+	children?: unknown;
+} = {}): HTMLElement {
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
+	const element = document.createElement(tagName);
+
+	assignClasses(element, options.className);
+	assignStyles(element, options.style);
+
+	if (options.text != null) {
+		element.textContent = String(options.text);
+	}
+
+	if (options.children != null) {
+		appendChildren(element, options.children);
+	}
+
+	return element;
+}
+
+// ============================================================================
 // Default Configuration
 // ============================================================================
 
@@ -73,45 +158,6 @@ const defaultExampleColors = {
 	},
 };
 
-const defaultExampleConfig: ExampleOptions = {
-	eyebrow: "",
-	title: "",
-	text: "",
-	content: undefined,
-	children: undefined,
-	flags: {
-		showEyebrow: true,
-		showTitle: true,
-		showText: true,
-	},
-	layout: {
-		maxWidth: "100%",
-		padding: "16px",
-		radius: "12px",
-		gap: "12px",
-	},
-	colors: defaultExampleColors,
-	styles: {},
-};
-
-// ============================================================================
-// Configuration Management
-// ============================================================================
-
-let exampleConfig = { ...defaultExampleConfig };
-
-export function loadExampleConfig(): ExampleOptions {
-	return { ...exampleConfig };
-}
-
-export function getDefaultExampleConfig(): ExampleOptions {
-	return { ...defaultExampleConfig };
-}
-
-export function updateExampleConfig(config: Partial<ExampleOptions>): void {
-	exampleConfig = { ...exampleConfig, ...config };
-}
-
 // ============================================================================
 // Parts interface for type-safe parts exposure
 // ============================================================================
@@ -130,11 +176,10 @@ interface ExampleWithParts extends HTMLElement {
 // ============================================================================
 
 export function example(options: ExampleOptions = {}): HTMLElement {
-	const resolved = { ...defaultExampleConfig, ...options };
-	const flags = resolved.flags || {};
-	const layout = resolved.layout || {};
-	const colors = resolved.colors || defaultExampleColors;
-	const styles = resolved.styles || {};
+	const flags = options.flags || {};
+	const layout = options.layout || {};
+	const colors = options.colors || defaultExampleColors;
+	const styles = options.styles || {};
 
 	// Resolve theme colors
 	const lightColors = { ...defaultExampleColors.light, ...colors.light };
@@ -144,7 +189,7 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 	const children: HTMLElement[] = [];
 
 	// Eyebrow
-	if (flags.showEyebrow !== false && resolved.eyebrow) {
+	if (flags.showEyebrow !== false && options.eyebrow) {
 		children.push(
 			createElement("div", {
 				className: "ts-example__eyebrow",
@@ -153,13 +198,13 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 					"--ts-example-eyebrow-light": lightColors.eyebrow,
 					"--ts-example-eyebrow-dark": darkColors.eyebrow,
 				},
-				text: resolved.eyebrow,
+				text: options.eyebrow,
 			})
 		);
 	}
 
 	// Title
-	if (flags.showTitle !== false && resolved.title) {
+	if (flags.showTitle !== false && options.title) {
 		children.push(
 			createElement("div", {
 				className: "ts-example__title",
@@ -168,13 +213,13 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 					"--ts-example-title-light": lightColors.title,
 					"--ts-example-title-dark": darkColors.title,
 				},
-				text: resolved.title,
+				text: options.title,
 			})
 		);
 	}
 
 	// Text
-	if (flags.showText !== false && resolved.text) {
+	if (flags.showText !== false && options.text) {
 		children.push(
 			createElement("div", {
 				className: "ts-example__text",
@@ -183,36 +228,36 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 					"--ts-example-text-light": lightColors.text,
 					"--ts-example-text-dark": darkColors.text,
 				},
-				text: resolved.text,
+				text: options.text,
 			})
 		);
 	}
 
 	// Content
-	if (resolved.content) {
+	if (options.content) {
 		children.push(
 			createElement("div", {
 				className: "ts-example__body",
 				style: styles.body,
-				children: resolved.content,
+				children: options.content,
 			})
 		);
 	}
 
 	// Children
-	if (resolved.children) {
+	if (options.children) {
 		children.push(
 			createElement("div", {
 				className: "ts-example__body",
 				style: styles.body,
-				children: resolved.children,
+				children: options.children,
 			})
 		);
 	}
 
 	// Create root element
 	const root = createElement("section", {
-		className: ["ts-example", resolved.className].filter(Boolean) as string[],
+		className: ["ts-example", options.className].filter(Boolean) as string[],
 		style: {
 			...styles.root,
 			maxWidth: layout.maxWidth,

@@ -1,0 +1,112 @@
+.ts-progressbar {
+  background: var(
+    --ts-progressbar-track-current,
+    var(--ts-progressbar-track-light, #e2e8f0)
+  );
+  border: 1px solid
+    var(
+      --ts-progressbar-track-border-current,
+      var(--ts-progressbar-track-border-light, rgba(148, 163, 184, 0.24))
+    );
+  border-radius: var(--ts-progressbar-radius, 999px);
+  box-shadow: var(
+    --ts-progressbar-shadow-current,
+    var(--ts-progressbar-shadow-light, inset 0 1px 2px rgba(15, 23, 42, 0.05))
+  );
+  display: block;
+  font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+  height: var(--ts-progressbar-height, 10px);
+  opacity: var(--ts-progressbar-track-opacity, 1);
+  overflow: hidden;
+  position: relative;
+}
+
+body.theme-light .ts-progressbar {
+  --ts-progressbar-track-current: var(
+    --ts-progressbar-track-light,
+    #e2e8f0
+  );
+  --ts-progressbar-track-border-current: var(
+    --ts-progressbar-track-border-light,
+    rgba(148, 163, 184, 0.24)
+  );
+  --ts-progressbar-fill-color-current: var(--ts-progressbar-fill-light, #22c55e);
+  --ts-progressbar-fill-current: var(
+    --ts-progressbar-fill-gradient-light,
+    linear-gradient(90deg, #22c55e 0%, #34d399 100%)
+  );
+  --ts-progressbar-shadow-current: var(--ts-progressbar-shadow-light, none);
+  --ts-progressbar-glow-current: var(--ts-progressbar-glow-light, drop-shadow(0 0 8px rgba(34, 197, 94, 0.22)));
+}
+
+body.theme-dark .ts-progressbar {
+  --ts-progressbar-track-current: var(
+    --ts-progressbar-track-dark,
+    rgba(148, 163, 184, 0.18)
+  );
+  --ts-progressbar-track-border-current: var(
+    --ts-progressbar-track-border-dark,
+    rgba(148, 163, 184, 0.2)
+  );
+  --ts-progressbar-fill-color-current: var(--ts-progressbar-fill-dark, #2dd4bf);
+  --ts-progressbar-fill-current: var(
+    --ts-progressbar-fill-gradient-dark,
+    linear-gradient(90deg, #14b8a6 0%, #38bdf8 100%)
+  );
+  --ts-progressbar-shadow-current: var(--ts-progressbar-shadow-dark, none);
+  --ts-progressbar-glow-current: var(--ts-progressbar-glow-dark, drop-shadow(0 0 10px rgba(45, 212, 191, 0.18)));
+}
+
+.ts-progressbar__fill {
+  background: var(
+    --ts-progressbar-fill-current,
+    linear-gradient(90deg, #22c55e 0%, #34d399 100%)
+  );
+  border-radius: inherit;
+  filter: saturate(1.02) var(--ts-progressbar-glow-current, none);
+  height: 100%;
+  min-width: 0;
+  position: relative;
+  transition:
+    width 220ms ease,
+    filter 220ms ease;
+}
+
+.ts-progressbar--no-glow .ts-progressbar__fill {
+  filter: none;
+}
+
+.ts-progressbar--static .ts-progressbar__fill {
+  transition: none;
+}
+
+.ts-progressbar--striped .ts-progressbar__fill {
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.18) 25%,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.04) 50%,
+      rgba(255, 255, 255, 0.18) 50%,
+      rgba(255, 255, 255, 0.18) 75%,
+      rgba(255, 255, 255, 0.04) 75%,
+      rgba(255, 255, 255, 0.04) 100%
+    ),
+    var(--ts-progressbar-fill-current);
+  background-size: 18px 18px, auto;
+}
+
+.ts-progressbar__fill--animated {
+  animation: ts-progressbar-stripes 1.2s linear infinite;
+}
+
+@keyframes ts-progressbar-stripes {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: 18px 0, 0 0;
+  }
+}
