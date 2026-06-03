@@ -29,7 +29,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 		this.t = getTranslations();
-		
+
 		// Log validation warnings on first load
 		logValidationWarnings(COMPONENTS);
 	}
@@ -211,11 +211,11 @@ export class TesseraSettingTab extends PluginSettingTab {
 	): void {
 		// Group fields by their prefix (e.g., "flags", "layout", "settings", "colors.light")
 		const groups = new Map<string, SettingField[]>();
-		
+
 		for (const field of fields) {
 			const parts = field.key.split(".");
 			const groupKey = parts.length > 1 ? parts.slice(0, -1).join(".") : "_root";
-			
+
 			if (!groups.has(groupKey)) {
 				groups.set(groupKey, []);
 			}
@@ -237,7 +237,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 	private addTooltipToSetting(setting: Setting, tooltipKey?: string): void {
 		if (!tooltipKey) return;
-		
+
 		const tooltipText = getTooltipText(this.t, tooltipKey);
 		if (!tooltipText) return;
 
@@ -246,7 +246,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		tooltipEl.className = "tessera-tooltip-icon";
 		tooltipEl.textContent = "?";
 		tooltipEl.setAttribute("aria-label", tooltipText);
-		
+
 		// Add to setting name - use querySelector to find the name element
 		const nameEl = setting.settingEl.querySelector(".setting-item-name");
 		if (nameEl) {
@@ -262,7 +262,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		const fieldLabel = getFieldLabel(this.t, field.key);
 		const setting = new Setting(container);
 		setting.setName(fieldLabel);
-		
+
 		// Add tooltip if description exists
 		this.addTooltipToSetting(setting, field.description);
 
@@ -332,7 +332,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 				this.showReloadButton();
 			});
 		});
-		
+
 		// Add alpha slider if value has alpha
 		if (isColorLike(currentValue)) {
 			const alpha = extractAlpha(String(currentValue));
@@ -461,7 +461,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		for (let i = 0; i < parts.length - 1; i++) {
 			const part = parts[i];
 			if (!part) continue;
-			
+
 			if (current[part] == null || typeof current[part] !== "object") {
 				current[part] = {};
 			}
