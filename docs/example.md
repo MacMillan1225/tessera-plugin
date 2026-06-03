@@ -159,6 +159,79 @@ dv.container.appendChild(tessera.card({
 }));
 ```
 
+### 带 Tooltip 和图例的热力图
+
+```dataviewjs
+// 生成带完成度的数据
+const data = {};
+const today = new Date();
+for (let i = 0; i < 180; i++) {
+  const date = new Date(today);
+  date.setDate(date.getDate() - i);
+  const dateStr = date.toISOString().split("T")[0];
+  data[dateStr] = {
+    total: Math.floor(Math.random() * 5) + 1,
+    completed: Math.floor(Math.random() * 5)
+  };
+}
+
+dv.container.appendChild(tessera.heatmap({
+  data: data,
+  flags: {
+    showLegend: true,
+    enableTooltip: true,
+    showMonthLabels: true,
+    showWeekLabels: true
+  },
+  settings: {
+    legend: "Less $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ More"
+  },
+  cellSize: 12,
+  cellGap: 2
+}));
+```
+
+### 自定义 Tooltip 样式
+
+```dataviewjs
+const data = {};
+const today = new Date();
+for (let i = 0; i < 90; i++) {
+  const date = new Date(today);
+  date.setDate(date.getDate() - i);
+  const dateStr = date.toISOString().split("T")[0];
+  data[dateStr] = Math.floor(Math.random() * 10);
+}
+
+dv.container.appendChild(tessera.heatmap({
+  data: data,
+  flags: {
+    enableTooltip: true,
+    showLegend: true
+  },
+  renderTooltip: ({ entry, dateKey, visual }) => {
+    const value = entry?.value || 0;
+    const level = visual?.level || 0;
+    return `<span class="ts-heatmap-tooltip__main"><b>${value}</b> tasks</span><span class="ts-heatmap-tooltip__date">${dateKey} · Level ${level}</span>`;
+  },
+  settings: {
+    legend: "Inactive $#f1f5f9$$#dcfce7$$#bbf7d0$$#86efac$$#4ade80$ Active"
+  },
+  colors: {
+    light: {
+      dayBg: "#f8fafc",
+      tooltip: "#0f172a",
+      tooltipBg: "#ffffff"
+    },
+    dark: {
+      dayBg: "#1e293b",
+      tooltip: "#f8fafc",
+      tooltipBg: "#0f172a"
+    }
+  }
+}));
+```
+
 ---
 
 ## 3. Progressbar 组件
