@@ -560,15 +560,14 @@ export class TesseraSettingTab extends PluginSettingTab {
 				display: inline-flex;
 				align-items: center;
 				justify-content: center;
-				width: 16px;
-				height: 16px;
+				width: 12px;
+				height: 12px;
 				border-radius: 50%;
-				background: var(--text-muted);
+				background: var(--color-base-50);
 				color: var(--background-primary);
 				font-size: 10px;
 				font-weight: 700;
 				margin-left: 6px;
-				cursor: help;
 				vertical-align: middle;
 				position: relative;
 			}
@@ -591,10 +590,6 @@ export class TesseraSettingTab extends PluginSettingTab {
 				transition: opacity 0.2s ease;
 				z-index: 1000;
 				box-shadow: var(--shadow-s);
-			}
-
-			.tessera-tooltip-icon:hover::after {
-				opacity: 1;
 			}
 		`;
 		document.head.appendChild(style);
