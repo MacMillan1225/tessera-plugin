@@ -3,6 +3,8 @@
  * Progress bar component for displaying progress
  */
 
+import { PROGRESSBAR_DEFAULTS } from "./config";
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -146,29 +148,6 @@ function createElement(tagName: string, options: {
 }
 
 // ============================================================================
-// Default Configuration
-// ============================================================================
-
-const defaultProgressbarColors = {
-	light: {
-		track: "#e2e8f0",
-		trackBorder: "rgba(148, 163, 184, 0.24)",
-		fill: "#22c55e",
-		fillGradient: "linear-gradient(90deg, #22c55e 0%, #34d399 100%)",
-		shadow: "inset 0 1px 2px rgba(15, 23, 42, 0.05)",
-		glow: "drop-shadow(0 0 8px rgba(34, 197, 94, 0.22))",
-	},
-	dark: {
-		track: "rgba(148, 163, 184, 0.18)",
-		trackBorder: "rgba(148, 163, 184, 0.2)",
-		fill: "#2dd4bf",
-		fillGradient: "linear-gradient(90deg, #14b8a6 0%, #38bdf8 100%)",
-		shadow: "inset 0 1px 2px rgba(15, 23, 42, 0.22)",
-		glow: "drop-shadow(0 0 10px rgba(45, 212, 191, 0.18))",
-	},
-};
-
-// ============================================================================
 // Helper Functions
 // ============================================================================
 
@@ -211,17 +190,16 @@ interface ProgressbarWithParts extends HTMLElement {
 // ============================================================================
 
 export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
-	const value = options.value || 0;
-	const max = options.max || 1;
-	const min = options.min || 0;
-	const flags = options.flags || {};
-	const layout = options.layout || {};
-	const colors = options.colors || defaultProgressbarColors;
+	const value = options.value ?? PROGRESSBAR_DEFAULTS.value;
+	const max = options.max ?? PROGRESSBAR_DEFAULTS.max;
+	const min = options.min ?? PROGRESSBAR_DEFAULTS.min;
+	const flags = { ...PROGRESSBAR_DEFAULTS.flags, ...options.flags };
+	const layout = { ...PROGRESSBAR_DEFAULTS.layout, ...options.layout };
+	const colors = {
+		light: { ...PROGRESSBAR_DEFAULTS.colors.light, ...options.colors?.light },
+		dark: { ...PROGRESSBAR_DEFAULTS.colors.dark, ...options.colors?.dark },
+	};
 	const styles = options.styles || {};
-
-	// Resolve theme colors
-	const lightColors = { ...defaultProgressbarColors.light, ...colors.light };
-	const darkColors = { ...defaultProgressbarColors.dark, ...colors.dark };
 
 	// Calculate progress
 	const progress = resolveProgress(value, min, max);
@@ -236,8 +214,8 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 			...styles.fill,
 			width: `${progress.percent}%`,
 			minWidth: progress.percent > 0 ? "2px" : "0",
-			"--ts-progressbar-fill-color": lightColors.fill,
-			"--ts-progressbar-fill-color-dark": darkColors.fill,
+			"--ts-progressbar-fill-color": colors.light.fill,
+			"--ts-progressbar-fill-color-dark": colors.dark.fill,
 		},
 	});
 
@@ -263,18 +241,10 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 			"--ts-progressbar-height": layout.height || "10px",
 			"--ts-progressbar-radius": layout.radius || "999px",
 			"--ts-progressbar-track-opacity": layout.trackOpacity || 1,
-			"--ts-progressbar-track-light": lightColors.track,
-			"--ts-progressbar-track-dark": darkColors.track,
-			"--ts-progressbar-track-border-light": lightColors.trackBorder,
-			"--ts-progressbar-track-border-dark": darkColors.trackBorder,
-			"--ts-progressbar-fill-light": lightColors.fill,
-			"--ts-progressbar-fill-dark": darkColors.fill,
-			"--ts-progressbar-fill-gradient-light": lightColors.fillGradient,
-			"--ts-progressbar-fill-gradient-dark": darkColors.fillGradient,
-			"--ts-progressbar-shadow-light": lightColors.shadow,
-			"--ts-progressbar-shadow-dark": darkColors.shadow,
-			"--ts-progressbar-glow-light": lightColors.glow,
-			"--ts-progressbar-glow-dark": darkColors.glow,
+			"--ts-progressbar-track-light": colors.light.track,
+			"--ts-progressbar-track-dark": colors.dark.track,
+			"--ts-progressbar-fill-light": colors.light.fill,
+			"--ts-progressbar-fill-dark": colors.dark.fill,
 		},
 		children: fill,
 	});

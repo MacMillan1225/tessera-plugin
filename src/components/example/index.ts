@@ -3,6 +3,8 @@
  * Template component for creating new components
  */
 
+import { EXAMPLE_DEFAULTS } from "./config";
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -138,27 +140,6 @@ function createElement(tagName: string, options: {
 }
 
 // ============================================================================
-// Default Configuration
-// ============================================================================
-
-const defaultExampleColors = {
-	light: {
-		background: "rgba(245, 248, 252, 0.9)",
-		border: "rgba(120, 140, 160, 0.18)",
-		eyebrow: "var(--text-muted)",
-		title: "var(--text-normal)",
-		text: "var(--text-muted)",
-	},
-	dark: {
-		background: "rgba(30, 41, 59, 0.72)",
-		border: "rgba(148, 163, 184, 0.18)",
-		eyebrow: "var(--text-muted)",
-		title: "var(--text-normal)",
-		text: "var(--text-muted)",
-	},
-};
-
-// ============================================================================
 // Parts interface for type-safe parts exposure
 // ============================================================================
 
@@ -176,14 +157,13 @@ interface ExampleWithParts extends HTMLElement {
 // ============================================================================
 
 export function example(options: ExampleOptions = {}): HTMLElement {
-	const flags = options.flags || {};
-	const layout = options.layout || {};
-	const colors = options.colors || defaultExampleColors;
+	const flags = { ...EXAMPLE_DEFAULTS.flags, ...options.flags };
+	const layout = { ...EXAMPLE_DEFAULTS.layout, ...options.layout };
+	const colors = {
+		light: { ...EXAMPLE_DEFAULTS.colors.light, ...options.colors?.light },
+		dark: { ...EXAMPLE_DEFAULTS.colors.dark, ...options.colors?.dark },
+	};
 	const styles = options.styles || {};
-
-	// Resolve theme colors
-	const lightColors = { ...defaultExampleColors.light, ...colors.light };
-	const darkColors = { ...defaultExampleColors.dark, ...colors.dark };
 
 	// Create children
 	const children: HTMLElement[] = [];
@@ -195,8 +175,8 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 				className: "ts-example__eyebrow",
 				style: {
 					...styles.eyebrow,
-					"--ts-example-eyebrow-light": lightColors.eyebrow,
-					"--ts-example-eyebrow-dark": darkColors.eyebrow,
+					"--ts-example-eyebrow-light": colors.light.eyebrow,
+					"--ts-example-eyebrow-dark": colors.dark.eyebrow,
 				},
 				text: options.eyebrow,
 			})
@@ -210,8 +190,8 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 				className: "ts-example__title",
 				style: {
 					...styles.title,
-					"--ts-example-title-light": lightColors.title,
-					"--ts-example-title-dark": darkColors.title,
+					"--ts-example-title-light": colors.light.title,
+					"--ts-example-title-dark": colors.dark.title,
 				},
 				text: options.title,
 			})
@@ -225,8 +205,8 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 				className: "ts-example__text",
 				style: {
 					...styles.text,
-					"--ts-example-text-light": lightColors.text,
-					"--ts-example-text-dark": darkColors.text,
+					"--ts-example-text-light": colors.light.text,
+					"--ts-example-text-dark": colors.dark.text,
 				},
 				text: options.text,
 			})
@@ -264,10 +244,10 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 			"--ts-example-padding": layout.padding,
 			"--ts-example-radius": layout.radius,
 			"--ts-example-gap": layout.gap,
-			"--ts-example-background-light": lightColors.background,
-			"--ts-example-background-dark": darkColors.background,
-			"--ts-example-border-light": lightColors.border,
-			"--ts-example-border-dark": darkColors.border,
+			"--ts-example-background-light": colors.light.background,
+			"--ts-example-background-dark": colors.dark.background,
+			"--ts-example-border-light": colors.light.border,
+			"--ts-example-border-dark": colors.dark.border,
 		},
 		children,
 	});

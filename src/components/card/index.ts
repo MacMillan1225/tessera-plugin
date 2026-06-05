@@ -3,6 +3,8 @@
  * General-purpose card component for dashboards and panels
  */
 
+import { CARD_DEFAULTS } from "./config";
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -146,31 +148,10 @@ function createElement(tagName: string, options: {
 }
 
 // ============================================================================
-// Default Configuration
+// Theme Color Resolution
 // ============================================================================
 
 const themeColorKeys = ["background", "border", "shadow", "hoverAccent", "value"];
-
-const defaultCardColors = {
-	light: {
-		background: "rgba(245, 248, 252, 0.9)",
-		border: "rgba(120, 140, 160, 0.18)",
-		shadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
-		hoverAccent: "var(--interactive-accent)",
-		value: "var(--text-accent, var(--text-normal))",
-	},
-	dark: {
-		background: "rgba(30, 41, 59, 0.72)",
-		border: "rgba(148, 163, 184, 0.18)",
-		shadow: "0 16px 36px rgba(2, 6, 23, 0.28)",
-		hoverAccent: "var(--interactive-accent)",
-		value: "var(--text-accent, var(--text-normal))",
-	},
-};
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
 
 function normalizeChildren(content: unknown): unknown[] {
 	if (content == null) {
@@ -201,8 +182,8 @@ function resolveThemeColors(colors: Record<string, unknown> = {}): { light: Reco
 	const sharedColors = pickSharedColors(colors);
 
 	return {
-		light: mergeStyles(defaultCardColors.light, sharedColors, colors.light),
-		dark: mergeStyles(defaultCardColors.dark, sharedColors, colors.dark),
+		light: mergeStyles(CARD_DEFAULTS.colors.light, sharedColors, colors.light),
+		dark: mergeStyles(CARD_DEFAULTS.colors.dark, sharedColors, colors.dark),
 	};
 }
 

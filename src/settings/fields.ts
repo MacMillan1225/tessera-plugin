@@ -1,8 +1,12 @@
 /**
  * Component field definitions for settings UI
+ * DEFAULT_SETTINGS imports from component config files (single source of truth)
  */
 
 import type { ComponentDefinition, PluginSettings } from "./types";
+import { CARD_DEFAULTS } from "../components/card/config";
+import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
+import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
 
 /**
  * Component settings definitions
@@ -119,126 +123,19 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 
 /**
  * Default settings for all components
+ * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
 	card: {
 		enabled: true,
-		config: {
-			flags: {
-				showHeader: true,
-				headerSep: true,
-				showTitle: true,
-				showMeta: true,
-				showValue: true,
-			},
-			layout: {
-				maxWidth: "100%",
-				padding: "16px",
-				radius: "16px",
-				gap: "14px",
-				bodyGap: "12px",
-			},
-			colors: {
-				light: {
-					background: "rgba(245, 248, 252, 0.9)",
-					border: "rgba(120, 140, 160, 0.18)",
-					shadow: "rgba(15, 23, 42, 0.08)",
-					hoverAccent: "var(--interactive-accent)",
-					value: "var(--text-accent, var(--text-normal))",
-				},
-				dark: {
-					background: "rgba(30, 41, 59, 0.72)",
-					border: "rgba(148, 163, 184, 0.18)",
-					shadow: "rgba(2, 6, 23, 0.28)",
-					hoverAccent: "var(--interactive-accent)",
-					value: "var(--text-accent, var(--text-normal))",
-				},
-			},
-		},
+		config: CARD_DEFAULTS as unknown as Record<string, unknown>,
 	},
 	heatmap: {
 		enabled: true,
-		config: {
-			flags: {
-				showWeekLabels: true,
-				showMonthLabels: true,
-				showLegend: true,
-				enableTooltip: true,
-				mondayFirst: true,
-			},
-			settings: {
-				rangeMode: "adaptive",
-				minWeeks: 12,
-				fixedDays: 84,
-				locale: "zh-CN",
-				monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-				weekLabels: ["一", "", "三", "", "五", "", "日"],
-				legend: "少 $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ 多",
-				tooltipId: "ts-heatmap-tooltip",
-			},
-			layout: {
-				maxWidth: "100%",
-				cellSize: 11,
-				cellGap: 2,
-				cellRadius: "3px",
-				weekLabelWidth: "20px",
-				weekLabelGap: "9px",
-				monthLabelHeight: "18px",
-				monthOffset: "28px",
-				gridTopOffset: "4px",
-				monthLabelSize: "9px",
-				weekLabelSize: "9px",
-				legendGap: "3px",
-				legendTop: "6px",
-				legendSwatchSize: "9px",
-			},
-			colors: {
-				light: {
-					dayBg: "#f1f5f9",
-					tooltip: "#ffffff",
-					tooltipBg: "#0f172a",
-					levels: ["#f1f5f9", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d", "#14532d"],
-				},
-				dark: {
-					dayBg: "#334155",
-					tooltip: "#0f172a",
-					tooltipBg: "#f1f5f9",
-					levels: ["#334155", "#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"],
-				},
-			},
-		},
+		config: HEATMAP_DEFAULTS as unknown as Record<string, unknown>,
 	},
 	progressbar: {
 		enabled: true,
-		config: {
-			value: 0,
-			max: 100,
-			min: 0,
-			showLabel: true,
-			labelFormat: "{value}%",
-			flags: {
-				showGlow: true,
-				striped: false,
-				animated: false,
-			},
-			layout: {
-				width: "100%",
-				height: "8px",
-				radius: "4px",
-				trackOpacity: 0.2,
-			},
-			colors: {
-				light: {
-					track: "rgba(0, 0, 0, 0.08)",
-					fill: "var(--interactive-accent)",
-					label: "var(--text-normal)",
-				},
-				dark: {
-					track: "rgba(255, 255, 255, 0.08)",
-					fill: "var(--interactive-accent)",
-					label: "var(--text-normal)",
-				},
-			},
-		},
+		config: PROGRESSBAR_DEFAULTS as unknown as Record<string, unknown>,
 	},
 };
