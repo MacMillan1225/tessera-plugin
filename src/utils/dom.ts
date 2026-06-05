@@ -140,7 +140,7 @@ export function resolveThemeColors(
 	const sharedColors = pickSharedColors(colors);
 
 	return {
-		light: mergeStyles(defaults.light, sharedColors, colors.light) as Record<string, unknown>,
-		dark: mergeStyles(defaults.dark, sharedColors, colors.dark) as Record<string, unknown>,
+		light: mergeStyles(defaults.light, sharedColors, colors.light),
+		dark: mergeStyles(defaults.dark, sharedColors, colors.dark),
 	};
 }
