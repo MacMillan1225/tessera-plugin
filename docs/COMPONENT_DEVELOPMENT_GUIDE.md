@@ -30,15 +30,16 @@ TesseraScript 的组件系统采用**数据驱动**的设计，添加新组件�
 
 ```
 src/components/<component-name>/
+├── config.ts         # 默认配置（必须，单一数据源）
 ├── index.ts          # 组件实现（必须）
-├── style.css         # 组件样式（可选）
-└── config.json       # 默认配置（可选，已被 settings 系统替代）
+└── style.css         # 组件样式（可选）
 ```
 
 ### 示例：Card 组件
 
 ```
 src/components/card/
+├── config.ts         # CARD_DEFAULTS 配置定义
 └── index.ts          # 导出 card() 函数
 ```
 
@@ -46,7 +47,42 @@ src/components/card/
 
 ## 从零创建新组件
 
-### 步骤 1：创建组件文件
+### 步骤 1：创建配置文件
+
+创建 `src/components/<name>/config.ts`（单一数据源）：
+
+```typescript
+/**
+ * <Name> component default configuration
+ * Single source of truth for all <name> defaults
+ */
+
+export const <NAME>_DEFAULTS = {
+  flags: {
+    showHeader: true,
+    animated: false,
+  },
+  layout: {
+    width: "100%",
+    height: "8px",
+    padding: "16px",
+  },
+  colors: {
+    light: {
+      background: "rgba(245, 248, 252, 0.9)",
+      text: "var(--text-normal)",
+    },
+    dark: {
+      background: "rgba(30, 41, 59, 0.72)",
+      text: "var(--text-normal)",
+    },
+  },
+};
+
+export type <Name>Config = typeof <NAME>_DEFAULTS;
+```
+
+### 步骤 2：创建组件文件
 
 创建 `src/components/<name>/index.ts`：
 
@@ -55,6 +91,8 @@ src/components/card/
  * TesseraScript Component: <Name>
  * 组件描述
  */
+
+import { <NAME>_DEFAULTS } from "./config";
 
 // ============================================================================
 // Types
@@ -93,33 +131,18 @@ export interface <Name>Options {
 }
 
 // ============================================================================
-// Default Configuration
-// ============================================================================
-
-const defaultColors = {
-  light: {
-    background: "rgba(245, 248, 252, 0.9)",
-    text: "var(--text-normal)",
-  },
-  dark: {
-    background: "rgba(30, 41, 59, 0.72)",
-    text: "var(--text-normal)",
-  },
-};
-
-// ============================================================================
 // Component Function
 // ============================================================================
 
 export function <name>(options: <Name>Options): HTMLElement {
   const { value, showLabel = true, labelFormat = "{value}%" } = options;
-  const flags = options.flags || {};
-  const layout = options.layout || {};
+  const flags = { ...<NAME>_DEFAULTS.flags, ...options.flags };
+  const layout = { ...<NAME>_DEFAULTS.layout, ...options.layout };
   
   // 解析颜色（支持 light/dark 主题）
   const colors = {
-    light: { ...defaultColors.light, ...options.colors?.light },
-    dark: { ...defaultColors.dark, ...options.colors?.dark },
+    light: { ...<NAME>_DEFAULTS.colors.light, ...options.colors?.light },
+    dark: { ...<NAME>_DEFAULTS.colors.dark, ...options.colors?.dark },
   };
 
   // 创建 DOM 元素
@@ -149,7 +172,7 @@ export function <name>(options: <Name>Options): HTMLElement {
 export default <name>;
 ```
 
-### 步骤 2：添加样式（可选）
+### 步骤 3：添加样式（可选）
 
 如果需要独立的 CSS 文件，创建 `src/components/<name>/style.css`：
 
@@ -218,12 +241,16 @@ export interface TodoConfig {
 }
 ```
 
-### 步骤 2：注册字段定义
+### 步骤 2：注册字段定义并引用配置
 
-编辑 `src/settings/fields.ts`，添加组件的字段定义：
+编辑 `src/settings/fields.ts`，添加组件的字段定义并引用组件配置：
 
 ```typescript
 import type { ComponentDefinition, PluginSettings } from "./types";
+import { CARD_DEFAULTS } from "../components/card/config";
+import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
+import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
+import { TODO_DEFAULTS } from "../components/todo/config";  // ← 添加导入
 
 export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
   card: { /* ... */ },
@@ -256,37 +283,24 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
   },
 };
 
-// 添加默认配置
+// 默认配置 - 引用组件配置（单一数据源）
 export const DEFAULT_SETTINGS: PluginSettings = {
-  card: { /* ... */ },
-  heatmap: { /* ... */ },
-  progressbar: { /* ... */ },
+  card: {
+    enabled: true,
+    config: CARD_DEFAULTS as unknown as Record<string, unknown>,
+  },
+  heatmap: {
+    enabled: true,
+    config: HEATMAP_DEFAULTS as unknown as Record<string, unknown>,
+  },
+  progressbar: {
+    enabled: true,
+    config: PROGRESSBAR_DEFAULTS as unknown as Record<string, unknown>,
+  },
   // ↓ 添加新组件 ↓
   todo: {
     enabled: true,
-    config: {
-      value: 0,
-      showLabel: true,
-      labelFormat: "{value}%",
-      flags: {
-        showHeader: true,
-        animated: false,
-      },
-      layout: {
-        width: "100%",
-        height: "8px",
-      },
-      colors: {
-        light: {
-          background: "rgba(245, 248, 252, 0.9)",
-          text: "var(--text-normal)",
-        },
-        dark: {
-          background: "rgba(30, 41, 59, 0.72)",
-          text: "var(--text-normal)",
-        },
-      },
-    },
+    config: TODO_DEFAULTS as unknown as Record<string, unknown>,
   },
 };
 ```
@@ -1257,16 +1271,65 @@ container.style.setProperty("--ts-xxx-bg-dark", colors.dark.background);
 ### 3. 配置优先级
 
 ```
-用户输入 > 插件设置 config > config.json > 硬编码默认值
+用户输入 > 插件设置 config > 组件 config.ts 默认值
 ```
 
 ```typescript
-// 合并配置
-const mergedOptions = {
-  ...defaultOptions,           // 硬编码默认值
-  ...pluginSettings.config,    // 插件设置
-  ...userOptions,              // 用户输入（最高优先级）
-};
+// 合并配置（在 main.ts 中）
+card: this.settings.card.enabled 
+  ? ((options) => card({ 
+      ...this.settings.card.config,  // 插件设置（来自 config.ts + 用户修改）
+      ...options                      // 用户输入（最高优先级）
+    }))
+  : undefined,
+
+// 组件内部合并（在 index.ts 中）
+export function card(options: CardOptions = {}): HTMLElement {
+  const flags = { ...CARD_DEFAULTS.flags, ...options.flags };
+  const layout = { ...CARD_DEFAULTS.layout, ...options.layout };
+  const colors = {
+    light: { ...CARD_DEFAULTS.colors.light, ...options.colors?.light },
+    dark: { ...CARD_DEFAULTS.colors.dark, ...options.colors?.dark },
+  };
+}
+```
+
+**配置数据流：**
+
+```
+components/card/config.ts (CARD_DEFAULTS)
+        ↓
+src/settings/fields.ts (DEFAULT_SETTINGS 引用 config.ts)
+        ↓
+main.ts loadSettings() (合并 data.json 用户配置)
+        ↓
+window.tessera.card (注入插件设置)
+        ↓
+用户调用 tessera.card({...}) (用户输入覆盖)
+        ↓
+card() 函数内部再次合并 (确保完整默认值)
+```
+用户输入 > 插件设置 config > 组件 config.ts 默认值
+```
+
+```typescript
+// 合并配置（在 main.ts 中）
+card: this.settings.card.enabled 
+  ? ((options) => card({ 
+      ...this.settings.card.config,  // 插件设置（来自 config.ts）
+      ...options                      // 用户输入（最高优先级）
+    }))
+  : undefined,
+
+// 组件内部进一步合并（在 index.ts 中）
+export function card(options: CardOptions = {}): HTMLElement {
+  const flags = { ...CARD_DEFAULTS.flags, ...options.flags };
+  const layout = { ...CARD_DEFAULTS.layout, ...options.layout };
+  const colors = {
+    light: { ...CARD_DEFAULTS.colors.light, ...options.colors?.light },
+    dark: { ...CARD_DEFAULTS.colors.dark, ...options.colors?.dark },
+  };
+}
 ```
 
 ### 4. 字段设计原则
@@ -1289,12 +1352,13 @@ const mergedOptions = {
 
 添加新组件时，确保完成以下步骤：
 
-- [ ] 创建 `src/components/<name>/index.ts`
-- [ ] 导出组件函数和类型接口
+- [ ] 创建 `src/components/<name>/config.ts` 定义默认配置
+- [ ] 创建 `src/components/<name>/index.ts` 实现组件
+- [ ] 在 config.ts 中导出 `<NAME>_DEFAULTS` 常量
+- [ ] 在 index.ts 中从 config.ts 导入并使用默认配置
 - [ ] 支持 Light/Dark 双主题颜色
 - [ ] 更新 `src/settings/types.ts` 添加接口
-- [ ] 更新 `src/settings/fields.ts` 注册字段
-- [ ] 更新 `src/settings/fields.ts` 添加默认配置
+- [ ] 更新 `src/settings/fields.ts` 注册字段并导入配置
 - [ ] 更新 `src/main.ts` 导入并注册组件
 - [ ] 更新 `src/i18n/en.json` 添加英文翻译
 - [ ] 更新 `src/i18n/zh.json` 添加中文翻译

@@ -404,51 +404,87 @@ const lightBg = options.colors?.light?.background ?? defaultColors.light.backgro
 
 ## 4. 默认配置处理机制
 
-### 4.1 默认配置定义
+### 4.1 配置架构（单一数据源）
+
+TesseraScript 采用**单一数据源**的配置架构，每个组件的默认配置只在一个地方定义：
+
+```
+src/components/<name>/config.ts    ← 唯一数据源
+        ↓
+src/settings/fields.ts             ← 引用配置
+        ↓
+main.ts                            ← 加载并合并用户配置
+```
+
+### 4.2 组件配置文件
+
+每个组件在 `config.ts` 中定义默认配置：
+
+```typescript
+// src/components/card/config.ts
+
+export const CARD_DEFAULTS = {
+  flags: {
+    showHeader: true,
+    headerSep: true,
+    showTitle: true,
+    showMeta: true,
+    showValue: true,
+  },
+  layout: {
+    maxWidth: "100%",
+    padding: "16px",
+    radius: "16px",
+    gap: "14px",
+    bodyGap: "12px",
+  },
+  colors: {
+    light: {
+      background: "rgba(245, 248, 252, 0.9)",
+      border: "rgba(120, 140, 160, 0.18)",
+      shadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
+      hoverAccent: "var(--interactive-accent)",
+      value: "var(--text-accent, var(--text-normal))",
+    },
+    dark: {
+      background: "rgba(30, 41, 59, 0.72)",
+      border: "rgba(148, 163, 184, 0.18)",
+      shadow: "0 16px 36px rgba(2, 6, 23, 0.28)",
+      hoverAccent: "var(--interactive-accent)",
+      value: "var(--text-accent, var(--text-normal))",
+    },
+  },
+};
+```
+
+### 4.3 Settings 系统引用配置
+
+`fields.ts` 中的 `DEFAULT_SETTINGS` 引用组件配置，不再重复定义：
 
 ```typescript
 // src/settings/fields.ts
 
+import { CARD_DEFAULTS } from "../components/card/config";
+import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
+import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
+
 export const DEFAULT_SETTINGS: PluginSettings = {
   card: {
-    enabled: true,  // 默认启用
-    config: {
-      flags: {
-        showHeader: true,
-        headerSep: true,
-        showTitle: true,
-        showMeta: true,
-        showValue: true,
-      },
-      layout: {
-        maxWidth: "100%",
-        padding: "16px",
-        radius: "16px",
-        gap: "14px",
-        bodyGap: "12px",
-      },
-      colors: {
-        light: {
-          background: "rgba(245, 248, 252, 0.9)",
-          border: "rgba(120, 140, 160, 0.18)",
-          shadow: "rgba(15, 23, 42, 0.08)",
-          // ...
-        },
-        dark: {
-          background: "rgba(30, 41, 59, 0.72)",
-          border: "rgba(148, 163, 184, 0.18)",
-          shadow: "rgba(2, 6, 23, 0.28)",
-          // ...
-        },
-      },
-    },
+    enabled: true,
+    config: CARD_DEFAULTS as unknown as Record<string, unknown>,
   },
-  heatmap: { /* ... */ },
-  progressbar: { /* ... */ },
+  heatmap: {
+    enabled: true,
+    config: HEATMAP_DEFAULTS as unknown as Record<string, unknown>,
+  },
+  progressbar: {
+    enabled: true,
+    config: PROGRESSBAR_DEFAULTS as unknown as Record<string, unknown>,
+  },
 };
 ```
 
-### 4.2 默认配置的职责
+### 4.4 默认配置的职责
 
 | 职责 | 说明 |
 |------|------|
@@ -457,7 +493,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 | **重置目标** | "恢复默认"功能的目标 |
 | **类型参考** | 定义配置结构 |
 
-### 4.3 配置加载流程
+### 4.5 配置加载流程
 
 ```typescript
 // src/main.ts
