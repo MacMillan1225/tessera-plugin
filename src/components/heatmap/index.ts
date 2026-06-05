@@ -4,6 +4,7 @@
  */
 
 import { HEATMAP_DEFAULTS } from "./config";
+import { toString, createElement } from "../../utils/dom";
 
 // ============================================================================
 // Types
@@ -206,107 +207,6 @@ function resolveConfig(userOptions: HeatmapOptions = {}): MutableHeatmapConfig {
 	}
 
 	return merged;
-}
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
-function toString(value: unknown): string {
-	if (typeof value === "string") return value;
-	if (typeof value === "number" || typeof value === "boolean") return String(value);
-	if (value == null) return "";
-	if (typeof value === "object") return JSON.stringify(value);
-	// eslint-disable-next-line @typescript-eslint/no-base-to-string
-	return String(value);
-}
-
-function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
-	if (!className) {
-		return element;
-	}
-
-	const classes = Array.isArray(className)
-		? className.flatMap((item) => String(item || "").split(/\s+/))
-		: String(className).split(/\s+/);
-
-	classes.filter(Boolean).forEach((name) => element.classList.add(name));
-	return element;
-}
-
-function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
-	if (!styles || typeof styles !== "object") {
-		return element;
-	}
-
-	Object.entries(styles).forEach(([key, value]) => {
-		if (value == null) {
-			return;
-		}
-
-		if (key.startsWith("--") || key.includes("-")) {
-			element.style.setProperty(key, toString(value));
-			return;
-		}
-
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
-		(element.style as any)[key] = value;
-	});
-
-	return element;
-}
-
-function appendChildren(element: Node, children?: unknown): Node {
-	const list = Array.isArray(children) ? children : [children];
-
-	list.flat(Infinity).forEach((child) => {
-		if (child == null || child === false) {
-			return;
-		}
-
-		if (child instanceof Node) {
-			element.appendChild(child);
-			return;
-		}
-
-		const text = typeof child === "string" ? child : typeof child === "number" || typeof child === "boolean" ? String(child) : JSON.stringify(child);
-		// eslint-disable-next-line obsidianmd/prefer-active-doc
-		element.appendChild(document.createTextNode(text));
-	});
-
-	return element;
-}
-
-function createElement(tagName: string, options: {
-	className?: string | string[];
-	attrs?: Record<string, unknown>;
-	style?: Record<string, unknown>;
-	text?: string;
-	children?: unknown;
-} = {}): HTMLElement {
-	// eslint-disable-next-line obsidianmd/prefer-active-doc
-	const element = document.createElement(tagName);
-
-	assignClasses(element, options.className);
-	assignStyles(element, options.style);
-
-	if (options.attrs) {
-		Object.entries(options.attrs).forEach(([key, value]) => {
-			if (value != null) {
-				element.setAttribute(key, toString(value));
-			}
-		});
-	}
-
-	if (options.text != null) {
-		element.textContent = String(options.text);
-	}
-
-	if (options.children != null) {
-		appendChildren(element, options.children);
-	}
-
-	return element;
 }
 
 // ============================================================================
