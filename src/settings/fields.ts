@@ -128,14 +128,14 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 export const DEFAULT_SETTINGS: PluginSettings = {
 	card: {
 		enabled: true,
-		config: CARD_DEFAULTS as unknown as Record<string, unknown>,
+		config: CARD_DEFAULTS,
 	},
 	heatmap: {
 		enabled: true,
-		config: HEATMAP_DEFAULTS as unknown as Record<string, unknown>,
+		config: HEATMAP_DEFAULTS,
 	},
 	progressbar: {
 		enabled: true,
-		config: PROGRESSBAR_DEFAULTS as unknown as Record<string, unknown>,
+		config: PROGRESSBAR_DEFAULTS,
 	},
 };
