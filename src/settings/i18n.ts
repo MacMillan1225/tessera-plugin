@@ -57,9 +57,9 @@ export function getTranslations(): Translations {
 /**
  * Get all available locales
  */
-function getAvailableLocales(): string[] {
-	return Object.keys(TRANSLATIONS);
-}
+// function getAvailableLocales(): string[] {
+// 	return Object.keys(TRANSLATIONS);
+// }
 
 // ============================================================================
 // i18n Validation
