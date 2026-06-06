@@ -4,7 +4,7 @@
  */
 
 import { HEATMAP_DEFAULTS } from "./config";
-import { toString, createElement } from "../../utils/dom";
+import { createElement } from "../../utils/dom";
 
 // ============================================================================
 // Types

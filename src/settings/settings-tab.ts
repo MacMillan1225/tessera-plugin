@@ -113,11 +113,11 @@ export class TesseraSettingTab extends PluginSettingTab {
 		setting.setDesc(this.t.settings.restoreNotice);
 		setting.addButton((btn) => {
 			btn.setButtonText(this.t.settings.restoreButton);
-			btn.setWarning();
+			btn.setDestructive();
 			btn.onClick(async () => {
 				await this.plugin.resetSettings();
 				this.needsReload = true;
-				this.display();
+				// this.display();
 			});
 		});
 	}
@@ -161,7 +161,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 			} else {
 				this.collapsedSections.add(key);
 			}
-			this.display();
+			// this.display();
 		});
 		headerSetting.settingEl.prepend(collapseBtn);
 
