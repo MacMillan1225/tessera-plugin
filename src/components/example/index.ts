@@ -177,9 +177,3 @@ export function example(options: ExampleOptions = {}): HTMLElement {
 
 	return result;
 }
-
-// ============================================================================
-// Default Export
-// ============================================================================
-
-export default example;

@@ -8,7 +8,7 @@ export function toString(value: unknown): string {
 	return JSON.stringify(value);
 }
 
-export function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
+function assignClasses(element: HTMLElement, className?: string | string[]): HTMLElement {
 	if (!className) {
 		return element;
 	}
@@ -21,7 +21,7 @@ export function assignClasses(element: HTMLElement, className?: string | string[
 	return element;
 }
 
-export function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
+function assignStyles(element: HTMLElement, styles?: Record<string, unknown>): HTMLElement {
 	if (!styles || typeof styles !== "object") {
 		return element;
 	}
@@ -42,7 +42,7 @@ export function assignStyles(element: HTMLElement, styles?: Record<string, unkno
 	return element;
 }
 
-export function appendChildren(element: Node, children?: unknown): Node {
+function appendChildren(element: Node, children?: unknown): Node {
 	const list = Array.isArray(children) ? children : [children];
 
 	list.flat(Infinity).forEach((child) => {
@@ -124,7 +124,7 @@ export function mergeStyles(...styles: unknown[]): Record<string, unknown> {
 
 const SHARED_COLOR_KEYS = ["background", "border", "shadow", "hoverAccent", "value"];
 
-export function pickSharedColors(colors: Record<string, unknown> = {}): Record<string, unknown> {
+function pickSharedColors(colors: Record<string, unknown> = {}): Record<string, unknown> {
 	return SHARED_COLOR_KEYS.reduce<Record<string, unknown>>((result, key) => {
 		if (colors[key] !== undefined) {
 			result[key] = colors[key];

@@ -932,9 +932,3 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	return result;
 }
-
-// ============================================================================
-// Default Export
-// ============================================================================
-
-export default heatmap;

@@ -26,7 +26,7 @@ const TRANSLATIONS: Record<string, Translations> = {
 /**
  * Get current Obsidian locale
  */
-export function getLocale(): string {
+function getLocale(): string {
 	// Obsidian exposes moment.js globally
 	interface WindowWithMoment extends Window {
 		moment?: { locale(): string };
@@ -57,7 +57,7 @@ export function getTranslations(): Translations {
 /**
  * Get all available locales
  */
-export function getAvailableLocales(): string[] {
+function getAvailableLocales(): string[] {
 	return Object.keys(TRANSLATIONS);
 }
 
@@ -76,7 +76,7 @@ interface ValidationResult {
  * Validate that all field keys and tooltip keys have translations
  * Call this at compile time or during development
  */
-export function validateTranslations(
+function validateTranslations(
 	components: Record<string, ComponentDefinition>,
 	locale?: string
 ): Map<string, ValidationResult> {

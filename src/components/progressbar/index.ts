@@ -162,9 +162,3 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 
 	return result;
 }
-
-// ============================================================================
-// Default Export
-// ============================================================================
-
-export default progressbar;
