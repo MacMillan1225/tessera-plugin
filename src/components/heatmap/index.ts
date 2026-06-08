@@ -703,7 +703,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		// Adaptive mode
 		const cellPitch = (layout.cellSize || 11) + (layout.cellGap || 2);
 		const width = root.clientWidth || root.parentElement?.clientWidth || 0;
-		const maxWeeks = Math.max(settings.minWeeks || 12, Math.round((Math.max(width, 280) - 40) / cellPitch) - 1);
+		const maxWeeks = Math.max(settings.minWeeks || 12, Math.round((Math.max(width, 280) - 40) / cellPitch));
 		const rawStart = addDays(end, -(maxWeeks * 7));
 		const start = mondayFirst ? alignToMonday(rawStart) : rawStart;
 
