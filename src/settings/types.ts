@@ -57,12 +57,11 @@ export interface Translations {
 	settings: {
 		title: string;
 		description: string;
-		usage: string;
-		usageDesc: string;
 		reloadNotice: string;
 		reloadButton: string;
 		restoreButton: string;
 		restoreNotice: string;
+		resetField: string;
 	};
 	components: {
 		card: { name: string; desc: string };

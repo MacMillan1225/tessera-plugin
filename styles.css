@@ -777,3 +777,21 @@ body.theme-dark .ts-example__text {
 .tessera-hidden {
 	display: none;
 }
+
+/* Per-field reset button */
+.tessera-reset-btn {
+	padding: 2px 4px !important;
+	min-height: unset !important;
+	opacity: 0.5;
+	transition: opacity 0.15s ease;
+	box-shadow: unset;
+}
+
+.tessera-reset-btn:hover {
+	opacity: 1;
+}
+
+.tessera-reset-btn svg {
+	width: 14px;
+	height: 14px;
+}

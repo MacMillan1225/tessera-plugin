@@ -6,7 +6,7 @@ import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
 import type { PluginSettings, SettingField, ComponentDefinition, Translations } from "./types";
 import { getTranslations, getFieldLabel, getTooltipText, getGroupLabel, getComponentName, getComponentDesc, logValidationWarnings } from "./i18n";
 import { rgbaToHex, hexToRgba, extractAlpha, isColorLike } from "./color-utils";
-import { COMPONENTS } from "./fields";
+import { COMPONENTS, DEFAULT_SETTINGS } from "./fields";
 
 // ============================================================================
 // Settings Tab Class
@@ -66,19 +66,6 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 		// Restore defaults section
 		this.renderRestoreSection(containerEl);
-
-		// Usage section
-		new Setting(containerEl).setName(this.t.settings.usage).setHeading();
-		containerEl.createEl("p", {
-			text: this.t.settings.usageDesc,
-		});
-		const codeBlock = containerEl.createEl("pre", { cls: "tessera-code-block" });
-		codeBlock.createEl("code", {
-			text: `dv.container.appendChild(tessera.card({
-  title: "Hello",
-  value: 42
-}));`,
-		});
 	}
 
 	// ============================================================================
@@ -113,11 +100,10 @@ export class TesseraSettingTab extends PluginSettingTab {
 		setting.setDesc(this.t.settings.restoreNotice);
 		setting.addButton((btn) => {
 			btn.setButtonText(this.t.settings.restoreButton);
-			btn.setDestructive();
 			btn.onClick(async () => {
 				await this.plugin.resetSettings();
 				this.needsReload = true;
-				// this.display();
+				this.display();
 			});
 		});
 	}
@@ -180,7 +166,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		// Collapsible content
 		if (!isCollapsed && componentConfig.enabled) {
 			const content = section.createDiv({ cls: "tessera-settings-content" });
-			this.renderFields(content, componentConfig.config, definition.fields);
+			this.renderFields(content, componentConfig.config, definition.fields, definition.componentKey);
 		}
 	}
 
@@ -201,7 +187,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		// Re-render if not collapsed and enabled
 		if (!isCollapsed && componentConfig.enabled) {
 			const content = section.createDiv({ cls: "tessera-settings-content" });
-			this.renderFields(content, componentConfig.config, definition.fields);
+			this.renderFields(content, componentConfig.config, definition.fields, definition.componentKey);
 		}
 	}
 
@@ -212,7 +198,8 @@ export class TesseraSettingTab extends PluginSettingTab {
 	private renderFields(
 		container: HTMLElement,
 		config: Record<string, unknown>,
-		fields: SettingField[]
+		fields: SettingField[],
+		componentKey: string
 	): void {
 		// Group fields by their prefix (e.g., "flags", "layout", "settings", "colors.light")
 		const groups = new Map<string, SettingField[]>();
@@ -235,7 +222,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 			}
 
 			for (const field of groupFields) {
-				this.renderField(container, config, field);
+				this.renderField(container, config, field, componentKey);
 			}
 		}
 	}
@@ -260,10 +247,39 @@ export class TesseraSettingTab extends PluginSettingTab {
 		}
 	}
 
+	private addResetButton(
+		setting: Setting,
+		config: Record<string, unknown>,
+		field: SettingField,
+		componentKey: string
+	): void {
+		const defaultConfig = DEFAULT_SETTINGS[componentKey as keyof PluginSettings]?.config;
+		if (!defaultConfig) return;
+
+		const defaultValue = this.getNestedValue(defaultConfig, field.key);
+		const currentValue = this.getNestedValue(config, field.key);
+
+		// Only show reset button when current value differs from default
+		if (JSON.stringify(currentValue) === JSON.stringify(defaultValue)) return;
+
+		setting.addButton((btn) => {
+			btn.setIcon("rotate-ccw");
+			btn.setTooltip(this.t.settings.resetField);
+			btn.setClass("tessera-reset-btn");
+			btn.onClick(async () => {
+				this.setNestedValue(config, field.key, defaultValue);
+				await this.plugin.saveSettings();
+				this.showReloadButton();
+				this.display();
+			});
+		});
+	}
+
 	private renderField(
 		container: HTMLElement,
 		config: Record<string, unknown>,
-		field: SettingField
+		field: SettingField,
+		componentKey: string
 	): void {
 		const fieldLabel = getFieldLabel(this.t, field.key);
 		const setting = new Setting(container);
@@ -271,6 +287,9 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 		// Add tooltip if description exists
 		this.addTooltipToSetting(setting, field.description);
+
+		// Add per-field reset button (appears left of the input control)
+		this.addResetButton(setting, config, field, componentKey);
 
 		const currentValue = this.getNestedValue(config, field.key);
 

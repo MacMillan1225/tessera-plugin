@@ -2,12 +2,11 @@
   "settings": {
     "title": "TesseraScript 配置",
     "description": "配置可用的组件及其默认设置。",
-    "usage": "使用方法",
-    "usageDesc": "在 dataviewjs 代码块中使用 tessera 组件：",
     "reloadNotice": "设置已保存。点击「应用并重载」以应用更改。",
     "reloadButton": "应用并重载",
     "restoreButton": "恢复默认设置",
-    "restoreNotice": "将所有配置恢复为默认值。此操作不可撤销。"
+    "restoreNotice": "将所有配置恢复为默认值。此操作不可撤销。",
+    "resetField": "恢复默认值"
   },
   "components": {
     "card": {
@@ -29,6 +28,7 @@
     "flags.showTitle": "显示标题",
     "flags.showMeta": "显示元数据",
     "flags.showValue": "显示数值",
+    "flags.showLabel": "显示标签",
     "layout.maxWidth": "最大宽度",
     "layout.padding": "内边距",
     "layout.radius": "圆角半径",

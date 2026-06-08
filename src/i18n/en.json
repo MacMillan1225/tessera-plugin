@@ -2,12 +2,11 @@
   "settings": {
     "title": "TesseraScript Configuration",
     "description": "Configure which components are available and their default settings.",
-    "usage": "Usage",
-    "usageDesc": "Use tessera components in your dataviewjs code blocks:",
     "reloadNotice": "Settings saved. Click 'Apply & Reload' to apply changes.",
     "reloadButton": "Apply & Reload",
     "restoreButton": "Restore Defaults",
-    "restoreNotice": "Restore all settings to their default values. This action cannot be undone."
+    "restoreNotice": "Restore all settings to their default values. This action cannot be undone.",
+    "resetField": "Reset to default"
   },
   "components": {
     "card": {
@@ -29,6 +28,7 @@
     "flags.showTitle": "Show Title",
     "flags.showMeta": "Show Meta",
     "flags.showValue": "Show Value",
+    "flags.showLabel": "Show Label",
     "layout.maxWidth": "Max Width",
     "layout.padding": "Padding",
     "layout.radius": "Border Radius",

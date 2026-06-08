@@ -2,12 +2,11 @@
   "settings": {
     "title": "TesseraScript 設定",
     "description": "利用可能なコンポーネントとそのデフォルト設定を構成します。",
-    "usage": "使用方法",
-    "usageDesc": "dataviewjs コードブロックで tessera コンポーネントを使用：",
     "reloadNotice": "設定が保存されました。「適用してリロード」をクリックして変更を適用してください。",
     "reloadButton": "適用してリロード",
     "restoreButton": "デフォルトに戻す",
-    "restoreNotice": "すべての設定をデフォルト値に戻します。この操作は元に戻せません。"
+    "restoreNotice": "すべての設定をデフォルト値に戻します。この操作は元に戻せません。",
+    "resetField": "デフォルトに戻す"
   },
   "components": {
     "card": {
@@ -29,6 +28,7 @@
     "flags.showTitle": "タイトルを表示",
     "flags.showMeta": "メタデータを表示",
     "flags.showValue": "値を表示",
+    "flags.showLabel": "ラベルを表示",
     "layout.maxWidth": "最大幅",
     "layout.padding": "パディング",
     "layout.radius": "角の半径",
