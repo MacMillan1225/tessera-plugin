@@ -41,6 +41,74 @@ export class TesseraSettingTab extends PluginSettingTab {
 		logValidationWarnings(COMPONENTS);
 	}
 
+	/**
+	 * Declarative settings API for Obsidian 1.13.0+.
+	 * Falls back to display() for pre-1.13.0 versions.
+	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	getSettingDefinitions(): any[] {
+		const definitions: unknown[] = [];
+
+		// Header
+		definitions.push({
+			name: this.t.settings.title,
+			desc: this.t.settings.description,
+		});
+
+		// Reload section (render callback for dynamic visibility)
+		definitions.push({
+			name: this.t.settings.reloadButton,
+			desc: this.t.settings.reloadNotice,
+			render: (setting: Setting) => {
+				this.reloadContainerEl = setting.settingEl;
+				if (!this.needsReload) {
+					setting.settingEl.classList.add("tessera-hidden");
+				}
+				setting.addButton((btn) => {
+					btn.setButtonText(this.t.settings.reloadButton);
+					btn.setCta();
+					btn.onClick(() => {
+						const appWithCommands = this.app as AppWithCommands;
+						appWithCommands.commands?.executeCommandById("app:reload");
+					});
+				});
+			},
+		});
+
+		// Component sections
+		for (const [key, definition] of Object.entries(COMPONENTS)) {
+			definitions.push({
+				type: "group",
+				heading: getComponentName(this.t, definition.componentKey),
+				render: (setting: Setting) => {
+					this.renderCollapsibleSection(
+						setting.settingEl,
+						key as keyof PluginSettings,
+						definition
+					);
+				},
+			});
+		}
+
+		// Restore defaults section
+		definitions.push({
+			name: this.t.settings.restoreButton,
+			desc: this.t.settings.restoreNotice,
+			render: (setting: Setting) => {
+				setting.addButton((btn) => {
+					btn.setButtonText(this.t.settings.restoreButton);
+					btn.onClick(async () => {
+						await this.plugin.resetSettings();
+						this.needsReload = true;
+						this.refreshSettings();
+					});
+				});
+			},
+		});
+
+		return definitions;
+	}
+
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
@@ -103,7 +171,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 			btn.onClick(async () => {
 				await this.plugin.resetSettings();
 				this.needsReload = true;
-				this.display();
+				this.refreshSettings();
 			});
 		});
 	}
@@ -112,6 +180,22 @@ export class TesseraSettingTab extends PluginSettingTab {
 		this.needsReload = true;
 		if (this.reloadContainerEl) {
 			this.reloadContainerEl.classList.remove("tessera-hidden");
+		}
+	}
+
+	/**
+	 * Refresh settings UI using the appropriate method for the Obsidian version.
+	 * - Obsidian 1.13.0+: uses refreshDomState() (new declarative API)
+	 * - Pre-1.13.0: falls back to display() (legacy imperative API)
+	 */
+	private refreshSettings(): void {
+		// Check if refreshDomState exists (Obsidian 1.13.0+)
+		if ("refreshDomState" in this && typeof (this as Record<string, unknown>).refreshDomState === "function") {
+			((this as Record<string, unknown>).refreshDomState as () => void).call(this);
+		} else {
+			// Fallback for pre-1.13.0 Obsidian
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			this.display();
 		}
 	}
 
@@ -147,7 +231,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 			} else {
 				this.collapsedSections.add(key);
 			}
-			this.display();
+			this.refreshSettings();
 		});
 		headerSetting.settingEl.prepend(collapseBtn);
 
@@ -270,7 +354,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 				this.setNestedValue(config, field.key, defaultValue);
 				await this.plugin.saveSettings();
 				this.showReloadButton();
-				this.display();
+				this.refreshSettings();
 			});
 		});
 	}
