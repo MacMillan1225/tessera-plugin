@@ -24,7 +24,7 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 		fields: [
 			// Flags
 			{ key: "flags.showHeader", type: "toggle", description: "tooltip.flags.showHeader" },
-			{ key: "flags.headerSep", type: "toggle", description: "tooltip.flags.headerSep" },
+			{ key: "flags.showHeaderSep", type: "toggle", description: "tooltip.flags.showHeaderSep" },
 			{ key: "flags.showTitle", type: "toggle", description: "tooltip.flags.showTitle" },
 			{ key: "flags.showMeta", type: "toggle", description: "tooltip.flags.showMeta" },
 			{ key: "flags.showValue", type: "toggle", description: "tooltip.flags.showValue" },

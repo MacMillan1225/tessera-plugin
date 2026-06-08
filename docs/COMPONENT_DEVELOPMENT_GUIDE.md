@@ -465,7 +465,7 @@ export interface CardOptions {
   // ↓ 添加新字段 ↓
   flags?: {
     showHeader?: boolean;
-    headerSep?: boolean;
+    showHeaderSep?: boolean;
     showTitle?: boolean;
     showMeta?: boolean;
     showValue?: boolean;
@@ -500,7 +500,7 @@ card: {
   config: {
     flags: {
       showHeader: true,
-      headerSep: true,
+      showHeaderSep: true,
       showTitle: true,
       showMeta: true,
       showValue: true,

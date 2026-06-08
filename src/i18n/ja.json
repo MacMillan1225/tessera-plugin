@@ -25,7 +25,7 @@
   },
   "fields": {
     "flags.showHeader": "ヘッダーを表示",
-    "flags.headerSep": "ヘッダー区切り",
+    "flags.showHeaderSep": "ヘッダー区切り",
     "flags.showTitle": "タイトルを表示",
     "flags.showMeta": "メタデータを表示",
     "flags.showValue": "値を表示",
@@ -90,7 +90,7 @@
   },
   "tooltips": {
     "flags.showHeader": "カードの上部にタイトルとメタデータ領域を表示",
-    "flags.headerSep": "ヘッダーとコンテンツの間に区切り線を表示",
+    "flags.showHeaderSep": "ヘッダーとコンテンツの間に区切り線を表示",
     "flags.showTitle": "ヘッダーにタイトルテキストを表示",
     "flags.showMeta": "ヘッダーにメタデータ（小さなラベル）を表示",
     "flags.showValue": "ヘッダーにメイン値を表示",

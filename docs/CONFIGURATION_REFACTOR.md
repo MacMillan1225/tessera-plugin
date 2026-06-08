@@ -107,7 +107,7 @@ interface CardOptions {
   className?: string | string[];
   flags?: {
     showHeader?: boolean;
-    headerSep?: boolean;
+    showHeaderSep?: boolean;
     showTitle?: boolean;
     showMeta?: boolean;
     showValue?: boolean;

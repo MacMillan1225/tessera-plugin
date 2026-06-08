@@ -25,7 +25,7 @@
   },
   "fields": {
     "flags.showHeader": "显示头部",
-    "flags.headerSep": "头部分隔线",
+    "flags.showHeaderSep": "头部分隔线",
     "flags.showTitle": "显示标题",
     "flags.showMeta": "显示元数据",
     "flags.showValue": "显示数值",
@@ -90,7 +90,7 @@
   },
   "tooltips": {
     "flags.showHeader": "是否在卡片顶部显示标题和元数据区域",
-    "flags.headerSep": "在标题区域和内容之间显示分隔线",
+    "flags.showHeaderSep": "在标题区域和内容之间显示分隔线",
     "flags.showTitle": "在头部显示标题文本",
     "flags.showMeta": "在头部显示元数据（小标签）",
     "flags.showValue": "在头部显示主数值",

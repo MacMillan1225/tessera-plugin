@@ -25,7 +25,7 @@
   },
   "fields": {
     "flags.showHeader": "Show Header",
-    "flags.headerSep": "Header Separator",
+    "flags.showHeaderSep": "Header Separator",
     "flags.showTitle": "Show Title",
     "flags.showMeta": "Show Meta",
     "flags.showValue": "Show Value",
@@ -90,7 +90,7 @@
   },
   "tooltips": {
     "flags.showHeader": "Show title and meta area at the top of the card",
-    "flags.headerSep": "Show separator between header and content",
+    "flags.showHeaderSep": "Show separator between header and content",
     "flags.showTitle": "Display title text in the header",
     "flags.showMeta": "Display metadata (small label) in the header",
     "flags.showValue": "Display main value in the header",

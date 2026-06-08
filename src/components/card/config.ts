@@ -6,7 +6,7 @@
 export const CARD_DEFAULTS = {
 	flags: {
 		showHeader: true,
-		headerSep: true,
+		showHeaderSep: true,
 		showTitle: true,
 		showMeta: true,
 		showValue: true,

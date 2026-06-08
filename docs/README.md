@@ -60,7 +60,7 @@ dv.container.appendChild(card({
   content: "Tasks completed today",
   flags: {
     showHeader: true,
-    headerSep: true
+    showHeaderSep: true
   },
   layout: {
     padding: "16px",
@@ -80,7 +80,7 @@ dv.container.appendChild(card({
 | `children` | `any` | `undefined` | Custom child elements |
 | `emptyText` | `string` | `"No content"` | Text when content is empty |
 | `flags.showHeader` | `boolean` | `true` | Show header section |
-| `flags.headerSep` | `boolean` | `true` | Show header separator |
+| `flags.showHeaderSep` | `boolean` | `true` | Show header separator |
 | `layout.padding` | `string` | `"16px"` | Card padding |
 | `layout.radius` | `string` | `"16px"` | Border radius |
 

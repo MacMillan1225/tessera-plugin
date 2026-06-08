@@ -20,7 +20,7 @@ export interface CardOptions {
 	className?: string | string[];
 	flags?: {
 		showHeader?: boolean;
-		headerSep?: boolean;
+		showHeaderSep?: boolean;
 		showTitle?: boolean;
 		showMeta?: boolean;
 		showValue?: boolean;
@@ -144,7 +144,7 @@ export function card(options: CardOptions = {}): HTMLElement {
 				? createElement("header", {
 						className: [
 							"ts-card__header",
-							flags.headerSep !== false && "ts-card__header--sep",
+							flags.showHeaderSep !== false && "ts-card__header--sep",
 						].filter(Boolean) as string[],
 						style: styles.header,
 						children: headerChildren,

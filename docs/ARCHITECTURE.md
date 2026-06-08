@@ -266,7 +266,7 @@ card({
   // 来自插件设置 (this.settings.card.config)
   flags: {
     showHeader: true,
-    headerSep: true,
+    showHeaderSep: true,
     showTitle: true,
     showMeta: true,
     showValue: true,
@@ -426,7 +426,7 @@ main.ts                            ← 加载并合并用户配置
 export const CARD_DEFAULTS = {
   flags: {
     showHeader: true,
-    headerSep: true,
+    showHeaderSep: true,
     showTitle: true,
     showMeta: true,
     showValue: true,
@@ -826,7 +826,7 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
     fields: [
       // 每个字段定义一个 UI 控件
       { key: "flags.showHeader", type: "toggle", description: "tooltip.flags.showHeader" },
-      { key: "flags.headerSep", type: "toggle", description: "tooltip.flags.headerSep" },
+      { key: "flags.showHeaderSep", type: "toggle", description: "tooltip.flags.showHeaderSep" },
       { key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
       { key: "layout.padding", type: "text", description: "tooltip.layout.padding" },
       { key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
