@@ -601,19 +601,26 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 			const cell = target.closest(".ts-heatmap__cell") as HTMLElement | null;
 			if (!cell || !cell.dataset.tooltipReady) return;
 
-			// Find cell context from stored data
-			const cellIndex = cells.indexOf(cell);
-			if (cellIndex === -1) return;
-
 			// Rebuild context for this cell
-			const dateKey = cell.getAttribute("aria-label");
+			const dateKey = cell.dataset.dateKey;
 			if (!dateKey) return;
 
 			const date = normalizeDate(dateKey);
 			if (!date) return;
 
+			// Parse entry from dataset
+			let entry: HeatmapEntry | undefined;
+			try {
+				const entryData = cell.dataset.entry;
+				if (entryData && entryData !== "null") {
+					entry = JSON.parse(entryData) as HeatmapEntry;
+				}
+			} catch {
+				entry = undefined;
+			}
+
 			const context: HeatmapCellContext = {
-				entry: undefined, // Will be resolved in renderTooltip
+				entry,
 				date,
 				dateKey,
 				theme: colors,
@@ -801,7 +808,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 				const cell = createElement("div", {
 					className: ["ts-heatmap__cell", `is-level-${safeLevel}`, visual.className].filter(Boolean) as string[],
 					attrs: {
-						"aria-label": dateKey,
+						"tabindex": "0",
 					},
 					style: {
 						...(visual.color ? { backgroundColor: visual.color } : null),
@@ -815,6 +822,8 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 				// Tooltip support - store context for event delegation
 				if (flags.showTooltip !== false) {
 					cell.dataset.tooltipReady = "true";
+					cell.dataset.dateKey = dateKey;
+					cell.dataset.entry = JSON.stringify(entry || null);
 				}
 
 				weekColumn.appendChild(cell);
