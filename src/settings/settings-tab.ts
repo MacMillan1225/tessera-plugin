@@ -147,7 +147,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 			} else {
 				this.collapsedSections.add(key);
 			}
-			// this.display();
+			this.display();
 		});
 		headerSetting.settingEl.prepend(collapseBtn);
 
