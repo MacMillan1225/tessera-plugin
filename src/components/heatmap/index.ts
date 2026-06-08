@@ -66,11 +66,11 @@ export interface HeatmapOptions {
 		showMonthLabels?: boolean;
 		showWeekLabels?: boolean;
 		showLegend?: boolean;
-		enableTooltip?: boolean;
+		showTooltip?: boolean;
 		mondayFirst?: boolean;
 	};
 	settings?: {
-		rangeMode?: "adaptive" | "fixed-days" | "fixed-range";
+		rangeMode?: "adaptive" | "fixed" | "year";
 		minWeeks?: number;
 		fixedDays?: number;
 		locale?: string;
@@ -124,90 +124,8 @@ export interface HeatmapOptions {
 }
 
 // ============================================================================
-// Configuration Resolution
+// Configuration Resolution (removed - using direct merge like other components)
 // ============================================================================
-
-// Mutable version of HeatmapConfig for internal use
-interface MutableHeatmapConfig {
-	flags: {
-		showWeekLabels: boolean;
-		showMonthLabels: boolean;
-		showLegend: boolean;
-		enableTooltip: boolean;
-		mondayFirst: boolean;
-	};
-	settings: {
-		rangeMode: "adaptive" | "fixed-days" | "fixed-range";
-		minWeeks: number;
-		fixedDays: number;
-		locale: string;
-		monthNames: string[];
-		weekLabels: string[];
-		legend: string | false | null;
-		tooltipId: string;
-	};
-	layout: {
-		maxWidth: string;
-		cellSize: number;
-		cellGap: number;
-		cellRadius: string;
-		weekLabelWidth: string;
-		weekLabelGap: string;
-		monthLabelHeight: string;
-		monthOffset: string;
-		gridTopOffset: string;
-		monthLabelSize: string;
-		weekLabelSize: string;
-		legendGap: string;
-		legendTop: string;
-		legendSwatchSize: string;
-	};
-	colors: ThemeColors;
-	styles: {
-		root: Record<string, unknown> | null;
-		months: Record<string, unknown> | null;
-		weeks: Record<string, unknown> | null;
-		grid: Record<string, unknown> | null;
-		legend: Record<string, unknown> | null;
-	};
-}
-
-function resolveConfig(userOptions: HeatmapOptions = {}): MutableHeatmapConfig {
-	const base = HEATMAP_DEFAULTS;
-	const merged: MutableHeatmapConfig = {
-		flags: { ...base.flags },
-		settings: { ...base.settings },
-		layout: { ...base.layout },
-		colors: {
-			light: { ...base.colors.light, levels: [...base.colors.light.levels] },
-			dark: { ...base.colors.dark, levels: [...base.colors.dark.levels] },
-		},
-		styles: { ...base.styles },
-	};
-
-	if (userOptions.flags) {
-		merged.flags = { ...merged.flags, ...userOptions.flags };
-	}
-	if (userOptions.settings) {
-		merged.settings = { ...merged.settings, ...userOptions.settings };
-	}
-	if (userOptions.layout) {
-		merged.layout = { ...merged.layout, ...userOptions.layout };
-	}
-	if (userOptions.colors) {
-		if (userOptions.colors.light) {
-			merged.colors.light = { ...merged.colors.light, ...userOptions.colors.light };
-		}
-		if (userOptions.colors.dark) {
-			merged.colors.dark = { ...merged.colors.dark, ...userOptions.colors.dark };
-		}
-	}
-	if (userOptions.styles) {
-		merged.styles = { ...merged.styles, ...userOptions.styles };
-	}
-
-	return merged;
-}
 
 // ============================================================================
 // Date Utilities
@@ -532,24 +450,14 @@ interface HeatmapWithParts extends HTMLElement {
 // ============================================================================
 
 export function heatmap(options: HeatmapOptions = {}): HTMLElement {
-	// Resolve configuration: default config + loaded config + user options
-	const resolvedConfig = resolveConfig(options);
-	const flags = { ...resolvedConfig.flags, ...options.flags };
-	const settings = { ...resolvedConfig.settings, ...options.settings };
-	const layout = { ...resolvedConfig.layout, ...options.layout };
-	// Resolve styles with null-to-undefined conversion
-	const styles = {
-		root: options.styles?.root ?? resolvedConfig.styles.root ?? undefined,
-		months: options.styles?.months ?? resolvedConfig.styles.months ?? undefined,
-		weeks: options.styles?.weeks ?? resolvedConfig.styles.weeks ?? undefined,
-		grid: options.styles?.grid ?? resolvedConfig.styles.grid ?? undefined,
-		legend: options.styles?.legend ?? resolvedConfig.styles.legend ?? undefined,
-	};
-
-	// Resolve theme colors with deep merge
+	// Resolve configuration: default config + user options (like other components)
+	const flags = { ...HEATMAP_DEFAULTS.flags, ...options.flags };
+	const settings = { ...HEATMAP_DEFAULTS.settings, ...options.settings };
+	const layout = { ...HEATMAP_DEFAULTS.layout, ...options.layout };
+	const styles = options.styles || {};
 	const colors: ThemeColors = {
-		light: { ...resolvedConfig.colors.light, ...options.colors?.light },
-		dark: { ...resolvedConfig.colors.dark, ...options.colors?.dark },
+		light: { ...HEATMAP_DEFAULTS.colors.light, ...options.colors?.light },
+		dark: { ...HEATMAP_DEFAULTS.colors.dark, ...options.colors?.dark },
 	};
 
 	// Merge flat color overrides
@@ -685,13 +593,13 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		const end = normalizeDate(options.endDate) || new Date();
 		const mondayFirst = flags.mondayFirst !== false;
 
-		if (settings.rangeMode === "fixed-range") {
+		if (settings.rangeMode === "fixed") {
 			const rawStart = normalizeDate(options.startDate) || addDays(end, -83);
 			const start = mondayFirst ? alignToMonday(rawStart) : rawStart;
 			return { start, end, totalDays: diffDays(start, end) + 1 };
 		}
 
-		if (settings.rangeMode === "fixed-days") {
+		if (settings.rangeMode === "year") {
 			const startSeed = addDays(end, -(settings.fixedDays || 84) - 1);
 			const start = mondayFirst ? alignToMonday(startSeed) : startSeed;
 			return { start, end, totalDays: diffDays(start, end) + 1 };
@@ -812,7 +720,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 				}
 
 				// Tooltip support
-				if (flags.enableTooltip !== false) {
+				if (flags.showTooltip !== false) {
 					cell.addEventListener("mouseenter", () => {
 						const tooltip = ensureTooltip(tooltipId);
 						// eslint-disable-next-line no-unsanitized/property, @microsoft/sdl/no-inner-html

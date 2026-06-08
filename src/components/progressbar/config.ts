@@ -7,12 +7,12 @@ export const PROGRESSBAR_DEFAULTS = {
 	value: 0,
 	max: 100,
 	min: 0,
-	showLabel: true,
 	labelFormat: "{value}%",
 	flags: {
+		showLabel: true,
 		showGlow: true,
-		striped: false,
-		animated: false,
+		showStriped: false,
+		showAnimated: false,
 	},
 	layout: {
 		width: "100%",
@@ -23,12 +23,20 @@ export const PROGRESSBAR_DEFAULTS = {
 	colors: {
 		light: {
 			track: "rgba(0, 0, 0, 0.08)",
+			trackBorder: "transparent",
 			fill: "var(--interactive-accent)",
+			fillGradient: "none",
+			shadow: "none",
+			glow: "none",
 			label: "var(--text-normal)",
 		},
 		dark: {
 			track: "rgba(255, 255, 255, 0.08)",
+			trackBorder: "transparent",
 			fill: "var(--interactive-accent)",
+			fillGradient: "none",
+			shadow: "none",
+			glow: "none",
 			label: "var(--text-normal)",
 		},
 	},

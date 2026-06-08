@@ -14,12 +14,12 @@ export interface ProgressbarOptions {
 	value?: number;
 	max?: number;
 	min?: number;
-	showLabel?: boolean;
 	labelFormat?: string;
 	flags?: {
+		showLabel?: boolean;
 		showGlow?: boolean;
-		striped?: boolean;
-		animated?: boolean;
+		showStriped?: boolean;
+		showAnimated?: boolean;
 	};
 	layout?: {
 		width?: string;
@@ -113,7 +113,7 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 	const fill = createElement("div", {
 		className: [
 			"ts-progressbar__fill",
-			flags.striped === true && flags.animated !== false && "ts-progressbar__fill--animated",
+			flags.showStriped === true && flags.showAnimated !== false && "ts-progressbar__fill--animated",
 		].filter(Boolean) as string[],
 		style: {
 			...styles.fill,
@@ -128,8 +128,8 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 	const root = createElement("div", {
 		className: [
 			"ts-progressbar",
-			flags.animated === false && "ts-progressbar--static",
-			flags.striped === true && "ts-progressbar--striped",
+			flags.showAnimated === false && "ts-progressbar--static",
+			flags.showStriped === true && "ts-progressbar--striped",
 			flags.showGlow === false && "ts-progressbar--no-glow",
 			options.className,
 		].filter(Boolean) as string[],

@@ -38,10 +38,14 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 			{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
 			{ key: "colors.light.border", type: "color", description: "tooltip.colors.border" },
 			{ key: "colors.light.shadow", type: "color", description: "tooltip.colors.shadow" },
+			{ key: "colors.light.hoverAccent", type: "color", description: "tooltip.colors.hoverAccent" },
+			{ key: "colors.light.value", type: "color", description: "tooltip.colors.value" },
 			// Colors (Dark)
 			{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
 			{ key: "colors.dark.border", type: "color", description: "tooltip.colors.border" },
 			{ key: "colors.dark.shadow", type: "color", description: "tooltip.colors.shadow" },
+			{ key: "colors.dark.hoverAccent", type: "color", description: "tooltip.colors.hoverAccent" },
+			{ key: "colors.dark.value", type: "color", description: "tooltip.colors.value" },
 		],
 	},
 	heatmap: {
@@ -51,7 +55,7 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 			{ key: "flags.showWeekLabels", type: "toggle", description: "tooltip.heatmap.showWeekLabels" },
 			{ key: "flags.showMonthLabels", type: "toggle", description: "tooltip.heatmap.showMonthLabels" },
 			{ key: "flags.showLegend", type: "toggle", description: "tooltip.heatmap.showLegend" },
-			{ key: "flags.enableTooltip", type: "toggle", description: "tooltip.heatmap.enableTooltip" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.heatmap.showTooltip" },
 			{ key: "flags.mondayFirst", type: "toggle", description: "tooltip.heatmap.mondayFirst" },
 			// Settings
 			{ key: "settings.locale", type: "select", description: "tooltip.heatmap.locale", options: [
@@ -74,6 +78,9 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 			{ key: "settings.minWeeks", type: "number", description: "tooltip.heatmap.minWeeks" },
 			{ key: "settings.fixedDays", type: "number", description: "tooltip.heatmap.fixedDays" },
 			{ key: "settings.legend", type: "text", description: "tooltip.heatmap.legend" },
+			{ key: "settings.monthNames", type: "text", description: "tooltip.heatmap.monthNames" },
+			{ key: "settings.weekLabels", type: "text", description: "tooltip.heatmap.weekLabels" },
+			{ key: "settings.tooltipId", type: "text", description: "tooltip.heatmap.tooltipId" },
 			// Layout
 			{ key: "layout.cellSize", type: "number", description: "tooltip.heatmap.cellSize" },
 			{ key: "layout.cellGap", type: "number", description: "tooltip.heatmap.cellGap" },
@@ -96,14 +103,14 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 		componentKey: "progressbar",
 		fields: [
 			// Basic
-			{ key: "showLabel", type: "toggle", description: "tooltip.progressbar.showLabel" },
 			{ key: "labelFormat", type: "text", placeholder: "{value}%", description: "tooltip.progressbar.labelFormat" },
 			{ key: "min", type: "number", description: "tooltip.progressbar.min" },
 			{ key: "max", type: "number", description: "tooltip.progressbar.max" },
 			// Flags
+			{ key: "flags.showLabel", type: "toggle", description: "tooltip.progressbar.showLabel" },
 			{ key: "flags.showGlow", type: "toggle", description: "tooltip.progressbar.showGlow" },
-			{ key: "flags.striped", type: "toggle", description: "tooltip.progressbar.striped" },
-			{ key: "flags.animated", type: "toggle", description: "tooltip.progressbar.animated" },
+			{ key: "flags.showStriped", type: "toggle", description: "tooltip.progressbar.showStriped" },
+			{ key: "flags.showAnimated", type: "toggle", description: "tooltip.progressbar.showAnimated" },
 			// Layout
 			{ key: "layout.width", type: "text", description: "tooltip.layout.width" },
 			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
@@ -111,11 +118,19 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
 			{ key: "layout.trackOpacity", type: "slider", min: 0, max: 1, step: 0.01, description: "tooltip.progressbar.trackOpacity" },
 			// Colors (Light)
 			{ key: "colors.light.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.light.trackBorder", type: "color", description: "tooltip.colors.trackBorder" },
 			{ key: "colors.light.fill", type: "color", description: "tooltip.colors.fill" },
+			{ key: "colors.light.fillGradient", type: "text", description: "tooltip.colors.fillGradient" },
+			{ key: "colors.light.shadow", type: "color", description: "tooltip.colors.shadow" },
+			{ key: "colors.light.glow", type: "color", description: "tooltip.colors.glow" },
 			{ key: "colors.light.label", type: "color", description: "tooltip.colors.label" },
 			// Colors (Dark)
 			{ key: "colors.dark.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.dark.trackBorder", type: "color", description: "tooltip.colors.trackBorder" },
 			{ key: "colors.dark.fill", type: "color", description: "tooltip.colors.fill" },
+			{ key: "colors.dark.fillGradient", type: "text", description: "tooltip.colors.fillGradient" },
+			{ key: "colors.dark.shadow", type: "color", description: "tooltip.colors.shadow" },
+			{ key: "colors.dark.glow", type: "color", description: "tooltip.colors.glow" },
 			{ key: "colors.dark.label", type: "color", description: "tooltip.colors.label" },
 		],
 	},

@@ -8,11 +8,11 @@ export const HEATMAP_DEFAULTS = {
 		showWeekLabels: true,
 		showMonthLabels: true,
 		showLegend: true,
-		enableTooltip: true,
+		showTooltip: true,
 		mondayFirst: true,
 	},
 	settings: {
-		rangeMode: "adaptive" as "adaptive" | "fixed-days" | "fixed-range",
+		rangeMode: "adaptive" as "adaptive" | "fixed" | "year",
 		minWeeks: 12,
 		fixedDays: 84,
 		locale: "zh-CN",
