@@ -557,15 +557,15 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	const cells: HTMLElement[] = [];
 
 	// Tooltip hide timeout
-	let tooltipHideTimeout: ReturnType<typeof setTimeout> | null = null;
+	let tooltipHideTimeout: number | null = null;
 
 	// Clear tooltip with debounce
 	function clearTooltip(): void {
 		if (tooltipHideTimeout) {
-			clearTimeout(tooltipHideTimeout);
+			window.clearTimeout(tooltipHideTimeout);
 			tooltipHideTimeout = null;
 		}
-		tooltipHideTimeout = setTimeout(() => {
+		tooltipHideTimeout = window.setTimeout(() => {
 			// eslint-disable-next-line obsidianmd/prefer-active-doc
 			const tooltip = document.getElementById(renderState.tooltipId);
 			if (tooltip) {
@@ -578,7 +578,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	// Show tooltip for a cell
 	function showTooltip(cell: HTMLElement, context: HeatmapCellContext, visual: HeatmapCellStyle): void {
 		if (tooltipHideTimeout) {
-			clearTimeout(tooltipHideTimeout);
+			window.clearTimeout(tooltipHideTimeout);
 			tooltipHideTimeout = null;
 		}
 		const tooltip = ensureTooltip(tooltipId);
@@ -598,7 +598,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	if (flags.showTooltip !== false) {
 		gridEl.addEventListener("mouseover", (event) => {
 			const target = event.target as HTMLElement;
-			const cell = target.closest(".ts-heatmap__cell") as HTMLElement | null;
+			const cell = target.closest<HTMLElement>(".ts-heatmap__cell");
 			if (!cell || !cell.dataset.tooltipReady) return;
 
 			// Rebuild context for this cell
@@ -668,7 +668,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		});
 
 		// Calculate actual width of week labels
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			if (weeksEl.hidden) return;
 
 			// Find the widest week label
@@ -901,7 +901,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	result.destroy = () => {
 		renderState.destroyed = true;
 		if (tooltipHideTimeout) {
-			clearTimeout(tooltipHideTimeout);
+			window.clearTimeout(tooltipHideTimeout);
 			tooltipHideTimeout = null;
 		}
 		clearTooltip();
