@@ -124,10 +124,6 @@ export interface HeatmapOptions {
 }
 
 // ============================================================================
-// Configuration Resolution (removed - using direct merge like other components)
-// ============================================================================
-
-// ============================================================================
 // Date Utilities
 // ============================================================================
 
@@ -560,13 +556,90 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	// Cell storage
 	const cells: HTMLElement[] = [];
 
-	// Clear tooltip
+	// Tooltip hide timeout
+	let tooltipHideTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	// Clear tooltip with debounce
 	function clearTooltip(): void {
-		// eslint-disable-next-line obsidianmd/prefer-active-doc
-		const tooltip = document.getElementById(renderState.tooltipId);
-		if (tooltip) {
-			tooltip.classList.remove("is-active");
+		if (tooltipHideTimeout) {
+			clearTimeout(tooltipHideTimeout);
+			tooltipHideTimeout = null;
 		}
+		tooltipHideTimeout = setTimeout(() => {
+			// eslint-disable-next-line obsidianmd/prefer-active-doc
+			const tooltip = document.getElementById(renderState.tooltipId);
+			if (tooltip) {
+				tooltip.classList.remove("is-active");
+			}
+			tooltipHideTimeout = null;
+		}, 50);
+	}
+
+	// Show tooltip for a cell
+	function showTooltip(cell: HTMLElement, context: HeatmapCellContext, visual: HeatmapCellStyle): void {
+		if (tooltipHideTimeout) {
+			clearTimeout(tooltipHideTimeout);
+			tooltipHideTimeout = null;
+		}
+		const tooltip = ensureTooltip(tooltipId);
+		// eslint-disable-next-line no-unsanitized/property, @microsoft/sdl/no-inner-html
+		tooltip.innerHTML = typeof options.renderTooltip === "function"
+			? options.renderTooltip({ ...context, visual })
+			: defaultTooltipRenderer({ ...context, visual });
+
+		applyTooltipTheme(root, tooltip);
+		positionTooltip(tooltip, cell);
+		window.requestAnimationFrame(() => {
+			tooltip.classList.add("is-active");
+		});
+	}
+
+	// Event delegation for tooltips on grid
+	if (flags.showTooltip !== false) {
+		gridEl.addEventListener("mouseover", (event) => {
+			const target = event.target as HTMLElement;
+			const cell = target.closest(".ts-heatmap__cell") as HTMLElement | null;
+			if (!cell || !cell.dataset.tooltipReady) return;
+
+			// Find cell context from stored data
+			const cellIndex = cells.indexOf(cell);
+			if (cellIndex === -1) return;
+
+			// Rebuild context for this cell
+			const dateKey = cell.getAttribute("aria-label");
+			if (!dateKey) return;
+
+			const date = normalizeDate(dateKey);
+			if (!date) return;
+
+			const context: HeatmapCellContext = {
+				entry: undefined, // Will be resolved in renderTooltip
+				date,
+				dateKey,
+				theme: colors,
+				locale,
+			};
+
+			// Get visual from cell classes
+			const levelMatch = Array.from(cell.classList).find(c => c.startsWith("is-level-"));
+			const level = levelMatch ? parseInt(levelMatch.replace("is-level-", ""), 10) : 0;
+			const visual: HeatmapCellStyle = { level };
+
+			showTooltip(cell, context, visual);
+		});
+
+		gridEl.addEventListener("mouseout", (event) => {
+			const target = event.target as HTMLElement;
+			const cell = target.closest(".ts-heatmap__cell");
+			if (!cell) return;
+
+			// Check if we're moving to another cell
+			const relatedTarget = event.relatedTarget as HTMLElement | null;
+			if (relatedTarget && relatedTarget.closest(".ts-heatmap__cell")) {
+				return; // Moving to another cell, don't hide
+			}
+			clearTooltip();
+		});
 	}
 
 	// Render week labels
@@ -585,6 +658,28 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 					text: label,
 				}),
 			);
+		});
+
+		// Calculate actual width of week labels
+		requestAnimationFrame(() => {
+			if (weeksEl.hidden) return;
+
+			// Find the widest week label
+			let maxWidth = 0;
+			const labels = weeksEl.querySelectorAll(".ts-heatmap__week-label");
+			labels.forEach((label) => {
+				const width = (label as HTMLElement).offsetWidth;
+				if (width > maxWidth) maxWidth = width;
+			});
+
+			// Update weeks width and months margin-left
+			if (maxWidth > 0) {
+				const weeksWidth = `${maxWidth}px`;
+				const monthsOffset = `${maxWidth + 8}px`;
+
+				weeksEl.style.width = weeksWidth;
+				monthsEl.style.marginLeft = monthsOffset;
+			}
 		});
 	}
 
@@ -715,27 +810,11 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 					},
 				});
 
-				if (visual.title !== undefined) {
-					cell.setAttribute("title", String(visual.title));
-				}
 
-				// Tooltip support
+
+				// Tooltip support - store context for event delegation
 				if (flags.showTooltip !== false) {
-					cell.addEventListener("mouseenter", () => {
-						const tooltip = ensureTooltip(tooltipId);
-						// eslint-disable-next-line no-unsanitized/property, @microsoft/sdl/no-inner-html
-						tooltip.innerHTML = typeof options.renderTooltip === "function"
-							? options.renderTooltip({ ...context, visual })
-							: defaultTooltipRenderer({ ...context, visual });
-
-						applyTooltipTheme(root, tooltip);
-						positionTooltip(tooltip, cell);
-						window.requestAnimationFrame(() => {
-							tooltip.classList.add("is-active");
-						});
-					});
-
-					cell.addEventListener("mouseleave", clearTooltip);
+					cell.dataset.tooltipReady = "true";
 				}
 
 				weekColumn.appendChild(cell);
@@ -812,6 +891,10 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	result.destroy = () => {
 		renderState.destroyed = true;
+		if (tooltipHideTimeout) {
+			clearTimeout(tooltipHideTimeout);
+			tooltipHideTimeout = null;
+		}
 		clearTooltip();
 		if ((root as unknown as Record<string, unknown>)._tsHeatmapResizeTimer) {
 			window.clearTimeout((root as unknown as Record<string, unknown>)._tsHeatmapResizeTimer as number);

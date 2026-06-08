@@ -63,7 +63,7 @@ body.theme-dark .ts-heatmap {
 .ts-heatmap__weeks {
 	display: flex;
 	flex-direction: column;
-	width: var(--ts-heatmap-week-label-width, 20px);
+	width: var(--ts-heatmap-week-label-width, auto);
 	margin-top: 5px;
 	margin-right: var(--ts-heatmap-week-label-gap, 9px);
 	flex-shrink: 0;

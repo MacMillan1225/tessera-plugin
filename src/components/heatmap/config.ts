@@ -26,7 +26,7 @@ export const HEATMAP_DEFAULTS = {
 		cellSize: 11,
 		cellGap: 2,
 		cellRadius: "3px",
-		weekLabelWidth: "20px",
+		weekLabelWidth: "auto",
 		weekLabelGap: "9px",
 		monthLabelHeight: "18px",
 		monthOffset: "28px",
