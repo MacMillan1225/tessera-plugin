@@ -2,9 +2,9 @@
  * Settings type definitions
  */
 
-import type { CardOptions } from "../components/card/index";
-import type { HeatmapOptions } from "../components/heatmap/index";
-import type { ProgressbarOptions } from "../components/progressbar/index";
+import type { CardOptions, CardInstance } from "../components/card/index";
+import type { HeatmapOptions, HeatmapInstance } from "../components/heatmap/index";
+import type { ProgressbarOptions, ProgressbarInstance } from "../components/progressbar/index";
 import type { ExampleOptions } from "../components/example/index";
 
 // ============================================================================
@@ -79,8 +79,8 @@ export interface Translations {
 
 export interface TesseraAPI {
 	version: string;
-	card: ((options: CardOptions) => HTMLElement) | undefined;
-	heatmap: ((options: HeatmapOptions) => HTMLElement) | undefined;
-	progressbar: ((options: ProgressbarOptions) => HTMLElement) | undefined;
+	card: ((options: CardOptions) => CardInstance) | undefined;
+	heatmap: ((options: HeatmapOptions) => HeatmapInstance) | undefined;
+	progressbar: ((options: ProgressbarOptions) => ProgressbarInstance) | undefined;
 	example: ((options: ExampleOptions) => HTMLElement);
 }

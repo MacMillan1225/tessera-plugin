@@ -84,20 +84,25 @@ function resolveProgress(value: number, min: number, max: number): { ratio: numb
 // Parts interface for type-safe parts exposure
 // ============================================================================
 
-interface ProgressbarWithParts extends HTMLElement {
-	parts: {
-		fill: HTMLElement;
-	};
+export interface ProgressbarInstance extends HTMLElement {
+	/** Progress value. Updates fill width and ARIA attributes. */
+	value: number;
+	/** Maximum value. Recalculates progress ratio. */
+	max: number;
+	/** Minimum value. Recalculates progress ratio. */
+	min: number;
+	/** Exposed parts for direct DOM access. */
+	parts: { fill: HTMLElement };
 }
 
 // ============================================================================
 // Component Function
 // ============================================================================
 
-export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
-	const value = options.value ?? PROGRESSBAR_DEFAULTS.value;
-	const max = options.max ?? PROGRESSBAR_DEFAULTS.max;
-	const min = options.min ?? PROGRESSBAR_DEFAULTS.min;
+export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstance {
+	let _value = options.value ?? PROGRESSBAR_DEFAULTS.value;
+	let _max = options.max ?? PROGRESSBAR_DEFAULTS.max;
+	let _min = options.min ?? PROGRESSBAR_DEFAULTS.min;
 	const flags = { ...PROGRESSBAR_DEFAULTS.flags, ...options.flags };
 	const layout = { ...PROGRESSBAR_DEFAULTS.layout, ...options.layout };
 	const colors = {
@@ -107,7 +112,7 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 	const styles = options.styles || {};
 
 	// Calculate progress
-	const progress = resolveProgress(value, min, max);
+	const progress = resolveProgress(_value, _min, _max);
 
 	// Create fill element
 	const fill = createElement("div", {
@@ -155,10 +160,38 @@ export function progressbar(options: ProgressbarOptions = {}): HTMLElement {
 	});
 
 	// Expose parts
-	const result = root as ProgressbarWithParts;
+	const result = root as ProgressbarInstance;
 	result.parts = {
 		fill,
 	};
+
+	// ---- Reactive update function -----------------------------------------
+	function updateProgress(): void {
+		const progress = resolveProgress(_value, _min, _max);
+		fill.style.width = `${progress.percent}%`;
+		fill.style.minWidth = progress.percent > 0 ? "2px" : "0";
+		root.setAttribute("aria-valuenow", String(progress.percent));
+	}
+
+	// ---- Reactive property accessors --------------------------------------
+
+	Object.defineProperty(result, "value", {
+		get: () => _value,
+		set(v: number) { _value = v; updateProgress(); },
+		enumerable: true, configurable: true,
+	});
+
+	Object.defineProperty(result, "max", {
+		get: () => _max,
+		set(v: number) { _max = v; updateProgress(); },
+		enumerable: true, configurable: true,
+	});
+
+	Object.defineProperty(result, "min", {
+		get: () => _min,
+		set(v: number) { _min = v; updateProgress(); },
+		enumerable: true, configurable: true,
+	});
 
 	return result;
 }

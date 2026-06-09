@@ -420,7 +420,14 @@ function renderLegend(
 // Parts interface
 // ============================================================================
 
-interface HeatmapWithParts extends HTMLElement {
+export interface HeatmapInstance extends HTMLElement {
+	/** Heatmap data. Setting triggers automatic refresh with debounce. */
+	data: Record<string, number | HeatmapEntry> | Map<string, number | HeatmapEntry>;
+	/** Start date. Setting triggers automatic refresh with debounce. */
+	startDate: string | Date;
+	/** End date. Setting triggers automatic refresh with debounce. */
+	endDate: string | Date;
+	/** Exposed parts. */
 	parts: {
 		months: HTMLElement;
 		weeks: HTMLElement;
@@ -429,8 +436,11 @@ interface HeatmapWithParts extends HTMLElement {
 		legend: HTMLElement;
 		cells: HTMLElement[];
 	};
+	/** Manual refresh. */
 	refresh: () => Promise<void>;
+	/** Cleanup. */
 	destroy: () => void;
+	/** Utilities. */
 	utils: {
 		toDateKey: typeof toDateKey;
 		normalizeDate: typeof normalizeDate;
@@ -445,7 +455,7 @@ interface HeatmapWithParts extends HTMLElement {
 // Component Function
 // ============================================================================
 
-export function heatmap(options: HeatmapOptions = {}): HTMLElement {
+export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 	// Resolve configuration: default config + user options (like other components)
 	const flags = { ...HEATMAP_DEFAULTS.flags, ...options.flags };
 	const settings = { ...HEATMAP_DEFAULTS.settings, ...options.settings };
@@ -472,6 +482,24 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	const locale = settings.locale;
 	const tooltipId = settings.tooltipId || HEATMAP_DEFAULTS.settings.tooltipId;
+
+	// Internal state (behind reactive property accessors)
+	let _data = options.data;
+	let _startDate = options.startDate;
+	let _endDate = options.endDate;
+
+	// Debounced refresh
+	let refreshTimeout: number | null = null;
+
+	function debouncedRefresh(): void {
+		if (refreshTimeout) {
+			window.clearTimeout(refreshTimeout);
+		}
+		refreshTimeout = window.setTimeout(() => {
+			void renderGrid();
+			refreshTimeout = null;
+		}, 150);
+	}
 
 	// Create parts
 	const monthsEl = createElement("div", {
@@ -692,11 +720,11 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	// Build date range
 	function buildRange(): { start: Date; end: Date; totalDays: number } {
-		const end = normalizeDate(options.endDate) || new Date();
+		const end = normalizeDate(_endDate) || new Date();
 		const mondayFirst = flags.mondayFirst !== false;
 
 		if (settings.rangeMode === "fixed") {
-			const rawStart = normalizeDate(options.startDate) || addDays(end, -83);
+			const rawStart = normalizeDate(_startDate) || addDays(end, -83);
 			const start = mondayFirst ? alignToMonday(rawStart) : rawStart;
 			return { start, end, totalDays: diffDays(start, end) + 1 };
 		}
@@ -729,7 +757,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 			return normalizeMap(result);
 		}
 
-		return normalizeMap(options.data);
+		return normalizeMap(_data);
 	}
 
 	// Render grid
@@ -884,7 +912,7 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 	}
 
 	// Expose parts and methods
-	const result = root as unknown as HeatmapWithParts;
+	const result = root as unknown as HeatmapInstance;
 	result.parts = {
 		months: monthsEl,
 		weeks: weeksEl,
@@ -900,6 +928,10 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 
 	result.destroy = () => {
 		renderState.destroyed = true;
+		if (refreshTimeout) {
+			window.clearTimeout(refreshTimeout);
+			refreshTimeout = null;
+		}
 		if (tooltipHideTimeout) {
 			window.clearTimeout(tooltipHideTimeout);
 			tooltipHideTimeout = null;
@@ -924,6 +956,25 @@ export function heatmap(options: HeatmapOptions = {}): HTMLElement {
 		htmlEscape,
 		ratioToLevel,
 	};
+
+	// Reactive property accessors
+	Object.defineProperty(result, "data", {
+		get: () => _data,
+		set(v: Record<string, number | HeatmapEntry> | Map<string, number | HeatmapEntry> | undefined) { _data = v; debouncedRefresh(); },
+		enumerable: true, configurable: true,
+	});
+
+	Object.defineProperty(result, "startDate", {
+		get: () => _startDate,
+		set(v: string | Date | undefined) { _startDate = v; debouncedRefresh(); },
+		enumerable: true, configurable: true,
+	});
+
+	Object.defineProperty(result, "endDate", {
+		get: () => _endDate,
+		set(v: string | Date | undefined) { _endDate = v; debouncedRefresh(); },
+		enumerable: true, configurable: true,
+	});
 
 	// Initial render
 	window.requestAnimationFrame(() => {
