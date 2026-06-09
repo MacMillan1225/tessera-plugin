@@ -19,7 +19,10 @@ dv.container.appendChild(tessera.card({
   title: "今日概览",
   meta: "OVERVIEW",
   value: 12,
-  content: "今天共处理了 12 条记录。"
+  content: "今天共处理了 12 条记录。",
+  flags:{
+  showHeaderSep: false
+  }
 }));
 ```
 
@@ -78,6 +81,7 @@ stats.forEach(stat => {
 });
 
 dv.container.appendChild(grid);
+
 ```
 
 ---
@@ -99,6 +103,9 @@ for (let i = 0; i < 365; i++) {
 
 dv.container.appendChild(tessera.heatmap({
   data: data,
+  flags: {
+	  showMonthLabels: false
+  },
   cellSize: 12,
   cellGap: 2
 }));
@@ -151,84 +158,85 @@ dv.container.appendChild(tessera.card({
   children: tessera.heatmap({
     data: data,
     cellSize: 11,
-    cellGap: 2
+    cellGap: 2,
   }),
   layout: {
     padding: "24px"
   }
 }));
+
 ```
 
-### 带 Tooltip 和图例的热力图
+### 自定义热力图
 
 ```dataviewjs
-// 生成带完成度的数据
-const data = {};
-const today = new Date();
-for (let i = 0; i < 180; i++) {
-  const date = new Date(today);
-  date.setDate(date.getDate() - i);
-  const dateStr = date.toISOString().split("T")[0];
-  data[dateStr] = {
-    total: Math.floor(Math.random() * 5) + 1,
-    completed: Math.floor(Math.random() * 5)
-  };
-}
 
-dv.container.appendChild(tessera.heatmap({
-  data: data,
-  flags: {
-    showLegend: true,
-    enableTooltip: true,
-    showMonthLabels: true,
-    showWeekLabels: true
-  },
-  settings: {
-    legend: "Less $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ More"
-  },
-  cellSize: 12,
-  cellGap: 2
-}));
-```
+function customTooltipRenderer(context) {
+    const entry = context.entry;
+    const date = context.date;
+    const dateKey = context.dateKey;
 
-### 自定义 Tooltip 样式
+    // 格式化日期
+    const dateText = date.toLocaleDateString("zh-CN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "long"
+    });
 
-```dataviewjs
-const data = {};
-const today = new Date();
-for (let i = 0; i < 90; i++) {
-  const date = new Date(today);
-  date.setDate(date.getDate() - i);
-  const dateStr = date.toISOString().split("T")[0];
-  data[dateStr] = Math.floor(Math.random() * 10);
-}
-
-dv.container.appendChild(tessera.heatmap({
-  data: data,
-  flags: {
-    enableTooltip: true,
-    showLegend: true
-  },
-  renderTooltip: ({ entry, dateKey, visual }) => {
-    const value = entry?.value || 0;
-    const level = visual?.level || 0;
-    return `<span class="ts-heatmap-tooltip__main"><b>${value}</b> tasks</span><span class="ts-heatmap-tooltip__date">${dateKey} · Level ${level}</span>`;
-  },
-  settings: {
-    legend: "Inactive $#f1f5f9$$#dcfce7$$#bbf7d0$$#86efac$$#4ade80$ Active"
-  },
-  colors: {
-    light: {
-      dayBg: "#f8fafc",
-      tooltip: "#0f172a",
-      tooltipBg: "#ffffff"
-    },
-    dark: {
-      dayBg: "#1e293b",
-      tooltip: "#f8fafc",
-      tooltipBg: "#0f172a"
+    // 如果没有数据
+    if (!entry || (!entry.total && !entry.completed)) {
+        return `
+            <span class="ts-heatmap-tooltip__main">暂无数据</span>
+            <span class="ts-heatmap-tooltip__date">${dateText}</span>
+        `;
     }
-  }
+
+    // 计算完成度
+    const total = entry.total || 0;
+    const completed = entry.completed || 0;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    // 根据完成度设置颜色
+    let statusColor = "#ef4444"; // 红色
+    if (percentage >= 80) statusColor = "#22c55e"; // 绿色
+    else if (percentage >= 50) statusColor = "#f59e0b"; // 黄色
+
+    return `
+        <span class="ts-heatmap-tooltip__main" style="color: ${statusColor}; font-weight: bold;">
+            完成度：${percentage}%
+        </span>
+        <span class="ts-heatmap-tooltip__main">
+            ${completed} / ${total} 项任务
+        </span>
+        <span class="ts-heatmap-tooltip__date">${dateText}</span>
+    `;
+}
+
+const data = {};
+const today = new Date();
+
+for (let i = 0; i < 365; i++) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateKey = date.toISOString().split("T")[0];
+
+    // 随机生成 total (1-10) 和 completed (0-total)
+    const total = Math.floor(Math.random() * 10) + 1;
+    const completed = Math.floor(Math.random() * (total + 1));
+
+    data[dateKey] = { total, completed };
+}
+dv.container.appendChild(tessera.heatmap({
+    data: data,
+    flags: {
+        showTooltip: true,
+        showMonthLabels: true,
+        showWeekLabels: true,
+        showLegend: true,
+    },
+    // 使用封装的函数
+    renderTooltip: customTooltipRenderer
 }));
 ```
 
@@ -260,7 +268,7 @@ dv.container.appendChild(tessera.progressbar({
 
 ```dataviewjs
 dv.container.appendChild(tessera.progressbar({
-  value: 0.65,
+  value: 65,
   flags: {
     striped: true,
     animated: true,
@@ -277,7 +285,7 @@ dv.container.appendChild(tessera.progressbar({
 
 ```dataviewjs
 dv.container.appendChild(tessera.progressbar({
-  value: 0.88,
+  value: 88,
   colors: {
     light: {
       track: "#fef3c7",
@@ -326,7 +334,6 @@ projects.forEach(project => {
 ```
 
 ---
-
 ## 4. 组合使用
 
 ### 仪表盘示例
@@ -481,3 +488,38 @@ dv.container.appendChild(heatmapEl);
 2. 使用 CSS 变量可以深度自定义样式
 3. 组件返回的是原生 DOM 元素，可以直接操作
 4. 建议将复杂布局拆分为多个简单组件
+
+```dataviewjs
+const mycard = tessera.card({
+	title:"这里是标题",
+	content:"这里是内容"
+});
+
+dv.container.appendChild(
+	mycard
+);
+
+const mycard2 = tessera.card({
+	title:"这里是标题",
+	content:"这里是内容"
+});
+
+mycard.content = mycard2;
+mycard.meta = "test";
+
+mycard2.title = "change";
+
+```
+
+```dataviewjs
+
+const bar = tessera.progressbar({ value: 30, max: 100 });
+dv.container.appendChild(bar);
+
+// 动态更新
+bar.value = 75;  // 进度条自动更新到 75%
+bar.max = 100;   // 进度重新计算
+
+bar.value = 35;  // 进度条自动更新到 75%
+
+```
