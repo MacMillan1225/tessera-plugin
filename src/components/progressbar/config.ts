@@ -1,6 +1,9 @@
 /**
  * Progressbar component default configuration
  * Single source of truth for all progressbar defaults
+ *
+ * Semantic color keys (ADR-0002): background (track) / border / text (label) / accent (fill)
+ * Lieflat style (ADR-0001): flat, no glow/shadow/gradient, monochrome default + configurable accent
  */
 
 export const PROGRESSBAR_DEFAULTS = {
@@ -10,7 +13,6 @@ export const PROGRESSBAR_DEFAULTS = {
 	labelFormat: "{value}%",
 	flags: {
 		showLabel: true,
-		showGlow: true,
 		showStriped: false,
 		showAnimated: false,
 	},
@@ -18,26 +20,19 @@ export const PROGRESSBAR_DEFAULTS = {
 		width: "100%",
 		height: "8px",
 		radius: "4px",
-		trackOpacity: 0.2,
 	},
 	colors: {
 		light: {
-			track: "rgba(0, 0, 0, 0.08)",
-			trackBorder: "transparent",
-			fill: "var(--interactive-accent)",
-			fillGradient: "none",
-			shadow: "none",
-			glow: "none",
-			label: "var(--text-normal)",
+			background: "#e7e5e4",
+			border: "transparent",
+			text: "var(--text-normal)",
+			accent: "var(--text-normal)",
 		},
 		dark: {
-			track: "rgba(255, 255, 255, 0.08)",
-			trackBorder: "transparent",
-			fill: "var(--interactive-accent)",
-			fillGradient: "none",
-			shadow: "none",
-			glow: "none",
-			label: "var(--text-normal)",
+			background: "#44403c",
+			border: "transparent",
+			text: "var(--text-normal)",
+			accent: "var(--text-normal)",
 		},
 	},
 } as const;

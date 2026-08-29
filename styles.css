@@ -28,9 +28,8 @@
 		--ts-card-background-current,
 		var(--ts-card-background-light, var(--ts-bg-card, var(--background-secondary)))
 	);
-	border-radius: var(--ts-card-radius, 10px);
+	border-radius: var(--ts-card-radius, 14px);
 	padding: var(--ts-card-padding, 16px);
-	box-shadow: var(--ts-card-shadow-current, var(--ts-card-shadow-light, none));
 	border: var(--ts-border-width, 1px) solid
 		var(
 			--ts-card-border-current,
@@ -40,11 +39,10 @@
 	flex-direction: column;
 	height: 100%;
 	overflow: visible;
-	color: var(--ts-text, var(--text-normal));
+	color: var(--ts-card-text-current, var(--ts-text, var(--text-normal)));
 	font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
 	transform: translateY(0);
 	transition:
-		box-shadow var(--ts-transition, 0.2s ease),
 		background-color var(--ts-transition, 0.2s ease),
 		border-color var(--ts-transition, 0.2s ease),
 		transform var(--ts-transition, 0.2s ease);
@@ -59,15 +57,8 @@ body.theme-light .ts-card {
 		--ts-card-border-light,
 		var(--ts-border, var(--background-modifier-border))
 	);
-	--ts-card-shadow-current: var(--ts-card-shadow-light, none);
-	--ts-card-hover-accent-current: var(
-		--ts-card-hover-accent-light,
-		var(--ts-accent, var(--interactive-accent))
-	);
-	--ts-card-value-color-current: var(
-		--ts-card-value-color-light,
-		var(--ts-accent, var(--interactive-accent))
-	);
+	--ts-card-text-current: var(--ts-card-text-light, var(--text-normal));
+	--ts-card-accent-current: var(--ts-card-accent-light, var(--text-normal));
 }
 
 body.theme-dark .ts-card {
@@ -79,36 +70,16 @@ body.theme-dark .ts-card {
 		--ts-card-border-dark,
 		var(--ts-border, var(--background-modifier-border))
 	);
-	--ts-card-shadow-current: var(--ts-card-shadow-dark, none);
-	--ts-card-hover-accent-current: var(
-		--ts-card-hover-accent-dark,
-		var(--ts-accent, var(--interactive-accent))
-	);
-	--ts-card-value-color-current: var(
-		--ts-card-value-color-dark,
-		var(--ts-accent, var(--interactive-accent))
-	);
+	--ts-card-text-current: var(--ts-card-text-dark, var(--text-normal));
+	--ts-card-accent-current: var(--ts-card-accent-dark, var(--text-normal));
 }
 
-/* Card Hover: Left border accent + subtle lift */
+/* Card Hover: restrained — no lift, no shadow, no accent border */
 .ts-card:hover {
-	transform: translateY(-1px);
 	border-color: var(
 		--ts-card-hover-border,
-		var(
-			--ts-card-border-current,
-			var(--ts-card-border-light, var(--ts-border, var(--background-modifier-border)))
-		)
+		var(--ts-card-border-current, var(--background-modifier-border))
 	);
-	box-shadow: var(
-		--ts-card-shadow-current,
-		var(--ts-card-shadow-light, 0 12px 28px rgba(15, 23, 42, 0.08))
-	),
-	inset var(--ts-hover-accent-width, 3px) 0 0
-		var(
-			--ts-card-hover-accent-current,
-			var(--ts-card-hover-accent-light, var(--ts-accent, var(--interactive-accent)))
-		);
 }
 
 /* Card Variants */
@@ -117,8 +88,7 @@ body.theme-dark .ts-card {
 }
 
 .ts-card--no-hover:hover {
-	box-shadow: none;
-	transform: none;
+	border-color: inherit;
 }
 
 .ts-card--compact {
@@ -180,10 +150,7 @@ body.theme-dark .ts-card {
 	font-family: var(--ts-font-mono, var(--font-monospace));
 	font-weight: 700;
 	line-height: 1;
-	color: var(
-		--ts-card-value-color-current,
-		var(--ts-card-value-color-light, var(--ts-accent, var(--interactive-accent)))
-	);
+	color: var(--ts-card-accent-current, var(--ts-card-accent-light, var(--text-normal)));
 }
 
 /* Card Empty State */
@@ -204,7 +171,8 @@ body.theme-dark .ts-card {
    ========================================================================== */
 
 .ts-heatmap {
-	--ts-heatmap-empty-current: var(--ts-heatmap-light-empty);
+	--ts-heatmap-background-current: var(--ts-heatmap-light-background);
+	--ts-heatmap-text-current: var(--ts-heatmap-light-text, var(--text-muted));
 	--ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
 	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
 	display: flex;
@@ -216,19 +184,22 @@ body.theme-dark .ts-card {
 }
 
 .ts-heatmap.theme-dark {
-	--ts-heatmap-empty-current: var(--ts-heatmap-dark-empty);
+	--ts-heatmap-background-current: var(--ts-heatmap-dark-background);
+	--ts-heatmap-text-current: var(--ts-heatmap-dark-text, var(--text-muted));
 	--ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
 	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
 }
 
 body.theme-light .ts-heatmap {
-	--ts-heatmap-empty-current: var(--ts-heatmap-light-empty);
+	--ts-heatmap-background-current: var(--ts-heatmap-light-background);
+	--ts-heatmap-text-current: var(--ts-heatmap-light-text, var(--text-muted));
 	--ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
 	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
 }
 
 body.theme-dark .ts-heatmap {
-	--ts-heatmap-empty-current: var(--ts-heatmap-dark-empty);
+	--ts-heatmap-background-current: var(--ts-heatmap-dark-background);
+	--ts-heatmap-text-current: var(--ts-heatmap-dark-text, var(--text-muted));
 	--ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
 	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
 }
@@ -306,7 +277,7 @@ body.theme-dark .ts-heatmap {
 	height: var(--ts-heatmap-cell-size, 11px);
 	margin-bottom: var(--ts-heatmap-cell-gap, 2px);
 	border-radius: var(--ts-heatmap-cell-radius, 3px);
-	background-color: var(--ts-heatmap-empty-current);
+	background-color: var(--ts-heatmap-background-current);
 	border: 1px solid transparent;
 	transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
 }
@@ -319,97 +290,97 @@ body.theme-dark .ts-heatmap {
 
 /* Heatmap Cell Levels - Light Theme */
 .ts-heatmap__cell.is-level-0 {
-	background-color: var(--ts-heatmap-empty-current);
+	background-color: var(--ts-heatmap-background-current);
 }
 
 body.theme-light .ts-heatmap__cell.is-level-0,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-0 {
-	background-color: var(--ts-heatmap-light-level-0, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-0, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-0,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-0 {
-	background-color: var(--ts-heatmap-dark-level-0, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-0, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-1,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-1 {
-	background-color: var(--ts-heatmap-light-level-1, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-1, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-1,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-1 {
-	background-color: var(--ts-heatmap-dark-level-1, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-1, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-2,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-2 {
-	background-color: var(--ts-heatmap-light-level-2, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-2, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-2,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-2 {
-	background-color: var(--ts-heatmap-dark-level-2, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-2, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-3,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-3 {
-	background-color: var(--ts-heatmap-light-level-3, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-3, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-3,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-3 {
-	background-color: var(--ts-heatmap-dark-level-3, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-3, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-4,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-4 {
-	background-color: var(--ts-heatmap-light-level-4, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-4, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-4,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-4 {
-	background-color: var(--ts-heatmap-dark-level-4, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-4, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-5,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-5 {
-	background-color: var(--ts-heatmap-light-level-5, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-5, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-5,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-5 {
-	background-color: var(--ts-heatmap-dark-level-5, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-5, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-6,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-6 {
-	background-color: var(--ts-heatmap-light-level-6, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-6, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-6,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-6 {
-	background-color: var(--ts-heatmap-dark-level-6, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-6, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-7,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-7 {
-	background-color: var(--ts-heatmap-light-level-7, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-7, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-7,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-7 {
-	background-color: var(--ts-heatmap-dark-level-7, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-7, var(--ts-heatmap-dark-background));
 }
 
 body.theme-light .ts-heatmap__cell.is-level-8,
 .ts-heatmap.theme-light .ts-heatmap__cell.is-level-8 {
-	background-color: var(--ts-heatmap-light-level-8, var(--ts-heatmap-light-empty));
+	background-color: var(--ts-heatmap-light-level-8, var(--ts-heatmap-light-background));
 }
 
 body.theme-dark .ts-heatmap__cell.is-level-8,
 .ts-heatmap.theme-dark .ts-heatmap__cell.is-level-8 {
-	background-color: var(--ts-heatmap-dark-level-8, var(--ts-heatmap-dark-empty));
+	background-color: var(--ts-heatmap-dark-level-8, var(--ts-heatmap-dark-background));
 }
 
 /* Heatmap Legend */
@@ -491,81 +462,62 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 
 .ts-progressbar {
 	background: var(
-		--ts-progressbar-track-current,
-		var(--ts-progressbar-track-light, #e2e8f0)
+		--ts-progressbar-background-current,
+		var(--ts-progressbar-background-light, #e7e5e4)
 	);
 	border: 1px solid
 		var(
-			--ts-progressbar-track-border-current,
-			var(--ts-progressbar-track-border-light, rgba(148, 163, 184, 0.24))
+			--ts-progressbar-border-current,
+			var(--ts-progressbar-border-light, transparent)
 		);
-	border-radius: var(--ts-progressbar-radius, 999px);
-	box-shadow: var(
-		--ts-progressbar-shadow-current,
-		var(--ts-progressbar-shadow-light, inset 0 1px 2px rgba(15, 23, 42, 0.05))
-	);
+	border-radius: var(--ts-progressbar-radius, 4px);
 	display: block;
 	font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
-	height: var(--ts-progressbar-height, 10px);
-	opacity: var(--ts-progressbar-track-opacity, 1);
+	height: var(--ts-progressbar-height, 8px);
 	overflow: hidden;
 	position: relative;
+	color: var(--ts-progressbar-text-current, var(--text-normal));
 }
 
 body.theme-light .ts-progressbar {
-	--ts-progressbar-track-current: var(
-		--ts-progressbar-track-light,
-		#e2e8f0
+	--ts-progressbar-background-current: var(
+		--ts-progressbar-background-light,
+		#e7e5e4
 	);
-	--ts-progressbar-track-border-current: var(
-		--ts-progressbar-track-border-light,
-		rgba(148, 163, 184, 0.24)
+	--ts-progressbar-border-current: var(
+		--ts-progressbar-border-light,
+		transparent
 	);
-	--ts-progressbar-fill-color-current: var(--ts-progressbar-fill-light, #22c55e);
-	--ts-progressbar-fill-current: var(
-		--ts-progressbar-fill-gradient-light,
-		linear-gradient(90deg, #22c55e 0%, #34d399 100%)
-	);
-	--ts-progressbar-shadow-current: var(--ts-progressbar-shadow-light, none);
-	--ts-progressbar-glow-current: var(--ts-progressbar-glow-light, drop-shadow(0 0 8px rgba(34, 197, 94, 0.22)));
+	--ts-progressbar-accent-current: var(--ts-progressbar-accent-light, var(--text-normal));
+	--ts-progressbar-text-current: var(--ts-progressbar-text-light, var(--text-normal));
 }
 
 body.theme-dark .ts-progressbar {
-	--ts-progressbar-track-current: var(
-		--ts-progressbar-track-dark,
-		rgba(148, 163, 184, 0.18)
+	--ts-progressbar-background-current: var(
+		--ts-progressbar-background-dark,
+		#44403c
 	);
-	--ts-progressbar-track-border-current: var(
-		--ts-progressbar-track-border-dark,
-		rgba(148, 163, 184, 0.2)
+	--ts-progressbar-border-current: var(
+		--ts-progressbar-border-dark,
+		transparent
 	);
-	--ts-progressbar-fill-color-current: var(--ts-progressbar-fill-dark, #2dd4bf);
-	--ts-progressbar-fill-current: var(
-		--ts-progressbar-fill-gradient-dark,
-		linear-gradient(90deg, #14b8a6 0%, #38bdf8 100%)
-	);
-	--ts-progressbar-shadow-current: var(--ts-progressbar-shadow-dark, none);
-	--ts-progressbar-glow-current: var(--ts-progressbar-glow-dark, drop-shadow(0 0 10px rgba(45, 212, 191, 0.18)));
+	--ts-progressbar-accent-current: var(--ts-progressbar-accent-dark, var(--text-normal));
+	--ts-progressbar-text-current: var(--ts-progressbar-text-dark, var(--text-normal));
 }
 
 /* Progressbar Fill */
 .ts-progressbar__fill {
 	background: var(
-		--ts-progressbar-fill-current,
-		linear-gradient(90deg, #22c55e 0%, #34d399 100%)
+		--ts-progressbar-accent-current,
+		var(--ts-progressbar-accent-light, var(--text-normal))
 	);
 	border-radius: inherit;
-	filter: saturate(1.02) var(--ts-progressbar-glow-current, none);
 	height: 100%;
 	min-width: 0;
 	position: relative;
 	transition:
 		width 220ms ease,
-		filter 220ms ease;
-}
-
-.ts-progressbar--no-glow .ts-progressbar__fill {
-	filter: none;
+		background-color 220ms ease;
 }
 
 .ts-progressbar--static .ts-progressbar__fill {
@@ -586,7 +538,7 @@ body.theme-dark .ts-progressbar {
 			rgba(255, 255, 255, 0.04) 75%,
 			rgba(255, 255, 255, 0.04) 100%
 		),
-		var(--ts-progressbar-fill-current);
+		var(--ts-progressbar-accent-current);
 	background-size: 18px 18px, auto;
 }
 
@@ -602,68 +554,6 @@ body.theme-dark .ts-progressbar {
 	to {
 		background-position: 18px 0, 0 0;
 	}
-}
-
-/* ==========================================================================
-   Example Component
-   ========================================================================== */
-
-.ts-example {
-	display: flex;
-	flex-direction: column;
-	gap: var(--ts-example-gap, 12px);
-	padding: var(--ts-example-padding, 16px);
-	border-radius: var(--ts-example-radius, 12px);
-	background: var(--ts-example-background-light);
-	border: 1px solid var(--ts-example-border-light);
-	transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-body.theme-light .ts-example {
-	background: var(--ts-example-background-light);
-	border-color: var(--ts-example-border-light);
-}
-
-body.theme-dark .ts-example {
-	background: var(--ts-example-background-dark);
-	border-color: var(--ts-example-border-dark);
-}
-
-.ts-example__eyebrow {
-	font-size: 11px;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: var(--ts-example-eyebrow-light);
-}
-
-body.theme-dark .ts-example__eyebrow {
-	color: var(--ts-example-eyebrow-dark);
-}
-
-.ts-example__title {
-	font-size: 16px;
-	font-weight: 600;
-	color: var(--ts-example-title-light);
-}
-
-body.theme-dark .ts-example__title {
-	color: var(--ts-example-title-dark);
-}
-
-.ts-example__text {
-	font-size: 14px;
-	line-height: 1.5;
-	color: var(--ts-example-text-light);
-}
-
-body.theme-dark .ts-example__text {
-	color: var(--ts-example-text-dark);
-}
-
-.ts-example__body {
-	font-size: 14px;
-	line-height: 1.6;
 }
 
 /* ==========================================================================

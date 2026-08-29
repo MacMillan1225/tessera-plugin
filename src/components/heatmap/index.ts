@@ -38,13 +38,15 @@ export interface HeatmapCellStyle {
 
 export interface ThemeColors {
 	light: {
-		dayBg: string;
+		background: string;
+		text: string;
 		tooltip: string;
 		tooltipBg: string;
 		levels: string[];
 	};
 	dark: {
-		dayBg: string;
+		background: string;
+		text: string;
 		tooltip: string;
 		tooltipBg: string;
 		levels: string[];
@@ -97,18 +99,21 @@ export interface HeatmapOptions {
 	};
 	colors?: {
 		light?: {
-			dayBg?: string;
+			background?: string;
+			text?: string;
 			tooltip?: string;
 			tooltipBg?: string;
 			levels?: string[];
 		};
 		dark?: {
-			dayBg?: string;
+			background?: string;
+			text?: string;
 			tooltip?: string;
 			tooltipBg?: string;
 			levels?: string[];
 		};
-		dayBg?: string;
+		background?: string;
+		text?: string;
 		tooltip?: string;
 		tooltipBg?: string;
 		levels?: string[];
@@ -467,9 +472,13 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 	};
 
 	// Merge flat color overrides
-	if (options.colors?.dayBg) {
-		colors.light.dayBg = options.colors.dayBg;
-		colors.dark.dayBg = options.colors.dayBg;
+	if (options.colors?.background) {
+		colors.light.background = options.colors.background;
+		colors.dark.background = options.colors.background;
+	}
+	if (options.colors?.text) {
+		colors.light.text = options.colors.text;
+		colors.dark.text = options.colors.text;
 	}
 	if (options.colors?.tooltip) {
 		colors.light.tooltip = options.colors.tooltip;
@@ -543,8 +552,10 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 			"--ts-heatmap-legend-gap": layout.legendGap,
 			"--ts-heatmap-legend-top": layout.legendTop,
 			"--ts-heatmap-legend-swatch-size": layout.legendSwatchSize,
-			"--ts-heatmap-light-empty": colors.light.dayBg,
-			"--ts-heatmap-dark-empty": colors.dark.dayBg,
+			"--ts-heatmap-light-background": colors.light.background,
+			"--ts-heatmap-dark-background": colors.dark.background,
+			"--ts-heatmap-light-text": colors.light.text,
+			"--ts-heatmap-dark-text": colors.dark.text,
 			"--ts-heatmap-light-tooltip": colors.light.tooltip,
 			"--ts-heatmap-dark-tooltip": colors.dark.tooltip,
 			"--ts-heatmap-light-tooltip-bg": colors.light.tooltipBg,

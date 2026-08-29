@@ -1,6 +1,9 @@
 /**
  * Heatmap component default configuration
  * Single source of truth for all heatmap defaults
+ *
+ * Semantic color keys (ADR-0002): background / text / tooltip / tooltipBg + levels (gradient)
+ * Lieflat style (ADR-0001): monochrome gray gradient, flat
  */
 
 export const HEATMAP_DEFAULTS = {
@@ -18,7 +21,7 @@ export const HEATMAP_DEFAULTS = {
 		locale: "zh-CN",
 		monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
 		weekLabels: ["一", "", "三", "", "五", "", "日"],
-		legend: "少 $#f1f5f9$$#bbf7d0$$#4ade80$$#15803d$ 多",
+		legend: "少 $#e7e5e4$$#a8a29e$$#57534e$$#1c1917$ 多",
 		tooltipId: "ts-heatmap-tooltip",
 	},
 	layout: {
@@ -39,16 +42,18 @@ export const HEATMAP_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			dayBg: "#f1f5f9",
+			background: "#fafaf9",
+			text: "var(--text-muted)",
 			tooltip: "#ffffff",
-			tooltipBg: "#0f172a",
-			levels: ["#f1f5f9", "#dcfce7", "#bbf7d0", "#86efac", "#4ade80", "#22c55e", "#16a34a", "#15803d", "#14532d"],
+			tooltipBg: "#1c1917",
+			levels: ["#fafaf9", "#f5f5f4", "#e7e5e4", "#d6d3d1", "#a8a29e", "#78716c", "#57534e", "#292524", "#1c1917"],
 		},
 		dark: {
-			dayBg: "#334155",
-			tooltip: "#0f172a",
-			tooltipBg: "#f1f5f9",
-			levels: ["#334155", "#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#6ee7b7", "#a7f3d0"],
+			background: "#1c1917",
+			text: "var(--text-muted)",
+			tooltip: "#1c1917",
+			tooltipBg: "#fafaf9",
+			levels: ["#1c1917", "#292524", "#44403c", "#57534e", "#78716c", "#a8a29e", "#d6d3d1", "#e7e5e4", "#fafaf9"],
 		},
 	},
 	styles: {
@@ -59,3 +64,5 @@ export const HEATMAP_DEFAULTS = {
 		legend: null,
 	},
 };
+
+export type HeatmapConfig = typeof HEATMAP_DEFAULTS;

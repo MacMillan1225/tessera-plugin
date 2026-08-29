@@ -40,16 +40,14 @@ export interface CardOptions {
 		light?: {
 			background?: string;
 			border?: string;
-			shadow?: string;
-			hoverAccent?: string;
-			value?: string;
+			text?: string;
+			accent?: string;
 		};
 		dark?: {
 			background?: string;
 			border?: string;
-			shadow?: string;
-			hoverAccent?: string;
-			value?: string;
+			text?: string;
+			accent?: string;
 		};
 		[key: string]: unknown;
 	};
@@ -237,12 +235,10 @@ export function card(options: CardOptions = {}): CardInstance {
 				"--ts-card-background-dark": themeColors.dark.background,
 				"--ts-card-border-light": themeColors.light.border,
 				"--ts-card-border-dark": themeColors.dark.border,
-				"--ts-card-shadow-light": themeColors.light.shadow,
-				"--ts-card-shadow-dark": themeColors.dark.shadow,
-				"--ts-card-hover-accent-light": themeColors.light.hoverAccent,
-				"--ts-card-hover-accent-dark": themeColors.dark.hoverAccent,
-				"--ts-card-value-color-light": themeColors.light.value,
-				"--ts-card-value-color-dark": themeColors.dark.value,
+				"--ts-card-text-light": themeColors.light.text,
+				"--ts-card-text-dark": themeColors.dark.text,
+				"--ts-card-accent-light": themeColors.light.accent,
+				"--ts-card-accent-dark": themeColors.dark.accent,
 			},
 			styles.card,
 		),

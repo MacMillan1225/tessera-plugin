@@ -1,6 +1,9 @@
 /**
  * Card component default configuration
  * Single source of truth for all card defaults
+ *
+ * Semantic color keys (ADR-0002): background / border / text / accent
+ * Lieflat style (ADR-0001): flat, no alpha, monochrome default + configurable accent
  */
 
 export const CARD_DEFAULTS = {
@@ -14,24 +17,22 @@ export const CARD_DEFAULTS = {
 	layout: {
 		maxWidth: "100%",
 		padding: "16px",
-		radius: "16px",
+		radius: "14px",
 		gap: "14px",
 		bodyGap: "12px",
 	},
 	colors: {
 		light: {
-			background: "rgba(245, 248, 252, 0.9)",
-			border: "rgba(120, 140, 160, 0.18)",
-			shadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
-			hoverAccent: "var(--interactive-accent)",
-			value: "var(--text-accent, var(--text-normal))",
+			background: "var(--background-secondary)",
+			border: "transparent",
+			text: "var(--text-normal)",
+			accent: "var(--text-normal)",
 		},
 		dark: {
-			background: "rgba(30, 41, 59, 0.72)",
-			border: "rgba(148, 163, 184, 0.18)",
-			shadow: "0 16px 36px rgba(2, 6, 23, 0.28)",
-			hoverAccent: "var(--interactive-accent)",
-			value: "var(--text-accent, var(--text-normal))",
+			background: "var(--background-secondary)",
+			border: "transparent",
+			text: "var(--text-normal)",
+			accent: "var(--text-normal)",
 		},
 	},
 } as const;

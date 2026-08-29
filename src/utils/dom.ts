@@ -122,7 +122,7 @@ export function mergeStyles(...styles: unknown[]): Record<string, unknown> {
 // Theme Color Resolution
 // ============================================================================
 
-const SHARED_COLOR_KEYS = ["background", "border", "shadow", "hoverAccent", "value"];
+const SHARED_COLOR_KEYS = ["background", "border", "text", "accent"];
 
 function pickSharedColors(colors: Record<string, unknown> = {}): Record<string, unknown> {
 	return SHARED_COLOR_KEYS.reduce<Record<string, unknown>>((result, key) => {

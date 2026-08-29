@@ -17,7 +17,6 @@ export interface ProgressbarOptions {
 	labelFormat?: string;
 	flags?: {
 		showLabel?: boolean;
-		showGlow?: boolean;
 		showStriped?: boolean;
 		showAnimated?: boolean;
 	};
@@ -25,24 +24,19 @@ export interface ProgressbarOptions {
 		width?: string;
 		height?: string;
 		radius?: string;
-		trackOpacity?: number;
 	};
 	colors?: {
 		light?: {
-			track?: string;
-			trackBorder?: string;
-			fill?: string;
-			fillGradient?: string;
-			shadow?: string;
-			glow?: string;
+			background?: string;
+			border?: string;
+			text?: string;
+			accent?: string;
 		};
 		dark?: {
-			track?: string;
-			trackBorder?: string;
-			fill?: string;
-			fillGradient?: string;
-			shadow?: string;
-			glow?: string;
+			background?: string;
+			border?: string;
+			text?: string;
+			accent?: string;
 		};
 	};
 	styles?: {
@@ -124,8 +118,8 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 			...styles.fill,
 			width: `${progress.percent}%`,
 			minWidth: progress.percent > 0 ? "2px" : "0",
-			"--ts-progressbar-fill-color": colors.light.fill,
-			"--ts-progressbar-fill-color-dark": colors.dark.fill,
+			"--ts-progressbar-accent-color": colors.light.accent,
+			"--ts-progressbar-accent-color-dark": colors.dark.accent,
 		},
 	});
 
@@ -135,7 +129,6 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 			"ts-progressbar",
 			flags.showAnimated === false && "ts-progressbar--static",
 			flags.showStriped === true && "ts-progressbar--striped",
-			flags.showGlow === false && "ts-progressbar--no-glow",
 			options.className,
 		].filter(Boolean) as string[],
 		attrs: {
@@ -150,11 +143,14 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 			width: layout.width || "100%",
 			"--ts-progressbar-height": layout.height || "10px",
 			"--ts-progressbar-radius": layout.radius || "999px",
-			"--ts-progressbar-track-opacity": layout.trackOpacity || 1,
-			"--ts-progressbar-track-light": colors.light.track,
-			"--ts-progressbar-track-dark": colors.dark.track,
-			"--ts-progressbar-fill-light": colors.light.fill,
-			"--ts-progressbar-fill-dark": colors.dark.fill,
+			"--ts-progressbar-background-light": colors.light.background,
+			"--ts-progressbar-background-dark": colors.dark.background,
+			"--ts-progressbar-border-light": colors.light.border,
+			"--ts-progressbar-border-dark": colors.dark.border,
+			"--ts-progressbar-text-light": colors.light.text,
+			"--ts-progressbar-text-dark": colors.dark.text,
+			"--ts-progressbar-accent-light": colors.light.accent,
+			"--ts-progressbar-accent-dark": colors.dark.accent,
 		},
 		children: fill,
 	});
