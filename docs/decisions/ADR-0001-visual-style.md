@@ -19,12 +19,19 @@
 
 ## 后果
 
-- styles.css 中 card/heatmap/progressbar/example 的颜色默认值、hover 规则、阴影规则需重写。
-- 各组件 config.ts 中 rgba 默认值改为实色 hex（或 Obsidian 主题变量）。
+- styles.css 中 card/heatmap/progressbar 的颜色默认值、hover 规则、阴影规则已重写（提交 e8a685b、7e46844）。
+- 各组件 config.ts 中 rgba 默认值已改为实色 hex / Obsidian 主题变量。
 - 深色反转卡片 (Inverted Card) 列为可选项，本轮不强制实现。
+
+## 实施记录 (2026-08-30)
+
+- card: 默认无边框（border 透明，靠背景色差分层）；hover 仅边框色微变（无位移/阴影/缩放）。
+- heatmap: cell hover 缩放 1.35→1.15 且去掉 hover 边框闪变；tooltip 阴影柔和化（0 4px 12px）、底色改暖灰 stone `#1c1917`。
+- progressbar: 去除 glow/阴影/渐变，fill 用语义 accent。
+- 删除整个 `.ts-example` 样式块（example 组件已删除，见 ADR-0003）。
 
 ## 相关文件
 
 - `styles.css`
-- `src/components/{card,heatmap,progressbar,example}/config.ts`
-- `src/components/{card,heatmap,progressbar,example}/index.ts`（hover 交互逻辑如有）
+- `src/components/{card,heatmap,progressbar}/config.ts`
+- `src/components/{card,heatmap,progressbar}/index.ts`（hover 交互逻辑如有）

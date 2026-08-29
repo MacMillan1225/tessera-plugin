@@ -20,17 +20,22 @@
 
 ## 后果
 
-- `src/main.ts`: window.tessera 挂载对象改为 core 分组结构; wrapper 合并逻辑（浅合并问题）需修复。
-- `src/settings/types.ts`: TesseraAPI 类型改为 `{ version, core: { card, heatmap, progressbar } }`。
-- `types/global.d.ts`: 同步全局类型。
-- heatmap 已有 data/startDate/endDate 响应式 + parts + refresh/destroy; progressbar 已有 value/max/min 响应式 — 复核统一性。
-- example 组件 parts 用 children[0..3] 索引（脆弱），需改为具名 parts。
-- 文档 docs/README.md、docs/ARCHITECTURE.md、docs/COMPONENT_DEVELOPMENT_GUIDE.md 同步。
+- `src/main.ts`: window.tessera 挂载对象已改为 core 分组结构; wrapper 合并逻辑已修复为 deepMerge。
+- `src/settings/types.ts`: TesseraAPI 类型已改为 `{ version, core: { card, heatmap, progressbar } }`。
+- `types/global.d.ts`: 已同步全局类型。
+- heatmap 已有 data/startDate/endDate 响应式 + parts + refresh/destroy; progressbar 已有 value/max/min 响应式 — 已复核统一性。
+- **example 组件已整体删除**（config.ts/index.ts/style.css + tessera 挂载 + styles.css 样式块），而非修复其脆弱 parts 索引。
+- 文档 docs/README.md、docs/ARCHITECTURE.md、docs/COMPONENT_DEVELOPMENT_GUIDE.md 需同步（README 仍描述已废弃的 Tessera.use/define 旧 API）。
+
+## 实施记录 (2026-08-30)
+
+- 提交 44eae5f 完成：命名空间迁移、deepMerge 深合并修复、删除 example、loadSettings version 门槛（version 不匹配则重置默认并 saveData）。
+- mergeComponentConfig: `this.deepMerge(config, options)` — 深合并用户 options 到默认 config。
 
 ## 相关文件
 
 - `src/main.ts`
 - `src/settings/types.ts`
 - `types/global.d.ts`
-- `src/components/{card,heatmap,progressbar,example}/index.ts`
+- `src/components/{card,heatmap,progressbar}/index.ts`
 - `docs/README.md` 等

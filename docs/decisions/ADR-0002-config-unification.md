@@ -17,15 +17,20 @@
 
 ## 后果
 
-- `src/components/*/config.ts` 的默认值结构按语义键重构（card: background/border/text/accent/hoverAccent→收敛; heatmap: dayBg→background, tooltip/tooltipBg 保留; progressbar: track→background, fill→accent, label→text 等）。
-- `src/settings/fields.ts` 字段定义收敛（删减不必要字段）。
-- `src/settings/types.ts` 类型同步。
-- 用户已有 data.json 配置与新键不匹配 → 需要迁移逻辑（loadSettings 时对旧键做映射或直接重置为默认，因处于初期开发阶段可接受破坏性变更）。
-- i18n 的 fields/tooltips 文案同步更新。
+- `src/components/*/config.ts` 的默认值结构已按语义键重构（card: background/border/text/accent; heatmap: background/text/tooltip/tooltipBg/levels; progressbar: background/border/text/accent）。
+- `src/settings/fields.ts` 字段定义已收敛（删 shadow/hoverAccent/value/dayBg/track/fill/fillGradient/trackBorder/glow/label/showGlow/trackOpacity）。
+- `src/settings/types.ts` 类型已同步。
+- 用户已有 data.json 配置与新键不匹配 → loadSettings 中通过 `version` 字段门槛：不匹配则整体重置为默认（初期开发阶段接受破坏性变更）。
+- i18n 的 fields/tooltips 文案已同步更新。
+
+## 实施记录 (2026-08-30)
+
+- 提交 7e46844 完成全部语义键迁移；`utils/dom.ts` 的 SHARED_COLOR_KEYS 改为 `["background","border","text","accent"]`。
+- 三个组件 JSON 翻译中重复键问题：esbuild duplicate-object-key 警告 36 条 → 修复为只在 card 段保留一份 background/border/text/accent，heatmap 段仅保留 tooltip/tooltipBg。
 
 ## 相关文件
 
-- `src/components/{card,heatmap,progressbar,example}/config.ts`
+- `src/components/{card,heatmap,progressbar}/config.ts`
 - `src/settings/fields.ts`
 - `src/settings/types.ts`
 - `src/main.ts`（loadSettings 旧数据迁移）

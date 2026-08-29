@@ -7,8 +7,8 @@
 | 术语 | 定义 |
 |------|------|
 | **贴片 (Tile)** | 用户在 DataviewJS 代码块中用固定格式 JS（形态 1：`tessera.core.card({...})` 直接调用）渲染出的一个可视化单元，如卡片、热力图、进度条。 |
-| **组件 (Component)** | 插件导出的渲染函数，接受 options 对象，返回 HTMLElement。当前核心组件：card、heatmap、progressbar；example 为模板组件。 |
-| **组件分组 (Component Group / Category)** | 组件的命名空间分类，如 `core`（核心）、未来可能的 `charts` 等。API 形如 `tessera.<group>.<component>`。 |
+| **组件 (Component)** | 插件导出的渲染函数，接受 options 对象，返回 HTMLElement。当前核心组件：card、heatmap、progressbar。example 模板组件已在初期阶段删除。 |
+| **组件分组 (Component Group / Category)** | 组件的命名空间分类，如 `core`（核心）、未来可能的 `charts` 等。API 形如 `tessera.<group>.<component>`。当前仅 `core` 分组（含 coreEnabled 分组级总开关）。 |
 | **核心组件 (Core Components)** | 分组 `core` 下的组件：card、heatmap、progressbar。插件内可整体开关（分组级），也可单独开关（组件级）。 |
 
 ## 配置体系

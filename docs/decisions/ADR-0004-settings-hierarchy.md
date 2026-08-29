@@ -16,11 +16,18 @@
 
 ## 后果
 
-- `src/settings/settings-tab.ts`: 重构为分组→组件→字段的嵌套渲染; 统一设置渲染路径。
-- `src/settings/fields.ts`: 字段收敛 + 按分组归类。
-- `src/settings/color-utils.ts`: rgbaToHex/hexToRgba 按 alpha 策略调整。
-- `styles.css` 设置 UI 部分同步（tessera-collapse-btn 等保留/调整）。
-- i18n 分组文案同步。
+- `src/settings/settings-tab.ts`: 已重构为分组→组件→字段的嵌套渲染; 统一设置渲染路径（弃双 API）。
+- `src/settings/fields.ts`: 字段已收敛 + 按分组归类。
+- `src/settings/color-utils.ts`: rgbaToHex/hexToRgba 已按 alpha 策略调整。
+- `styles.css` 设置 UI 部分已同步（tessera-collapse-btn 等保留/调整）。
+- i18n 分组文案已同步。
+
+## 实施记录 (2026-08-30)
+
+- 提交 1211575 完成：四层结构（插件总开关 → core 分组级 coreEnabled → 组件级 enabled → 字段详情）。
+- **alpha 内嵌成功**：renderColorField 在同一控制行 addColorPicker + addSlider（SliderComponent 无 setClass，用 sliderEl.addClass），alpha<1 存 rgba、=1 存 hex。
+- 双 API 已弃：统一 display() 单路径，refreshSettings 直接调 display()（eslint-disable 因 Obsidian 1.13+ 标记 display deprecated，disable 注释须放在调用处）。
+- PluginSettings 新增 `version`（1→2）与 `coreEnabled`；`ComponentKey = "card" | "heatmap" | "progressbar"` 类型。
 
 ## 相关文件
 
