@@ -2,10 +2,9 @@
  * Global type declarations for TesseraScript
  */
 
-import type { CardOptions } from "../src/components/card/index";
-import type { HeatmapOptions } from "../src/components/heatmap/index";
-import type { ProgressbarOptions } from "../src/components/progressbar/index";
-import type { ExampleOptions } from "../src/components/example/index";
+import type { CardOptions, CardInstance } from "../src/components/card/index";
+import type { HeatmapOptions, HeatmapInstance } from "../src/components/heatmap/index";
+import type { ProgressbarOptions, ProgressbarInstance } from "../src/components/progressbar/index";
 
 // ============================================================================
 // Tessera API Types
@@ -13,10 +12,11 @@ import type { ExampleOptions } from "../src/components/example/index";
 
 export interface TesseraAPI {
 	version: string;
-	card(options?: CardOptions): HTMLElement;
-	heatmap(options?: HeatmapOptions): HTMLElement;
-	progressbar(options?: ProgressbarOptions): HTMLElement;
-	example(options?: ExampleOptions): HTMLElement;
+	core: {
+		card(options?: CardOptions): CardInstance;
+		heatmap(options?: HeatmapOptions): HeatmapInstance;
+		progressbar(options?: ProgressbarOptions): ProgressbarInstance;
+	};
 }
 
 // ============================================================================

@@ -5,7 +5,6 @@
 import type { CardOptions, CardInstance } from "../components/card/index";
 import type { HeatmapOptions, HeatmapInstance } from "../components/heatmap/index";
 import type { ProgressbarOptions, ProgressbarInstance } from "../components/progressbar/index";
-import type { ExampleOptions } from "../components/example/index";
 
 // ============================================================================
 // Component Settings Types
@@ -17,6 +16,7 @@ export interface ComponentConfig {
 }
 
 export interface PluginSettings {
+	version: number;
 	card: ComponentConfig;
 	heatmap: ComponentConfig;
 	progressbar: ComponentConfig;
@@ -79,8 +79,9 @@ export interface Translations {
 
 export interface TesseraAPI {
 	version: string;
-	card: ((options: CardOptions) => CardInstance) | undefined;
-	heatmap: ((options: HeatmapOptions) => HeatmapInstance) | undefined;
-	progressbar: ((options: ProgressbarOptions) => ProgressbarInstance) | undefined;
-	example: ((options: ExampleOptions) => HTMLElement);
+	core: {
+		card: ((options: CardOptions) => CardInstance) | undefined;
+		heatmap: ((options: HeatmapOptions) => HeatmapInstance) | undefined;
+		progressbar: ((options: ProgressbarOptions) => ProgressbarInstance) | undefined;
+	};
 }

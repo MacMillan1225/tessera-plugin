@@ -7,7 +7,6 @@ import { Notice, Plugin } from "obsidian";
 import { card } from "./components/card/index";
 import { heatmap } from "./components/heatmap/index";
 import { progressbar } from "./components/progressbar/index";
-import { example } from "./components/example/index";
 
 import type { PluginSettings, TesseraAPI } from "./settings";
 import { DEFAULT_SETTINGS, TesseraSettingTab } from "./settings";
@@ -35,19 +34,21 @@ export default class TesseraPlugin extends Plugin {
 		}
 
 		// Create tessera API object with config injection
+		// Namespace: tessera.core.<component> (ADR-0003)
 		const tessera: TesseraAPI = {
 			version: "1.0.0",
-			// Wrap each component to inject settings config as defaults
-			card: this.settings.card.enabled 
-				? ((options) => card({ ...this.settings.card.config, ...options }))
-				: undefined,
-			heatmap: this.settings.heatmap.enabled 
-				? ((options) => heatmap({ ...this.settings.heatmap.config, ...options }))
-				: undefined,
-			progressbar: this.settings.progressbar.enabled 
-				? ((options) => progressbar({ ...this.settings.progressbar.config, ...options }))
-				: undefined,
-			example,
+			core: {
+				// Wrap each component to inject settings config as deep-merged defaults
+				card: this.settings.card.enabled
+					? (options) => card(this.mergeComponentConfig(this.settings.card.config, options))
+					: undefined,
+				heatmap: this.settings.heatmap.enabled
+					? (options) => heatmap(this.mergeComponentConfig(this.settings.heatmap.config, options))
+					: undefined,
+				progressbar: this.settings.progressbar.enabled
+					? (options) => progressbar(this.mergeComponentConfig(this.settings.progressbar.config, options))
+					: undefined,
+			},
 		};
 
 		// Mount to window
@@ -59,10 +60,9 @@ export default class TesseraPlugin extends Plugin {
 			name: "Check status",
 			callback: () => {
 				const components = [
-					this.settings.card.enabled ? "card" : null,
-					this.settings.heatmap.enabled ? "heatmap" : null,
-					this.settings.progressbar.enabled ? "progressbar" : null,
-					"example",
+					this.settings.card.enabled ? "core.card" : null,
+					this.settings.heatmap.enabled ? "core.heatmap" : null,
+					this.settings.progressbar.enabled ? "core.progressbar" : null,
 				].filter(Boolean);
 
 				new Notice(
@@ -85,18 +85,28 @@ export default class TesseraPlugin extends Plugin {
 
 	async loadSettings() {
 		const loaded = await this.loadData() as Partial<PluginSettings> | null;
+
+		// Version gate: incompatible or missing saved data resets to defaults
+		// (Early development phase — breaking changes are acceptable, ADR-0002)
+		if (!loaded || loaded.version !== DEFAULT_SETTINGS.version) {
+			this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as PluginSettings;
+			await this.saveSettings();
+			return;
+		}
+
 		this.settings = {
+			version: DEFAULT_SETTINGS.version,
 			card: {
-				enabled: loaded?.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
-				config: this.deepMerge(DEFAULT_SETTINGS.card.config, loaded?.card?.config),
+				enabled: loaded.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.card.config, loaded.card?.config),
 			},
 			heatmap: {
-				enabled: loaded?.heatmap?.enabled ?? DEFAULT_SETTINGS.heatmap.enabled,
-				config: this.deepMerge(DEFAULT_SETTINGS.heatmap.config, loaded?.heatmap?.config),
+				enabled: loaded.heatmap?.enabled ?? DEFAULT_SETTINGS.heatmap.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.heatmap.config, loaded.heatmap?.config),
 			},
 			progressbar: {
-				enabled: loaded?.progressbar?.enabled ?? DEFAULT_SETTINGS.progressbar.enabled,
-				config: this.deepMerge(DEFAULT_SETTINGS.progressbar.config, loaded?.progressbar?.config),
+				enabled: loaded.progressbar?.enabled ?? DEFAULT_SETTINGS.progressbar.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.progressbar.config, loaded.progressbar?.config),
 			},
 		};
 	}
@@ -110,17 +120,27 @@ export default class TesseraPlugin extends Plugin {
 		await this.saveSettings();
 	}
 
+	/**
+	 * Deep-merge settings config (defaults) with per-call options.
+	 * Nested groups (flags/layout/colors/styles) merge recursively instead of
+	 * being overwritten wholesale (fixes the previous shallow-merge bug).
+	 */
+	private mergeComponentConfig<T>(config: Record<string, unknown>, options?: T): T {
+		const source = (options ?? {}) as unknown;
+		return this.deepMerge(config, source as Record<string, unknown>) as T;
+	}
+
 	private deepMerge(target: Record<string, unknown>, source?: Record<string, unknown>): Record<string, unknown> {
 		if (!source) return { ...target };
-		
+
 		const result = { ...target };
 		for (const key of Object.keys(source)) {
 			if (
-				source[key] && 
-				typeof source[key] === "object" && 
+				source[key] &&
+				typeof source[key] === "object" &&
 				!Array.isArray(source[key]) &&
-				target[key] && 
-				typeof target[key] === "object" && 
+				target[key] &&
+				typeof target[key] === "object" &&
 				!Array.isArray(target[key])
 			) {
 				result[key] = this.deepMerge(

@@ -83,7 +83,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 				render: (setting: Setting) => {
 					this.renderCollapsibleSection(
 						setting.settingEl,
-						key as keyof PluginSettings,
+						key as Exclude<keyof PluginSettings, "version">,
 						definition
 					);
 				},
@@ -127,7 +127,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		for (const [key, definition] of Object.entries(COMPONENTS)) {
 			this.renderCollapsibleSection(
 				containerEl,
-				key as keyof PluginSettings,
+				key as Exclude<keyof PluginSettings, "version">,
 				definition
 			);
 		}
@@ -205,7 +205,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 	private renderCollapsibleSection(
 		containerEl: HTMLElement,
-		key: keyof PluginSettings,
+		key: Exclude<keyof PluginSettings, "version">,
 		definition: ComponentDefinition
 	): void {
 		const componentConfig = this.plugin.settings[key];
@@ -256,7 +256,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 	private rerenderSectionContent(
 		section: HTMLElement,
-		key: keyof PluginSettings,
+		key: Exclude<keyof PluginSettings, "version">,
 		definition: ComponentDefinition
 	): void {
 		const componentConfig = this.plugin.settings[key];
@@ -337,7 +337,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		field: SettingField,
 		componentKey: string
 	): void {
-		const defaultConfig = DEFAULT_SETTINGS[componentKey as keyof PluginSettings]?.config;
+		const defaultConfig = DEFAULT_SETTINGS[componentKey as Exclude<keyof PluginSettings, "version">]?.config;
 		if (!defaultConfig) return;
 
 		const defaultValue = this.getNestedValue(defaultConfig, field.key);

@@ -139,7 +139,7 @@ function validateTranslations(
  * Log validation warnings to console
  */
 export function logValidationWarnings(
-	components: Record<keyof PluginSettings, ComponentDefinition>
+	components: Record<Exclude<keyof PluginSettings, "version">, ComponentDefinition>
 ): void {
 	const results = validateTranslations(components);
 	

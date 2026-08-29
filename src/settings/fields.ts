@@ -18,7 +18,7 @@ import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
  * Key format: dot-notation path (e.g., "flags.showHeader", "layout.padding")
  * Labels are automatically translated via i18n
  */
-export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
+export const COMPONENTS: Record<Exclude<keyof PluginSettings, "version">, ComponentDefinition> = {
 	card: {
 		componentKey: "card",
 		fields: [
@@ -141,6 +141,7 @@ export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
  * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
+	version: 1,
 	card: {
 		enabled: true,
 		config: CARD_DEFAULTS,
