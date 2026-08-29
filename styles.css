@@ -26,37 +26,29 @@
 .ts-card {
 	background: var(
 		--ts-card-background-current,
-		var(--ts-card-background-light, var(--ts-bg-card, var(--background-secondary)))
+		var(--ts-card-background-light, var(--background-secondary))
 	);
 	border-radius: var(--ts-card-radius, 14px);
 	padding: var(--ts-card-padding, 16px);
-	border: var(--ts-border-width, 1px) solid
-		var(
-			--ts-card-border-current,
-			var(--ts-card-border-light, var(--ts-border, var(--background-modifier-border)))
-		);
+	border: 1px solid
+		var(--ts-card-border-current, var(--ts-card-border-light, transparent));
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	overflow: visible;
-	color: var(--ts-card-text-current, var(--ts-text, var(--text-normal)));
+	color: var(--ts-card-text-current, var(--ts-card-text-light, var(--text-normal)));
 	font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
-	transform: translateY(0);
 	transition:
 		background-color var(--ts-transition, 0.2s ease),
-		border-color var(--ts-transition, 0.2s ease),
-		transform var(--ts-transition, 0.2s ease);
+		border-color var(--ts-transition, 0.2s ease);
 }
 
 body.theme-light .ts-card {
 	--ts-card-background-current: var(
 		--ts-card-background-light,
-		var(--ts-bg-card, var(--background-secondary))
+		var(--background-secondary)
 	);
-	--ts-card-border-current: var(
-		--ts-card-border-light,
-		var(--ts-border, var(--background-modifier-border))
-	);
+	--ts-card-border-current: var(--ts-card-border-light, transparent);
 	--ts-card-text-current: var(--ts-card-text-light, var(--text-normal));
 	--ts-card-accent-current: var(--ts-card-accent-light, var(--text-normal));
 }
@@ -64,21 +56,18 @@ body.theme-light .ts-card {
 body.theme-dark .ts-card {
 	--ts-card-background-current: var(
 		--ts-card-background-dark,
-		var(--ts-bg-card, var(--background-secondary))
+		var(--background-secondary)
 	);
-	--ts-card-border-current: var(
-		--ts-card-border-dark,
-		var(--ts-border, var(--background-modifier-border))
-	);
+	--ts-card-border-current: var(--ts-card-border-dark, transparent);
 	--ts-card-text-current: var(--ts-card-text-dark, var(--text-normal));
 	--ts-card-accent-current: var(--ts-card-accent-dark, var(--text-normal));
 }
 
-/* Card Hover: restrained — no lift, no shadow, no accent border */
+/* Card Hover: restrained — subtle border only, no lift, no shadow */
 .ts-card:hover {
 	border-color: var(
 		--ts-card-hover-border,
-		var(--ts-card-border-current, var(--background-modifier-border))
+		var(--background-modifier-border-hover, var(--background-modifier-border))
 	);
 }
 
@@ -117,7 +106,7 @@ body.theme-dark .ts-card {
 	font-family: var(--ts-font-title, var(--ts-font-body, var(--font-interface)));
 	font-weight: 700;
 	line-height: 1.3;
-	color: var(--ts-text, var(--text-normal));
+	color: var(--ts-card-text-current, var(--ts-card-text-light, var(--text-normal)));
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -283,8 +272,7 @@ body.theme-dark .ts-heatmap {
 }
 
 .ts-heatmap__cell:hover {
-	transform: scale(1.35);
-	border-color: var(--background-modifier-border);
+	transform: scale(1.15);
 	z-index: 1;
 }
 
@@ -408,18 +396,18 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 	white-space: pre-wrap;
 }
 
-/* Heatmap Tooltip */
+/* Heatmap Tooltip — restrained, flat shadow */
 .ts-heatmap-tooltip {
 	--ts-heatmap-tooltip-fg: #ffffff;
-	--ts-heatmap-tooltip-bg: #0f172a;
+	--ts-heatmap-tooltip-bg: #1c1917;
 	position: fixed !important;
 	z-index: 9999;
 	padding: 8px 12px;
 	border-radius: 8px;
 	background-color: var(--ts-heatmap-tooltip-bg);
 	color: var(--ts-heatmap-tooltip-fg);
-	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-	border: 1px solid rgba(255, 255, 255, 0.08);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.06);
 	font-size: 12px;
 	font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
 	line-height: 1.4;
