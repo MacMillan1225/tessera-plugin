@@ -600,6 +600,18 @@ body.theme-dark .ts-progressbar {
 	overflow: hidden;
 }
 
+/* Core group is the top-level hierarchy node (ADR-0004) */
+.tessera-core-section .tessera-settings-content {
+	margin: 0 8px;
+	border-left: 2px solid var(--background-modifier-border);
+}
+
+/* Inline alpha slider next to a color picker (ADR-0004): compact width */
+.tessera-alpha-slider {
+	flex: 0 1 120px;
+	min-width: 60px;
+}
+
 .tessera-settings-section .setting-item {
 	border: none;
 }

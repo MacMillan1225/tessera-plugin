@@ -35,17 +35,19 @@ export default class TesseraPlugin extends Plugin {
 
 		// Create tessera API object with config injection
 		// Namespace: tessera.core.<component> (ADR-0003)
+		// coreEnabled is the master switch for the whole core group (ADR-0004)
+		const coreEnabled = this.settings.coreEnabled;
 		const tessera: TesseraAPI = {
 			version: "1.0.0",
 			core: {
 				// Wrap each component to inject settings config as deep-merged defaults
-				card: this.settings.card.enabled
+				card: coreEnabled && this.settings.card.enabled
 					? (options) => card(this.mergeComponentConfig(this.settings.card.config, options))
 					: undefined,
-				heatmap: this.settings.heatmap.enabled
+				heatmap: coreEnabled && this.settings.heatmap.enabled
 					? (options) => heatmap(this.mergeComponentConfig(this.settings.heatmap.config, options))
 					: undefined,
-				progressbar: this.settings.progressbar.enabled
+				progressbar: coreEnabled && this.settings.progressbar.enabled
 					? (options) => progressbar(this.mergeComponentConfig(this.settings.progressbar.config, options))
 					: undefined,
 			},
@@ -96,6 +98,7 @@ export default class TesseraPlugin extends Plugin {
 
 		this.settings = {
 			version: DEFAULT_SETTINGS.version,
+			coreEnabled: loaded.coreEnabled ?? DEFAULT_SETTINGS.coreEnabled,
 			card: {
 				enabled: loaded.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.card.config, loaded.card?.config),

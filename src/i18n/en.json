@@ -2,6 +2,7 @@
   "settings": {
     "title": "TesseraScript Configuration",
     "description": "Configure which components are available and their default settings.",
+    "coreDesc": "Manage the core component group and its availability.",
     "reloadNotice": "Settings saved. Click 'Apply & Reload' to apply changes.",
     "reloadButton": "Apply & Reload",
     "restoreButton": "Restore Defaults",
@@ -76,6 +77,7 @@
     "layout.height": "Height"
   },
   "groups": {
+    "core": "Core",
     "flags": "Flags",
     "layout": "Layout",
     "settings": "Settings",

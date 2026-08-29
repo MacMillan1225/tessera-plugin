@@ -2,6 +2,7 @@
   "settings": {
     "title": "TesseraScript 設定",
     "description": "利用可能なコンポーネントとそのデフォルト設定を構成します。",
+    "coreDesc": "コアコンポーネントグループとその可用性を管理します。",
     "reloadNotice": "設定が保存されました。「適用してリロード」をクリックして変更を適用してください。",
     "reloadButton": "適用してリロード",
     "restoreButton": "デフォルトに戻す",
@@ -76,6 +77,7 @@
     "layout.height": "高さ"
   },
   "groups": {
+    "core": "コア",
     "flags": "フラグ",
     "layout": "レイアウト",
     "settings": "設定",

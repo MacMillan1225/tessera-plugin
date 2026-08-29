@@ -15,8 +15,13 @@ export interface ComponentConfig {
 	config: Record<string, unknown>;
 }
 
+/** Keys of the configurable core components (ADR-0004 hierarchy: group → component → field). */
+export type ComponentKey = "card" | "heatmap" | "progressbar";
+
 export interface PluginSettings {
 	version: number;
+	/** Master switch for the "core" component group (ADR-0004). */
+	coreEnabled: boolean;
 	card: ComponentConfig;
 	heatmap: ComponentConfig;
 	progressbar: ComponentConfig;
@@ -62,6 +67,8 @@ export interface Translations {
 		restoreButton: string;
 		restoreNotice: string;
 		resetField: string;
+		/** Description for the core group header (ADR-0004). */
+		coreDesc: string;
 	};
 	components: {
 		card: { name: string; desc: string };

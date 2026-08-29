@@ -3,7 +3,7 @@
  * DEFAULT_SETTINGS imports from component config files (single source of truth)
  */
 
-import type { ComponentDefinition, PluginSettings } from "./types";
+import type { ComponentDefinition, ComponentKey, PluginSettings } from "./types";
 import { CARD_DEFAULTS } from "../components/card/config";
 import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
 import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
@@ -18,7 +18,7 @@ import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
  * Key format: dot-notation path (e.g., "flags.showHeader", "layout.padding")
  * Labels are automatically translated via i18n
  */
-export const COMPONENTS: Record<Exclude<keyof PluginSettings, "version">, ComponentDefinition> = {
+export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 	card: {
 		componentKey: "card",
 		fields: [
@@ -133,7 +133,8 @@ export const COMPONENTS: Record<Exclude<keyof PluginSettings, "version">, Compon
  * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
-	version: 1,
+	version: 2,
+	coreEnabled: true,
 	card: {
 		enabled: true,
 		config: CARD_DEFAULTS,

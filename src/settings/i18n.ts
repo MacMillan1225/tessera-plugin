@@ -2,7 +2,7 @@
  * i18n utilities with validation
  */
 
-import type { Translations, ComponentDefinition, PluginSettings } from "./types";
+import type { Translations, ComponentDefinition, ComponentKey } from "./types";
 
 // Import translation files
 import enTranslations from "../i18n/en.json";
@@ -139,7 +139,7 @@ function validateTranslations(
  * Log validation warnings to console
  */
 export function logValidationWarnings(
-	components: Record<Exclude<keyof PluginSettings, "version">, ComponentDefinition>
+	components: Record<ComponentKey, ComponentDefinition>
 ): void {
 	const results = validateTranslations(components);
 	

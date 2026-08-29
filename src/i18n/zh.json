@@ -2,6 +2,7 @@
   "settings": {
     "title": "TesseraScript 配置",
     "description": "配置可用的组件及其默认设置。",
+    "coreDesc": "管理核心组件组及其可用性。",
     "reloadNotice": "设置已保存。点击「应用并重载」以应用更改。",
     "reloadButton": "应用并重载",
     "restoreButton": "恢复默认设置",
@@ -76,6 +77,7 @@
     "layout.height": "高度"
   },
   "groups": {
+    "core": "核心组件",
     "flags": "标志",
     "layout": "布局",
     "settings": "设置",

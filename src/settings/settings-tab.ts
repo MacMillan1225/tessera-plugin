@@ -1,9 +1,12 @@
 /**
  * Settings Tab implementation
+ *
+ * Hierarchy (ADR-0004): group (core) → component → field.
+ * Single rendering path: display() + manual refresh. No dual API.
  */
 
 import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
-import type { PluginSettings, SettingField, ComponentDefinition, Translations } from "./types";
+import type { PluginSettings, SettingField, ComponentDefinition, ComponentKey, Translations } from "./types";
 import { getTranslations, getFieldLabel, getTooltipText, getGroupLabel, getComponentName, getComponentDesc, logValidationWarnings } from "./i18n";
 import { rgbaToHex, hexToRgba, extractAlpha, isColorLike } from "./color-utils";
 import { COMPONENTS, DEFAULT_SETTINGS } from "./fields";
@@ -16,13 +19,6 @@ interface TesseraPluginLike extends Plugin {
 	settings: PluginSettings;
 	saveSettings(): Promise<void>;
 	resetSettings(): Promise<void>;
-}
-
-// Interface for Obsidian's internal command API
-interface AppWithCommands extends App {
-	commands?: {
-		executeCommandById(id: string): void;
-	};
 }
 
 export class TesseraSettingTab extends PluginSettingTab {
@@ -41,74 +37,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		logValidationWarnings(COMPONENTS);
 	}
 
-	/**
-	 * Declarative settings API for Obsidian 1.13.0+.
-	 * Falls back to display() for pre-1.13.0 versions.
-	 */
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	getSettingDefinitions(): any[] {
-		const definitions: unknown[] = [];
-
-		// Header
-		definitions.push({
-			name: this.t.settings.title,
-			desc: this.t.settings.description,
-		});
-
-		// Reload section (render callback for dynamic visibility)
-		definitions.push({
-			name: this.t.settings.reloadButton,
-			desc: this.t.settings.reloadNotice,
-			render: (setting: Setting) => {
-				this.reloadContainerEl = setting.settingEl;
-				if (!this.needsReload) {
-					setting.settingEl.classList.add("tessera-hidden");
-				}
-				setting.addButton((btn) => {
-					btn.setButtonText(this.t.settings.reloadButton);
-					btn.setCta();
-					btn.onClick(() => {
-						const appWithCommands = this.app as AppWithCommands;
-						appWithCommands.commands?.executeCommandById("app:reload");
-					});
-				});
-			},
-		});
-
-		// Component sections
-		for (const [key, definition] of Object.entries(COMPONENTS)) {
-			definitions.push({
-				type: "group",
-				heading: getComponentName(this.t, definition.componentKey),
-				render: (setting: Setting) => {
-					this.renderCollapsibleSection(
-						setting.settingEl,
-						key as Exclude<keyof PluginSettings, "version">,
-						definition
-					);
-				},
-			});
-		}
-
-		// Restore defaults section
-		definitions.push({
-			name: this.t.settings.restoreButton,
-			desc: this.t.settings.restoreNotice,
-			render: (setting: Setting) => {
-				setting.addButton((btn) => {
-					btn.setButtonText(this.t.settings.restoreButton);
-					btn.onClick(async () => {
-						await this.plugin.resetSettings();
-						this.needsReload = true;
-						this.refreshSettings();
-					});
-				});
-			},
-		});
-
-		return definitions;
-	}
-
+	/** Single rendering path — legacy display() works on all supported versions. */
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
@@ -123,79 +52,62 @@ export class TesseraSettingTab extends PluginSettingTab {
 		// Reload button (hidden by default)
 		this.renderReloadSection(containerEl);
 
-		// Render each component as a collapsible section
-		for (const [key, definition] of Object.entries(COMPONENTS)) {
-			this.renderCollapsibleSection(
-				containerEl,
-				key as Exclude<keyof PluginSettings, "version">,
-				definition
-			);
-		}
+		// Core group (group → component → field hierarchy)
+		this.renderCoreGroup(containerEl);
 
 		// Restore defaults section
 		this.renderRestoreSection(containerEl);
 	}
 
 	// ============================================================================
-	// Section Renderers
+	// Group & Section Renderers
 	// ============================================================================
 
-	private renderReloadSection(containerEl: HTMLElement): void {
-		const section = containerEl.createDiv({ cls: "tessera-reload-section" });
-		this.reloadContainerEl = section;
+	/**
+	 * Top-level "core" group (ADR-0004):
+	 * group header with master toggle + collapsible component sections.
+	 */
+	private renderCoreGroup(containerEl: HTMLElement): void {
+		const section = containerEl.createDiv({ cls: "tessera-settings-section tessera-core-section" });
+		const isCollapsed = this.collapsedSections.has("core");
 
-		if (!this.needsReload) {
-			section.classList.add("tessera-hidden");
-		}
+		const headerSetting = new Setting(section);
+		headerSetting.setName(getGroupLabel(this.t, "core"));
+		headerSetting.setDesc(this.t.settings.coreDesc);
 
-		const setting = new Setting(section);
-		setting.setName(this.t.settings.reloadButton);
-		setting.setDesc(this.t.settings.reloadNotice);
-		setting.addButton((btn) => {
-			btn.setButtonText(this.t.settings.reloadButton);
-			btn.setCta();
-			btn.onClick(() => {
-				// Use Obsidian's internal command API to reload the app
-				const appWithCommands = this.app as AppWithCommands;
-				appWithCommands.commands?.executeCommandById("app:reload");
-			});
+		// Collapse button
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
+		const collapseBtn = document.createElement("span");
+		collapseBtn.className = "tessera-collapse-btn";
+		collapseBtn.textContent = isCollapsed ? "▶" : "▼";
+		collapseBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
+			if (isCollapsed) {
+				this.collapsedSections.delete("core");
+			} else {
+				this.collapsedSections.add("core");
+			}
+			this.refreshSettings();
 		});
-	}
+		headerSetting.settingEl.prepend(collapseBtn);
 
-	private renderRestoreSection(containerEl: HTMLElement): void {
-		const setting = new Setting(containerEl);
-		setting.setName(this.t.settings.restoreButton);
-		setting.setDesc(this.t.settings.restoreNotice);
-		setting.addButton((btn) => {
-			btn.setButtonText(this.t.settings.restoreButton);
-			btn.onClick(async () => {
-				await this.plugin.resetSettings();
-				this.needsReload = true;
+		// Master toggle for the whole core group
+		headerSetting.addToggle((toggle) => {
+			toggle.setValue(this.plugin.settings.coreEnabled);
+			toggle.onChange(async (value) => {
+				this.plugin.settings.coreEnabled = value;
+				await this.plugin.saveSettings();
+				this.showReloadButton();
 				this.refreshSettings();
 			});
 		});
-	}
 
-	private showReloadButton(): void {
-		this.needsReload = true;
-		if (this.reloadContainerEl) {
-			this.reloadContainerEl.classList.remove("tessera-hidden");
-		}
-	}
-
-	/**
-	 * Refresh settings UI using the appropriate method for the Obsidian version.
-	 * - Obsidian 1.13.0+: uses refreshDomState() (new declarative API)
-	 * - Pre-1.13.0: falls back to display() (legacy imperative API)
-	 */
-	private refreshSettings(): void {
-		// Check if refreshDomState exists (Obsidian 1.13.0+)
-		if ("refreshDomState" in this && typeof (this as Record<string, unknown>).refreshDomState === "function") {
-			((this as Record<string, unknown>).refreshDomState as () => void).call(this);
-		} else {
-			// Fallback for pre-1.13.0 Obsidian
-			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			this.display();
+		// Component sections — visible only when group expanded AND enabled
+		if (!isCollapsed && this.plugin.settings.coreEnabled) {
+			const content = section.createDiv({ cls: "tessera-settings-content" });
+			for (const [key, definition] of Object.entries(COMPONENTS)) {
+				this.renderCollapsibleSection(content, key as ComponentKey, definition);
+			}
 		}
 	}
 
@@ -205,7 +117,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 	private renderCollapsibleSection(
 		containerEl: HTMLElement,
-		key: Exclude<keyof PluginSettings, "version">,
+		key: ComponentKey,
 		definition: ComponentDefinition
 	): void {
 		const componentConfig = this.plugin.settings[key];
@@ -256,7 +168,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 
 	private rerenderSectionContent(
 		section: HTMLElement,
-		key: Exclude<keyof PluginSettings, "version">,
+		key: ComponentKey,
 		definition: ComponentDefinition
 	): void {
 		const componentConfig = this.plugin.settings[key];
@@ -337,7 +249,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 		field: SettingField,
 		componentKey: string
 	): void {
-		const defaultConfig = DEFAULT_SETTINGS[componentKey as Exclude<keyof PluginSettings, "version">]?.config;
+		const defaultConfig = DEFAULT_SETTINGS[componentKey as ComponentKey]?.config;
 		if (!defaultConfig) return;
 
 		const defaultValue = this.getNestedValue(defaultConfig, field.key);
@@ -383,7 +295,7 @@ export class TesseraSettingTab extends PluginSettingTab {
 				break;
 
 			case "color":
-				this.renderColorField(setting, container, config, field, currentValue);
+				this.renderColorField(setting, config, field, currentValue);
 				break;
 
 			case "select":
@@ -421,48 +333,47 @@ export class TesseraSettingTab extends PluginSettingTab {
 		});
 	}
 
+	/**
+	 * Color picker with an INLINE alpha slider (ADR-0004).
+	 * The alpha slider sits in the same control row as the color picker,
+	 * so transparency is adjustable without a separate sub-row.
+	 */
 	private renderColorField(
 		setting: Setting,
-		container: HTMLElement,
 		config: Record<string, unknown>,
 		field: SettingField,
 		currentValue: unknown
 	): void {
+		const currentColor = typeof currentValue === "string" ? currentValue : "#000000";
+		// Shared alpha state between picker and inline slider (0..1)
+		let currentAlpha = isColorLike(currentColor) ? extractAlpha(currentColor) : 1;
+
 		setting.addColorPicker((picker) => {
-			// Convert rgba/rgb to hex for the picker
-			const hexValue = isColorLike(currentValue) ? rgbaToHex(String(currentValue)) : "#000000";
+			const hexValue = isColorLike(currentColor) ? rgbaToHex(currentColor) : "#000000";
 			picker.setValue(hexValue);
 			picker.onChange(async (value) => {
-				// Preserve alpha if original was rgba
-				const currentColor = typeof currentValue === "string" ? currentValue : "#000000";
-				const alpha = extractAlpha(currentColor);
-				const colorValue = alpha < 1 ? hexToRgba(value, alpha) : value;
+				const colorValue = currentAlpha < 1 ? hexToRgba(value, currentAlpha) : value;
 				this.setNestedValue(config, field.key, colorValue);
 				await this.plugin.saveSettings();
 				this.showReloadButton();
 			});
 		});
 
-		// Add alpha slider if value has alpha
-		if (isColorLike(currentValue)) {
-			const alpha = extractAlpha(String(currentValue));
-			if (alpha < 1) {
-				const alphaSetting = new Setting(container);
-				alphaSetting.setName("  └ alpha");
-				alphaSetting.addSlider((slider) => {
-					slider.setLimits(0, 1, 0.01);
-					slider.setValue(alpha);
-					slider.setDynamicTooltip();
-					slider.onChange(async (value) => {
-						const currentColorValue = this.getNestedValue(config, field.key);
-						const hex = rgbaToHex(typeof currentColorValue === "string" ? currentColorValue : "#000000");
-						this.setNestedValue(config, field.key, hexToRgba(hex, value));
-						await this.plugin.saveSettings();
-						this.showReloadButton();
-					});
-				});
-			}
-		}
+		// Inline alpha slider — same control row, compact width
+		setting.addSlider((slider) => {
+			slider.setLimits(0, 1, 0.01);
+			slider.setValue(currentAlpha);
+			slider.setDynamicTooltip();
+			slider.sliderEl.addClass("tessera-alpha-slider");
+			slider.onChange(async (value) => {
+				currentAlpha = value;
+				const stored = this.getNestedValue(config, field.key);
+				const hex = rgbaToHex(typeof stored === "string" ? stored : "#000000");
+				this.setNestedValue(config, field.key, value < 1 ? hexToRgba(hex, value) : hex);
+				await this.plugin.saveSettings();
+				this.showReloadButton();
+			});
+		});
 	}
 
 	private renderSelectField(
@@ -564,6 +475,57 @@ export class TesseraSettingTab extends PluginSettingTab {
 	// ============================================================================
 	// Utility Methods
 	// ============================================================================
+
+	/** Refresh the whole settings UI (single rendering path). */
+	private refreshSettings(): void {
+		// eslint-disable-next-line @typescript-eslint/no-deprecated -- intentional: unified render path (ADR-0004), no dual API
+		this.display();
+	}
+
+	private renderReloadSection(containerEl: HTMLElement): void {
+		const section = containerEl.createDiv({ cls: "tessera-reload-section" });
+		this.reloadContainerEl = section;
+
+		if (!this.needsReload) {
+			section.classList.add("tessera-hidden");
+		}
+
+		const setting = new Setting(section);
+		setting.setName(this.t.settings.reloadButton);
+		setting.setDesc(this.t.settings.reloadNotice);
+		setting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.reloadButton);
+			btn.setCta();
+			btn.onClick(() => {
+				// Use Obsidian's internal command API to reload the app
+				const appWithCommands = this.app as unknown as {
+					commands?: { executeCommandById(id: string): void };
+				};
+				appWithCommands.commands?.executeCommandById("app:reload");
+			});
+		});
+	}
+
+	private renderRestoreSection(containerEl: HTMLElement): void {
+		const setting = new Setting(containerEl);
+		setting.setName(this.t.settings.restoreButton);
+		setting.setDesc(this.t.settings.restoreNotice);
+		setting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.restoreButton);
+			btn.onClick(async () => {
+				await this.plugin.resetSettings();
+				this.needsReload = true;
+				this.refreshSettings();
+			});
+		});
+	}
+
+	private showReloadButton(): void {
+		this.needsReload = true;
+		if (this.reloadContainerEl) {
+			this.reloadContainerEl.classList.remove("tessera-hidden");
+		}
+	}
 
 	private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 		const parts = path.split(".");
