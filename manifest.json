@@ -1,7 +1,7 @@
 {
 	"id": "tessera-script",
 	"name": "TesseraScript",
-	"version": "1.25.0",
+	"version": "1.25.1",
 	"minAppVersion": "1.13.0",
 	"description": "基于 DataviewJS 的组件库插件 - 卡片、热力图、进度条与图表，快速搭建个人看板",
 	"author": "猫佑Millan",
