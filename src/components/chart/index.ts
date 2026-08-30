@@ -1,6 +1,6 @@
 /**
  * TesseraScript Chart Group (ADR-0005)
- * tessera.chart.{line, bar, gauge, rose}
+ * tessera.chart.{line, bar, gauge, rose, radar}
  * All charts are ECharts-backed and lazily load lib/echarts.min.js.
  */
 
@@ -9,6 +9,7 @@ import { line, type LineOptions, type LineInstance } from "./line";
 import { bar, type BarOptions, type BarInstance } from "./bar";
 import { gauge, type GaugeOptions, type GaugeInstance } from "./gauge";
 import { rose, type RoseOptions, type RoseInstance } from "./rose";
+import { radar, type RadarOptions, type RadarInstance } from "./radar";
 
 export type { ChartData, ChartColors } from "./shared";
 
@@ -17,6 +18,7 @@ export interface ChartGroup {
 	bar: ((options?: BarOptions) => BarInstance) | undefined;
 	gauge: ((options?: GaugeOptions) => GaugeInstance) | undefined;
 	rose: ((options?: RoseOptions) => RoseInstance) | undefined;
+	radar: ((options?: RadarOptions) => RadarInstance) | undefined;
 }
 
 export interface ChartGroupOptions {
@@ -26,6 +28,7 @@ export interface ChartGroupOptions {
 	barEnabled: boolean;
 	gaugeEnabled: boolean;
 	roseEnabled: boolean;
+	radarEnabled: boolean;
 }
 
 /**
@@ -41,5 +44,6 @@ export function createChartGroup(options: ChartGroupOptions): ChartGroup {
 		bar: options.barEnabled ? (opts) => bar(opts) : undefined,
 		gauge: options.gaugeEnabled ? (opts) => gauge(opts) : undefined,
 		rose: options.roseEnabled ? (opts) => rose(opts) : undefined,
+		radar: options.radarEnabled ? (opts) => radar(opts) : undefined,
 	};
 }

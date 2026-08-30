@@ -586,6 +586,194 @@ body.theme-dark .ts-progressbar {
 }
 
 /* ==========================================================================
+   List Component
+   ========================================================================== */
+
+.ts-list {
+	background: var(
+		--ts-list-background-current,
+		var(--ts-list-light-background, var(--background-secondary))
+	);
+	border: 1px solid
+		var(--ts-list-border-current, var(--ts-list-light-border, transparent));
+	border-radius: var(--ts-list-radius, 12px);
+	padding: var(--ts-list-padding, 14px);
+	color: var(--ts-list-text-current, var(--ts-list-light-text, var(--text-normal)));
+	font-family: var(--font-interface);
+	max-width: 100%;
+}
+
+body.theme-light .ts-list {
+	--ts-list-background-current: var(--ts-list-light-background, var(--background-secondary));
+	--ts-list-border-current: var(--ts-list-light-border, transparent);
+	--ts-list-text-current: var(--ts-list-light-text, var(--text-normal));
+	--ts-list-accent-current: var(--ts-list-light-accent, var(--text-normal));
+}
+
+body.theme-dark .ts-list {
+	--ts-list-background-current: var(--ts-list-dark-background, var(--background-secondary));
+	--ts-list-border-current: var(--ts-list-dark-border, transparent);
+	--ts-list-text-current: var(--ts-list-dark-text, var(--text-normal));
+	--ts-list-accent-current: var(--ts-list-dark-accent, var(--text-normal));
+}
+
+.ts-list__items {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--ts-list-gap, 8px);
+}
+
+.ts-list__item {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	padding: 2px 6px;
+	margin: 0 -6px;
+	border-radius: 6px;
+	transition: background-color var(--ts-transition, 0.15s ease);
+}
+
+.ts-list--dividers .ts-list__item {
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding-bottom: 6px;
+}
+
+.ts-list--dividers .ts-list__item:last-child {
+	border-bottom: none;
+}
+
+.ts-list__item:hover {
+	background: var(--ts-list-hover, var(--background-modifier-hover));
+}
+
+.ts-list--no-hover .ts-list__item:hover {
+	background: transparent;
+}
+
+.ts-list__bullet {
+	flex: 0 0 auto;
+	width: var(--ts-list-bullet-size, 5px);
+	height: var(--ts-list-bullet-size, 5px);
+	border-radius: 50%;
+	background: var(--ts-list-accent-current, var(--text-normal));
+	align-self: center;
+	margin-top: 0.35em;
+}
+
+.ts-list--no-bullets .ts-list__bullet {
+	display: none;
+}
+
+.ts-list__label {
+	flex: 1 1 auto;
+	font-size: 0.95em;
+	line-height: 1.5;
+}
+
+.ts-list__value {
+	flex: 0 0 auto;
+	font-size: 0.85em;
+	font-weight: 600;
+	color: var(--ts-text-muted, var(--text-muted));
+	font-variant-numeric: tabular-nums;
+}
+
+.ts-list__empty {
+	font-size: 0.9em;
+	color: var(--text-muted);
+	padding: 4px 0;
+}
+
+/* ==========================================================================
+   Tags Component
+   ========================================================================== */
+
+.ts-tags {
+	background: var(
+		--ts-tags-background-current,
+		var(--ts-tags-light-background, var(--background-secondary))
+	);
+	border: 1px solid
+		var(--ts-tags-border-current, var(--ts-tags-light-border, transparent));
+	border-radius: var(--ts-tags-radius, 12px);
+	padding: var(--ts-tags-padding, 12px);
+	color: var(--ts-tags-text-current, var(--ts-tags-light-text, var(--text-normal)));
+	font-family: var(--font-interface);
+	max-width: 100%;
+}
+
+body.theme-light .ts-tags {
+	--ts-tags-background-current: var(--ts-tags-light-background, var(--background-secondary));
+	--ts-tags-border-current: var(--ts-tags-light-border, transparent);
+	--ts-tags-text-current: var(--ts-tags-light-text, var(--text-normal));
+	--ts-tags-accent-current: var(--ts-tags-light-accent, var(--text-normal));
+}
+
+body.theme-dark .ts-tags {
+	--ts-tags-background-current: var(--ts-tags-dark-background, var(--background-secondary));
+	--ts-tags-border-current: var(--ts-tags-dark-border, transparent);
+	--ts-tags-text-current: var(--ts-tags-dark-text, var(--text-normal));
+	--ts-tags-accent-current: var(--ts-tags-dark-accent, var(--text-normal));
+}
+
+.ts-tags__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--ts-tags-gap, 6px);
+}
+
+.ts-tags--no-wrap .ts-tags__chips {
+	flex-wrap: nowrap;
+	overflow-x: auto;
+}
+
+.ts-tags__tag {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	padding: var(--ts-tags-tag-padding, 4px 10px);
+	border-radius: var(--ts-tags-tag-radius, 999px);
+	font-size: var(--ts-tags-tag-font-size, 12px);
+	font-weight: 500;
+	line-height: 1.4;
+	white-space: nowrap;
+	/* Default (pill): accent-colored outline with no fill */
+	color: var(--ts-tags-accent-current, var(--text-normal));
+	background: transparent;
+	border: 1px solid var(--ts-tags-accent-current, var(--text-normal));
+}
+
+.ts-tags__tag--soft {
+	background: var(--ts-tags-tag-accent, var(--background-modifier-hover));
+	color: var(--ts-tags-text-current, var(--text-normal));
+	border-color: transparent;
+}
+
+.ts-tags__tag--outlined {
+	background: transparent;
+	color: var(--ts-tags-tag-accent, var(--ts-tags-accent-current, var(--text-normal)));
+	border: 1px solid var(--ts-tags-tag-accent, var(--ts-tags-accent-current, var(--text-normal)));
+}
+
+/* Per-tag color override: --ts-tags-tag-accent switches the chip color */
+.ts-tags__tag--pill {
+	color: var(--ts-tags-tag-accent, var(--ts-tags-accent-current, var(--text-normal)));
+	border-color: var(--ts-tags-tag-accent, var(--ts-tags-accent-current, var(--text-normal)));
+}
+
+.ts-tags--squared .ts-tags__tag {
+	border-radius: 6px;
+}
+
+.ts-tags__empty {
+	font-size: 0.9em;
+	color: var(--text-muted);
+}
+
+/* ==========================================================================
    Notification Styles
    ========================================================================== */
 

@@ -23,6 +23,14 @@
 			"name": "进度条",
 			"desc": "用于显示进度的进度条组件"
 		},
+		"list": {
+			"name": "列表",
+			"desc": "带圆点的项目符号列表，Lieflat 风格"
+		},
+		"tags": {
+			"name": "标签栏",
+			"desc": "自动换行的标签胶囊，支持多种样式"
+		},
 		"line": {
 			"name": "折线图",
 			"desc": "Lieflat 风格折线图 (ECharts)"
@@ -38,6 +46,10 @@
 		"rose": {
 			"name": "花瓣玫瑰图",
 			"desc": "按值分层着色的玫瑰图"
+		},
+		"radar": {
+			"name": "雷达图",
+			"desc": "Lieflat 风格多边形雷达图，适合六维数据"
 		}
 	},
 	"fields": {
@@ -99,7 +111,30 @@
 		"colors.dark.grid": "暗色网格线",
 		"colors.light.track": "亮色轨道",
 		"colors.dark.track": "暗色轨道",
-		"label": "中心标签"
+		"label": "中心标签",
+		"flags.showBullets": "显示圆点",
+		"flags.showDividers": "显示分隔线",
+		"flags.showHover": "悬停高亮",
+		"layout.bulletSize": "圆点大小",
+		"layout.indent": "文本缩进",
+		"flags.pill": "胶囊形状",
+		"flags.soft": "柔和填充",
+		"flags.outlined": "描边样式",
+		"flags.wrap": "自动换行",
+		"layout.tagRadius": "标签圆角",
+		"layout.tagPadding": "标签内边距",
+		"layout.tagFontSize": "标签字号",
+		"flags.showArea": "面积填充",
+		"flags.showAxes": "显示轴线",
+		"layout.symbolSize": "数据点大小",
+		"layout.lineWidth": "线宽",
+		"layout.barMaxWidth": "柱状最大宽度",
+		"layout.barRadius": "柱状圆角",
+		"layout.gridLeft": "左侧轴距",
+		"layout.gridRight": "右侧轴距",
+		"layout.gridTop": "顶部轴距",
+		"layout.gridBottom": "底部轴距",
+		"max": "最大值 (留空=自动)"
 	},
 	"groups": {
 		"core": "核心组件",
@@ -166,6 +201,29 @@
 		"gauge.showLabel": "显示中心标签",
 		"gauge.showTicks": "沿量表弧线显示刻度",
 		"colors.grid": "网格线颜色",
-		"colors.track": "轨道（未填充弧）颜色"
+		"colors.track": "轨道（未填充弧）颜色",
+		"list.showBullets": "在每行前显示强调色圆点",
+		"list.showDividers": "在行之间显示细分隔线",
+		"list.showHover": "悬停行时显示浅色背景",
+		"list.bulletSize": "圆点直径（CSS 值，如 5px）",
+		"list.indent": "文本相对圆点的左缩进（CSS 值）",
+		"tags.pill": "胶囊形状（完全圆角）",
+		"tags.soft": "柔和填充背景（Lieflat soft 变体）",
+		"tags.outlined": "描边标签（仅边框无填充）",
+		"tags.wrap": "允许标签换行到多行",
+		"tags.tagRadius": "单个标签的圆角（CSS 值）",
+		"tags.tagPadding": "单个标签的内边距（CSS 值）",
+		"tags.tagFontSize": "单个标签的字体大小（CSS 值）",
+		"chart.symbolSize": "数据点直径（像素，留空=自动 5）",
+		"chart.lineWidth": "线条宽度（像素，留空=自动 2）",
+		"chart.barMaxWidth": "柱状最大宽度（像素，留空=自动 28）",
+		"chart.barRadius": "柱状顶部圆角（像素，留空=自动 6）",
+		"chart.gridLeft": "坐标轴距画布左边缘的距离（像素）",
+		"chart.gridRight": "坐标轴距画布右边缘的距离（像素）",
+		"chart.gridTop": "坐标轴距画布上边缘的距离（像素）",
+		"chart.gridBottom": "坐标轴距画布下边缘的距离（像素）",
+		"radar.max": "各维度最大刻度值，留空时自动计算",
+		"radar.showArea": "以半透明强调色填充雷达多边形",
+		"radar.showAxes": "从中心到每个顶点绘制轴线"
 	}
 }

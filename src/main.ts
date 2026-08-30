@@ -7,6 +7,8 @@ import { Notice, Plugin } from "obsidian";
 import { card } from "./components/card/index";
 import { heatmap } from "./components/heatmap/index";
 import { progressbar } from "./components/progressbar/index";
+import { list } from "./components/list/index";
+import { tags } from "./components/tags/index";
 import { createChartGroup } from "./components/chart/index";
 
 import type { PluginSettings, TesseraAPI } from "./settings";
@@ -57,6 +59,12 @@ export default class TesseraPlugin extends Plugin {
 				progressbar: coreEnabled && this.settings.progressbar.enabled
 					? (options) => progressbar(this.mergeComponentConfig(this.settings.progressbar.config, options))
 					: undefined,
+				list: coreEnabled && this.settings.list.enabled
+					? (options) => list(this.mergeComponentConfig(this.settings.list.config, options))
+					: undefined,
+				tags: coreEnabled && this.settings.tags.enabled
+					? (options) => tags(this.mergeComponentConfig(this.settings.tags.config, options))
+					: undefined,
 			},
 			chart: chartEnabled
 				? createChartGroup({
@@ -65,12 +73,14 @@ export default class TesseraPlugin extends Plugin {
 					barEnabled: this.settings.bar.enabled,
 					gaugeEnabled: this.settings.gauge.enabled,
 					roseEnabled: this.settings.rose.enabled,
+					radarEnabled: this.settings.radar.enabled,
 				})
 				: {
 					line: undefined,
 					bar: undefined,
 					gauge: undefined,
 					rose: undefined,
+					radar: undefined,
 				},
 		};
 
@@ -86,10 +96,13 @@ export default class TesseraPlugin extends Plugin {
 					this.settings.card.enabled ? "core.card" : null,
 					this.settings.heatmap.enabled ? "core.heatmap" : null,
 					this.settings.progressbar.enabled ? "core.progressbar" : null,
+					this.settings.list.enabled ? "core.list" : null,
+					this.settings.tags.enabled ? "core.tags" : null,
 					this.settings.line.enabled ? "chart.line" : null,
 					this.settings.bar.enabled ? "chart.bar" : null,
 					this.settings.gauge.enabled ? "chart.gauge" : null,
 					this.settings.rose.enabled ? "chart.rose" : null,
+					this.settings.radar.enabled ? "chart.radar" : null,
 				].filter(Boolean);
 
 				new Notice(
@@ -137,6 +150,14 @@ export default class TesseraPlugin extends Plugin {
 				enabled: loaded.progressbar?.enabled ?? DEFAULT_SETTINGS.progressbar.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.progressbar.config, loaded.progressbar?.config),
 			},
+			list: {
+				enabled: loaded.list?.enabled ?? DEFAULT_SETTINGS.list.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.list.config, loaded.list?.config),
+			},
+			tags: {
+				enabled: loaded.tags?.enabled ?? DEFAULT_SETTINGS.tags.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.tags.config, loaded.tags?.config),
+			},
 			line: {
 				enabled: loaded.line?.enabled ?? DEFAULT_SETTINGS.line.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.line.config, loaded.line?.config),
@@ -152,6 +173,10 @@ export default class TesseraPlugin extends Plugin {
 			rose: {
 				enabled: loaded.rose?.enabled ?? DEFAULT_SETTINGS.rose.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.rose.config, loaded.rose?.config),
+			},
+			radar: {
+				enabled: loaded.radar?.enabled ?? DEFAULT_SETTINGS.radar.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.radar.config, loaded.radar?.config),
 			},
 		};
 	}

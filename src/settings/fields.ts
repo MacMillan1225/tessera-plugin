@@ -7,10 +7,13 @@ import type { ComponentDefinition, ComponentKey, PluginSettings } from "./types"
 import { CARD_DEFAULTS } from "../components/card/config";
 import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
 import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
+import { LIST_DEFAULTS } from "../components/list/config";
+import { TAGS_DEFAULTS } from "../components/tags/config";
 import { LINE_DEFAULTS } from "../components/chart/config";
 import { BAR_DEFAULTS } from "../components/chart/config";
 import { GAUGE_DEFAULTS } from "../components/chart/config";
 import { ROSE_DEFAULTS } from "../components/chart/config";
+import { RADAR_DEFAULTS } from "../components/chart/config";
 
 /**
  * Component settings definitions
@@ -129,6 +132,60 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
 		],
 	},
+	list: {
+		componentKey: "list",
+		fields: [
+			// Flags
+			{ key: "flags.showBullets", type: "toggle", description: "tooltip.list.showBullets" },
+			{ key: "flags.showDividers", type: "toggle", description: "tooltip.list.showDividers" },
+			{ key: "flags.showHover", type: "toggle", description: "tooltip.list.showHover" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.padding", type: "text", description: "tooltip.layout.padding" },
+			{ key: "layout.radius", type: "text", description: "tooltip.layout.radius" },
+			{ key: "layout.gap", type: "text", description: "tooltip.layout.gap" },
+			{ key: "layout.bulletSize", type: "text", description: "tooltip.list.bulletSize" },
+			{ key: "layout.indent", type: "text", description: "tooltip.list.indent" },
+			// Colors (Light)
+			{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.light.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.dark.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
+	tags: {
+		componentKey: "tags",
+		fields: [
+			// Flags
+			{ key: "flags.pill", type: "toggle", description: "tooltip.tags.pill" },
+			{ key: "flags.soft", type: "toggle", description: "tooltip.tags.soft" },
+			{ key: "flags.outlined", type: "toggle", description: "tooltip.tags.outlined" },
+			{ key: "flags.wrap", type: "toggle", description: "tooltip.tags.wrap" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.padding", type: "text", description: "tooltip.layout.padding" },
+			{ key: "layout.radius", type: "text", description: "tooltip.layout.radius" },
+			{ key: "layout.gap", type: "text", description: "tooltip.layout.gap" },
+			{ key: "layout.tagRadius", type: "text", description: "tooltip.tags.tagRadius" },
+			{ key: "layout.tagPadding", type: "text", description: "tooltip.tags.tagPadding" },
+			{ key: "layout.tagFontSize", type: "text", description: "tooltip.tags.tagFontSize" },
+			// Colors (Light)
+			{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.light.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
+			{ key: "colors.dark.border", type: "color", description: "tooltip.colors.border" },
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
 	// ---- Chart group components (ADR-0005) ----
 	line: {
 		componentKey: "line",
@@ -142,6 +199,12 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			// Layout
 			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
 			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			{ key: "layout.symbolSize", type: "number", placeholder: "5", description: "tooltip.chart.symbolSize" },
+			{ key: "layout.lineWidth", type: "number", placeholder: "2", description: "tooltip.chart.lineWidth" },
+			{ key: "layout.gridLeft", type: "number", placeholder: "8", description: "tooltip.chart.gridLeft" },
+			{ key: "layout.gridRight", type: "number", placeholder: "12", description: "tooltip.chart.gridRight" },
+			{ key: "layout.gridTop", type: "number", placeholder: "28", description: "tooltip.chart.gridTop" },
+			{ key: "layout.gridBottom", type: "number", placeholder: "4", description: "tooltip.chart.gridBottom" },
 			// Colors (Light)
 			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
 			{ key: "colors.light.grid", type: "color", description: "tooltip.colors.grid" },
@@ -162,6 +225,12 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			// Layout
 			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
 			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			{ key: "layout.barMaxWidth", type: "number", placeholder: "28", description: "tooltip.chart.barMaxWidth" },
+			{ key: "layout.barRadius", type: "number", placeholder: "6", description: "tooltip.chart.barRadius" },
+			{ key: "layout.gridLeft", type: "number", placeholder: "8", description: "tooltip.chart.gridLeft" },
+			{ key: "layout.gridRight", type: "number", placeholder: "12", description: "tooltip.chart.gridRight" },
+			{ key: "layout.gridTop", type: "number", placeholder: "28", description: "tooltip.chart.gridTop" },
+			{ key: "layout.gridBottom", type: "number", placeholder: "4", description: "tooltip.chart.gridBottom" },
 			// Colors (Light)
 			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
 			{ key: "colors.light.grid", type: "color", description: "tooltip.colors.grid" },
@@ -213,6 +282,32 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
 		],
 	},
+	radar: {
+		componentKey: "radar",
+		fields: [
+			// Basic
+			{ key: "max", type: "number", placeholder: "auto", description: "tooltip.radar.max" },
+			// Flags
+			{ key: "flags.showLegend", type: "toggle", description: "tooltip.chart.showLegend" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.chart.showTooltip" },
+			{ key: "flags.showLabels", type: "toggle", description: "tooltip.chart.showLabels" },
+			{ key: "flags.showArea", type: "toggle", description: "tooltip.radar.showArea" },
+			{ key: "flags.showAxes", type: "toggle", description: "tooltip.radar.showAxes" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			{ key: "layout.lineWidth", type: "number", placeholder: "2", description: "tooltip.chart.lineWidth" },
+			{ key: "layout.symbolSize", type: "number", placeholder: "3", description: "tooltip.chart.symbolSize" },
+			// Colors (Light)
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
 };
 
 /**
@@ -224,13 +319,13 @@ export const GROUPS: { key: "core" | "chart"; enabledKey: "coreEnabled" | "chart
 		key: "core",
 		enabledKey: "coreEnabled",
 		descKey: "coreDesc",
-		components: ["card", "heatmap", "progressbar"],
+		components: ["card", "heatmap", "progressbar", "list", "tags"],
 	},
 	{
 		key: "chart",
 		enabledKey: "chartEnabled",
 		descKey: "chartDesc",
-		components: ["line", "bar", "gauge", "rose"],
+		components: ["line", "bar", "gauge", "rose", "radar"],
 	},
 ];
 
@@ -239,7 +334,7 @@ export const GROUPS: { key: "core" | "chart"; enabledKey: "coreEnabled" | "chart
  * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
-	version: 3,
+	version: 4,
 	coreEnabled: true,
 	chartEnabled: true,
 	card: {
@@ -253,6 +348,14 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	progressbar: {
 		enabled: true,
 		config: PROGRESSBAR_DEFAULTS,
+	},
+	list: {
+		enabled: true,
+		config: LIST_DEFAULTS,
+	},
+	tags: {
+		enabled: true,
+		config: TAGS_DEFAULTS,
 	},
 	line: {
 		enabled: true,
@@ -269,5 +372,9 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	rose: {
 		enabled: true,
 		config: ROSE_DEFAULTS,
+	},
+	radar: {
+		enabled: true,
+		config: RADAR_DEFAULTS,
 	},
 };

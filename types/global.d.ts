@@ -5,10 +5,13 @@
 import type { CardOptions, CardInstance } from "../src/components/card/index";
 import type { HeatmapOptions, HeatmapInstance } from "../src/components/heatmap/index";
 import type { ProgressbarOptions, ProgressbarInstance } from "../src/components/progressbar/index";
+import type { ListOptions, ListInstance } from "../src/components/list/index";
+import type { TagsOptions, TagsInstance } from "../src/components/tags/index";
 import type { LineOptions, LineInstance } from "../src/components/chart/line";
 import type { BarOptions, BarInstance } from "../src/components/chart/bar";
 import type { GaugeOptions, GaugeInstance } from "../src/components/chart/gauge";
 import type { RoseOptions, RoseInstance } from "../src/components/chart/rose";
+import type { RadarOptions, RadarInstance } from "../src/components/chart/radar";
 
 // ============================================================================
 // Tessera API Types
@@ -20,12 +23,15 @@ export interface TesseraAPI {
 		card(options?: CardOptions): CardInstance;
 		heatmap(options?: HeatmapOptions): HeatmapInstance;
 		progressbar(options?: ProgressbarOptions): ProgressbarInstance;
+		list(options?: ListOptions): ListInstance;
+		tags(options?: TagsOptions): TagsInstance;
 	};
 	chart: {
 		line(options?: LineOptions): LineInstance;
 		bar(options?: BarOptions): BarInstance;
 		gauge(options?: GaugeOptions): GaugeInstance;
 		rose(options?: RoseOptions): RoseInstance;
+		radar(options?: RadarOptions): RadarInstance;
 	};
 }
 

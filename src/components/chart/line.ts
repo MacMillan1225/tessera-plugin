@@ -23,6 +23,15 @@ export interface LineOptions {
 	layout?: {
 		maxWidth?: string;
 		height?: string;
+		/** Data point diameter in px (auto/default 5). */
+		symbolSize?: number;
+		/** Line stroke width in px (auto/default 2). */
+		lineWidth?: number;
+		/** Grid insets (px) — distance between axes and canvas edges. */
+		gridLeft?: number;
+		gridRight?: number;
+		gridTop?: number;
+		gridBottom?: number;
 	};
 	colors?: ChartColors;
 	className?: string | string[];
@@ -42,6 +51,7 @@ export interface LineInstance extends HTMLElement {
 function buildLineOption(
 	data: ChartData,
 	flags: NonNullable<LineOptions["flags"]>,
+	layout: NonNullable<LineOptions["layout"]>,
 	colors: Record<string, string | string[]>,
 	theme: "light" | "dark",
 ): EChartsOption {
@@ -50,6 +60,14 @@ function buildLineOption(
 	const accent = colors.accent as string;
 	const seriesColors = (colors.series as string[]) || [accent];
 
+	// Size knobs — fall back to defaults when unset (auto sizing)
+	const symbolSize = layout.symbolSize ?? LINE_DEFAULTS.layout.symbolSize;
+	const lineWidth = layout.lineWidth ?? LINE_DEFAULTS.layout.lineWidth;
+	const gridLeft = layout.gridLeft ?? LINE_DEFAULTS.layout.gridLeft;
+	const gridRight = layout.gridRight ?? LINE_DEFAULTS.layout.gridRight;
+	const gridTop = layout.gridTop ?? LINE_DEFAULTS.layout.gridTop;
+	const gridBottom = layout.gridBottom ?? LINE_DEFAULTS.layout.gridBottom;
+
 	const series = data.series?.length
 		? data.series.map((s, i) => ({
 			name: s.name,
@@ -57,8 +75,8 @@ function buildLineOption(
 			data: s.values,
 			smooth: flags.smooth === true,
 			symbol: "circle",
-			symbolSize: 5,
-			lineStyle: { width: 2, color: seriesColors[i % seriesColors.length] },
+			symbolSize,
+			lineStyle: { width: lineWidth, color: seriesColors[i % seriesColors.length] },
 			itemStyle: { color: seriesColors[i % seriesColors.length] },
 			areaStyle: flags.area === true
 				? { opacity: 0.08, color: seriesColors[i % seriesColors.length] }
@@ -70,8 +88,8 @@ function buildLineOption(
 			data: data.values,
 			smooth: flags.smooth === true,
 			symbol: "circle",
-			symbolSize: 5,
-			lineStyle: { width: 2, color: accent },
+			symbolSize,
+			lineStyle: { width: lineWidth, color: accent },
 			itemStyle: { color: accent },
 			areaStyle: flags.area === true ? { opacity: 0.08, color: accent } : undefined,
 		}];
@@ -89,10 +107,10 @@ function buildLineOption(
 			}
 			: undefined,
 		grid: {
-			left: 8,
-			right: 12,
-			top: flags.showLegend ? 28 : 12,
-			bottom: 4,
+			left: gridLeft,
+			right: gridRight,
+			top: flags.showLegend ? gridTop : Math.max(gridTop - 16, 4),
+			bottom: gridBottom,
 			containLabel: true,
 		},
 		xAxis: {
@@ -132,7 +150,7 @@ export function line(options: LineOptions = {}): LineInstance {
 		maxWidth: layout.maxWidth,
 		height: layout.height,
 		colors,
-		buildOption: (theme) => buildLineOption(_data, flags, chartThemeColors(colors, theme), theme),
+		buildOption: (theme) => buildLineOption(_data, flags, layout, chartThemeColors(colors, theme), theme),
 	}) as unknown as LineInstance;
 
 	// Reactive data

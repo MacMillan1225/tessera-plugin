@@ -23,6 +23,14 @@
 			"name": "Progressbar",
 			"desc": "Progress bar component for displaying progress"
 		},
+		"list": {
+			"name": "List",
+			"desc": "Bullet-point list with accent dots, Lieflat style"
+		},
+		"tags": {
+			"name": "Tags",
+			"desc": "Auto-wrapping tag chips with multiple styles"
+		},
 		"line": {
 			"name": "Line",
 			"desc": "Lieflat-style line chart (ECharts)"
@@ -38,6 +46,10 @@
 		"rose": {
 			"name": "Petal Rose",
 			"desc": "Layered rose chart with petals by value"
+		},
+		"radar": {
+			"name": "Radar",
+			"desc": "Lieflat polygon radar chart, great for 6-dimension data"
 		}
 	},
 	"fields": {
@@ -99,7 +111,30 @@
 		"colors.dark.grid": "Dark Grid",
 		"colors.light.track": "Light Track",
 		"colors.dark.track": "Dark Track",
-		"label": "Center Label"
+		"label": "Center Label",
+		"flags.showBullets": "Show Bullets",
+		"flags.showDividers": "Show Dividers",
+		"flags.showHover": "Hover Highlight",
+		"layout.bulletSize": "Bullet Size",
+		"layout.indent": "Text Indent",
+		"flags.pill": "Pill Shape",
+		"flags.soft": "Soft Fill",
+		"flags.outlined": "Outlined",
+		"flags.wrap": "Auto Wrap",
+		"layout.tagRadius": "Tag Radius",
+		"layout.tagPadding": "Tag Padding",
+		"layout.tagFontSize": "Tag Font Size",
+		"flags.showArea": "Area Fill",
+		"flags.showAxes": "Show Axes",
+		"layout.symbolSize": "Symbol Size",
+		"layout.lineWidth": "Line Width",
+		"layout.barMaxWidth": "Max Bar Width",
+		"layout.barRadius": "Bar Radius",
+		"layout.gridLeft": "Left Axis Inset",
+		"layout.gridRight": "Right Axis Inset",
+		"layout.gridTop": "Top Axis Inset",
+		"layout.gridBottom": "Bottom Axis Inset",
+		"max": "Max Value (empty = auto)"
 	},
 	"groups": {
 		"core": "Core",
@@ -166,6 +201,29 @@
 		"gauge.showLabel": "Show the center label",
 		"gauge.showTicks": "Show tick marks along the gauge arc",
 		"colors.grid": "Grid line color",
-		"colors.track": "Track (unfilled arc) color"
+		"colors.track": "Track (unfilled arc) color",
+		"list.showBullets": "Show accent-colored dots before each row",
+		"list.showDividers": "Separate rows with hairline dividers",
+		"list.showHover": "Highlight row background on hover",
+		"list.bulletSize": "Bullet dot diameter (CSS value, e.g., 5px)",
+		"list.indent": "Left indent of text relative to bullets (CSS value)",
+		"tags.pill": "Pill shape (fully rounded)",
+		"tags.soft": "Soft filled background (Lieflat soft variant)",
+		"tags.outlined": "Outlined tags (border only, no fill)",
+		"tags.wrap": "Allow tags to wrap onto multiple lines",
+		"tags.tagRadius": "Per-tag corner radius (CSS value)",
+		"tags.tagPadding": "Per-tag inner padding (CSS value)",
+		"tags.tagFontSize": "Per-tag font size (CSS value)",
+		"chart.symbolSize": "Data point diameter in px (empty = auto 5)",
+		"chart.lineWidth": "Line stroke width in px (empty = auto 2)",
+		"chart.barMaxWidth": "Max bar width in px (empty = auto 28)",
+		"chart.barRadius": "Bar top corner radius in px (empty = auto 6)",
+		"chart.gridLeft": "Distance from axis to the left canvas edge (px)",
+		"chart.gridRight": "Distance from axis to the right canvas edge (px)",
+		"chart.gridTop": "Distance from axis to the top canvas edge (px)",
+		"chart.gridBottom": "Distance from axis to the bottom canvas edge (px)",
+		"radar.max": "Max scale value per dimension; auto-computed when empty",
+		"radar.showArea": "Fill radar polygons with a translucent accent",
+		"radar.showAxes": "Draw axis lines from center to each vertex"
 	}
 }

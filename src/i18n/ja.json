@@ -23,6 +23,14 @@
 			"name": "プログレスバー",
 			"desc": "進捗を表示するプログレスバーコンポーネント"
 		},
+		"list": {
+			"name": "リスト",
+			"desc": "アクセントドット付きの箇条書きリスト、Lieflat スタイル"
+		},
+		"tags": {
+			"name": "タグ",
+			"desc": "自動折り返しのタグチップ、複数スタイル対応"
+		},
 		"line": {
 			"name": "折れ線",
 			"desc": "Lieflat スタイルの折れ線チャート (ECharts)"
@@ -38,6 +46,10 @@
 		"rose": {
 			"name": "ペタルローズ",
 			"desc": "値で花びらを分けたレイヤーローズチャート"
+		},
+		"radar": {
+			"name": "レーダー",
+			"desc": "Lieflat スタイルの多角形レーダーチャート、6次元データに最適"
 		}
 	},
 	"fields": {
@@ -99,7 +111,30 @@
 		"colors.dark.grid": "ダークグリッド",
 		"colors.light.track": "ライトトラック",
 		"colors.dark.track": "ダークトラック",
-		"label": "中央ラベル"
+		"label": "中央ラベル",
+		"flags.showBullets": "ドットを表示",
+		"flags.showDividers": "区切り線を表示",
+		"flags.showHover": "ホバー強調",
+		"layout.bulletSize": "ドットサイズ",
+		"layout.indent": "テキストのインデント",
+		"flags.pill": "ピル形状",
+		"flags.soft": "ソフト塗りつぶし",
+		"flags.outlined": "アウトライン",
+		"flags.wrap": "自動折り返し",
+		"layout.tagRadius": "タグの角の半径",
+		"layout.tagPadding": "タグの内側余白",
+		"layout.tagFontSize": "タグのフォントサイズ",
+		"flags.showArea": "エリア塗りつぶし",
+		"flags.showAxes": "軸線を表示",
+		"layout.symbolSize": "データポイントサイズ",
+		"layout.lineWidth": "線の太さ",
+		"layout.barMaxWidth": "棒の最大幅",
+		"layout.barRadius": "棒の角の半径",
+		"layout.gridLeft": "左の軸オフセット",
+		"layout.gridRight": "右の軸オフセット",
+		"layout.gridTop": "上の軸オフセット",
+		"layout.gridBottom": "下の軸オフセット",
+		"max": "最大値（空欄=自動）"
 	},
 	"groups": {
 		"core": "コア",
@@ -166,6 +201,29 @@
 		"gauge.showLabel": "中央ラベルを表示",
 		"gauge.showTicks": "ゲージの円弧に沿って目盛りを表示",
 		"colors.grid": "グリッド線の色",
-		"colors.track": "トラック（未塗りつぶし部分）の色"
+		"colors.track": "トラック（未塗りつぶし部分）の色",
+		"list.showBullets": "各行の前にアクセント色のドットを表示",
+		"list.showDividers": "行を細い区切り線で分ける",
+		"list.showHover": "ホバー時に浅い背景色を表示",
+		"list.bulletSize": "ドットの直径（CSS値、例: 5px）",
+		"list.indent": "ドットに対するテキストの左インデント（CSS値）",
+		"tags.pill": "ピル形状（完全な角丸）",
+		"tags.soft": "ソフトな塗りつぶし背景（Lieflat soft バリアント）",
+		"tags.outlined": "アウトライインタグ（枠線のみ、塗りなし）",
+		"tags.wrap": "タグを複数行に折り返す",
+		"tags.tagRadius": "タグの角の半径（CSS値）",
+		"tags.tagPadding": "タグの内側余白（CSS値）",
+		"tags.tagFontSize": "タグのフォントサイズ（CSS値）",
+		"chart.symbolSize": "データポイントの直径（px、空欄=自動 5）",
+		"chart.lineWidth": "線の太さ（px、空欄=自動 2）",
+		"chart.barMaxWidth": "棒の最大幅（px、空欄=自動 28）",
+		"chart.barRadius": "棒の上部角の半径（px、空欄=自動 6）",
+		"chart.gridLeft": "軸からキャンバス左端までの距離（px）",
+		"chart.gridRight": "軸からキャンバス右端までの距離（px）",
+		"chart.gridTop": "軸からキャンバス上端までの距離（px）",
+		"chart.gridBottom": "軸からキャンバス下端までの距離（px）",
+		"radar.max": "各次元の最大スケール値。空欄時は自動計算",
+		"radar.showArea": "半透明のアクセントでレーダー多角形を塗る",
+		"radar.showAxes": "中心から各頂点へ軸線を描く"
 	}
 }

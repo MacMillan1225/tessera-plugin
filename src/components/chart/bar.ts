@@ -21,6 +21,15 @@ export interface BarOptions {
 	layout?: {
 		maxWidth?: string;
 		height?: string;
+		/** Max bar width in px (auto/default 28). */
+		barMaxWidth?: number;
+		/** Bar corner radius in px (Lieflat chunky: rounded tops, default 6). */
+		barRadius?: number;
+		/** Grid insets (px) — distance between axes and canvas edges. */
+		gridLeft?: number;
+		gridRight?: number;
+		gridTop?: number;
+		gridBottom?: number;
 	};
 	colors?: ChartColors;
 	className?: string | string[];
@@ -40,6 +49,7 @@ export interface BarInstance extends HTMLElement {
 function buildBarOption(
 	data: ChartData,
 	flags: NonNullable<BarOptions["flags"]>,
+	layout: NonNullable<BarOptions["layout"]>,
 	colors: Record<string, string | string[]>,
 	theme: "light" | "dark",
 ): EChartsOption {
@@ -48,6 +58,14 @@ function buildBarOption(
 	const accent = colors.accent as string;
 	const seriesColors = (colors.series as string[]) || [accent];
 
+	// Size knobs — fall back to defaults when unset (auto sizing)
+	const barMaxWidth = layout.barMaxWidth ?? BAR_DEFAULTS.layout.barMaxWidth;
+	const barRadius = layout.barRadius ?? BAR_DEFAULTS.layout.barRadius;
+	const gridLeft = layout.gridLeft ?? BAR_DEFAULTS.layout.gridLeft;
+	const gridRight = layout.gridRight ?? BAR_DEFAULTS.layout.gridRight;
+	const gridTop = layout.gridTop ?? BAR_DEFAULTS.layout.gridTop;
+	const gridBottom = layout.gridBottom ?? BAR_DEFAULTS.layout.gridBottom;
+
 	// Single series: per-bar colors from the palette (Lieflat chunky bars).
 	// Multi series: one color per series, grouped bars.
 	const series = data.series?.length
@@ -55,10 +73,10 @@ function buildBarOption(
 			name: s.name,
 			type: "bar" as const,
 			data: s.values,
-			barMaxWidth: 28,
+			barMaxWidth,
 			itemStyle: {
 				color: seriesColors[i % seriesColors.length],
-				borderRadius: [6, 6, 0, 0],
+				borderRadius: [barRadius, barRadius, 0, 0],
 			},
 		}))
 		: [{
@@ -68,10 +86,10 @@ function buildBarOption(
 				value: v,
 				itemStyle: { color: seriesColors[i % seriesColors.length] },
 			})),
-			barMaxWidth: 28,
+			barMaxWidth,
 			itemStyle: {
 				color: accent,
-				borderRadius: [6, 6, 0, 0],
+				borderRadius: [barRadius, barRadius, 0, 0],
 			},
 		}];
 
@@ -88,10 +106,10 @@ function buildBarOption(
 			}
 			: undefined,
 		grid: {
-			left: 8,
-			right: 12,
-			top: flags.showLegend ? 28 : 12,
-			bottom: 4,
+			left: gridLeft,
+			right: gridRight,
+			top: flags.showLegend ? gridTop : Math.max(gridTop - 16, 4),
+			bottom: gridBottom,
 			containLabel: true,
 		},
 		xAxis: {
@@ -131,7 +149,7 @@ export function bar(options: BarOptions = {}): BarInstance {
 		maxWidth: layout.maxWidth,
 		height: layout.height,
 		colors,
-		buildOption: (theme) => buildBarOption(_data, flags, chartThemeColors(colors, theme), theme),
+		buildOption: (theme) => buildBarOption(_data, flags, layout, chartThemeColors(colors, theme), theme),
 	}) as unknown as BarInstance;
 
 	// Reactive data
