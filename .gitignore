@@ -19,7 +19,7 @@ main.js
 data.json
 
 # Design reference images (stay local, not versioned)
-reference/
+/reference/
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
