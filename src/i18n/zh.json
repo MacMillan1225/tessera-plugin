@@ -8,7 +8,18 @@
 		"restoreButton": "恢复默认设置",
 		"restoreNotice": "将所有配置恢复为默认值。此操作不可撤销。",
 		"resetField": "恢复默认值",
-		"chartDesc": "管理图表组件组（ECharts，懒加载）及其可用性。"
+		"chartDesc": "管理图表组件组（ECharts，懒加载）及其可用性。",
+		"libsTitle": "图表库",
+		"libsDesc": "图表组件依赖的第三方库按需下载。安装后图表立即可用；无需时可删除以节省空间。",
+		"libsDownload": "下载",
+		"libsDelete": "删除",
+		"libsInstalled": "已安装",
+		"libsMissing": "未安装",
+		"libsDownloading": "下载中…",
+		"libsDownloaded": "已下载 {name}",
+		"libsDeleted": "已删除 {name}",
+		"libsDeleteFailed": "删除 {name} 失败：{reason}",
+		"libsDownloadFailed": "下载 {name} 失败：{reason}"
 	},
 	"components": {
 		"card": {

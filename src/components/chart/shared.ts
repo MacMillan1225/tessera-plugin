@@ -5,7 +5,7 @@
  */
 
 import type { EChartsType, EChartsOption } from "echarts";
-import { loadEcharts } from "./loader";
+import { loadEcharts, EchartsNotInstalledError } from "./loader";
 import { createElement } from "../../utils/dom";
 
 // ============================================================================
@@ -144,9 +144,12 @@ export function createChartBase(options: ChartBaseOptions): HTMLElement & ChartB
 			const nextChart = chart ?? echarts.init(canvas, null, { renderer: "svg" });
 			chart = nextChart;
 			nextChart.setOption(options.buildOption(theme), { notMerge: true });
-		} catch {
-			// ECharts failed to load — render a readable fallback
-			canvas.textContent = "Echarts failed to load";
+		} catch (error) {
+			// Library missing → actionable hint pointing at the settings section.
+			// Any other load failure → generic message.
+			canvas.textContent = error instanceof EchartsNotInstalledError
+				? "ECharts 未安装，请到设置 → 图表库 一键下载"
+				: "Echarts failed to load";
 		}
 	}
 

@@ -8,7 +8,18 @@
 		"restoreButton": "デフォルトに戻す",
 		"restoreNotice": "すべての設定をデフォルト値に戻します。この操作は元に戻せません。",
 		"resetField": "デフォルトに戻す",
-		"chartDesc": "チャートコンポーネントグループ（ECharts、遅延読み込み）とその可用性を管理します。"
+		"chartDesc": "チャートコンポーネントグループ（ECharts、遅延読み込み）とその可用性を管理します。",
+		"libsTitle": "チャートライブラリ",
+		"libsDesc": "チャートコンポーネントが使用するサードパーティライブラリはオンデマンドでダウンロードされます。インストール後すぐにチャートが使えます。不要な場合は削除して容量を節約できます。",
+		"libsDownload": "ダウンロード",
+		"libsDelete": "削除",
+		"libsInstalled": "インストール済み",
+		"libsMissing": "未インストール",
+		"libsDownloading": "ダウンロード中…",
+		"libsDownloaded": "{name} をダウンロードしました",
+		"libsDeleted": "{name} を削除しました",
+		"libsDeleteFailed": "{name} の削除に失敗: {reason}",
+		"libsDownloadFailed": "{name} のダウンロードに失敗: {reason}"
 	},
 	"components": {
 		"card": {

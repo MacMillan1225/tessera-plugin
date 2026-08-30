@@ -5,11 +5,12 @@
  * Single rendering path: display() + manual refresh. No dual API.
  */
 
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
-import type { PluginSettings, SettingField, ComponentDefinition, ComponentKey, Translations, GroupKey } from "./types";
+import { App, Notice, Plugin, PluginSettingTab, Setting } from "obsidian";
+import type { PluginSettings, SettingField, ComponentDefinition, ComponentKey, Translations, GroupKey, LibLifecycle } from "./types";
 import { getTranslations, getFieldLabel, getTooltipText, getGroupLabel, getComponentName, getComponentDesc, logValidationWarnings } from "./i18n";
 import { rgbaToHex, hexToRgba, extractAlpha, isColorLike } from "./color-utils";
 import { COMPONENTS, DEFAULT_SETTINGS, GROUPS } from "./fields";
+import type { LibManager } from "../lib-manager";
 
 // ============================================================================
 // Settings Tab Class
@@ -19,6 +20,7 @@ interface TesseraPluginLike extends Plugin {
 	settings: PluginSettings;
 	saveSettings(): Promise<void>;
 	resetSettings(): Promise<void>;
+	libManager: LibManager;
 }
 
 export class TesseraSettingTab extends PluginSettingTab {
@@ -58,6 +60,9 @@ export class TesseraSettingTab extends PluginSettingTab {
 		// Reload button (hidden by default)
 		this.renderReloadSection(containerEl);
 
+		// Third-party libraries (download / delete / status — extensible registry)
+		this.renderLibrariesSection(containerEl);
+
 		// Component groups (group → component → field hierarchy)
 		for (const group of GROUPS) {
 			this.renderGroup(containerEl, group.key, group.enabledKey, group.descKey, group.components);
@@ -70,6 +75,120 @@ export class TesseraSettingTab extends PluginSettingTab {
 	// ============================================================================
 	// Group & Section Renderers
 	// ============================================================================
+
+	/**
+	 * Third-party library manager section (ADR-0005, extendable registry).
+	 * Renders one row per managed library with status + download/delete buttons.
+	 */
+	private renderLibrariesSection(containerEl: HTMLElement): void {
+		const section = containerEl.createDiv({ cls: "tessera-settings-section tessera-core-section" });
+
+		const headerSetting = new Setting(section);
+		headerSetting.setName(this.t.settings.libsTitle);
+		headerSetting.setDesc(this.t.settings.libsDesc);
+
+		// Per-library rows (registry is generic — future libs slot in here).
+		const libs = this.plugin.libManager.managedLibs;
+		const content = section.createDiv({ cls: "tessera-settings-content" });
+		for (const lib of libs) {
+			this.renderLibraryRow(content, lib);
+		}
+	}
+
+	/** Render a single library row: name + status + download/delete buttons. */
+	private renderLibraryRow(
+		container: HTMLElement,
+		lib: { id: string; name: string; version: string; description?: string },
+	): void {
+		const setting = new Setting(container);
+		setting.setName(lib.name);
+		setting.setDesc(lib.description ?? "");
+
+		const statusEl = container.createDiv({ cls: "tessera-lib-status" });
+		setting.settingEl.appendChild(statusEl);
+
+		setting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.libsDownload);
+			btn.setCta();
+			btn.onClick(() => {
+				void this.handleLibDownload(lib.id, statusEl, btn);
+			});
+		});
+
+		setting.addButton((btn) => {
+			btn.setButtonText(this.t.settings.libsDelete);
+			btn.setDestructive();
+			btn.onClick(() => {
+				void this.handleLibDelete(lib.id, statusEl, btn);
+			});
+		});
+
+		// Async status check (exists on disk).
+		void this.updateLibStatus(lib.id, statusEl);
+	}
+
+	/** Async status check + status label render. */
+	private async updateLibStatus(libId: string, statusEl: HTMLElement): Promise<void> {
+		try {
+			const installed = await this.plugin.libManager.isInstalled(libId);
+			statusEl.textContent = installed
+				? this.t.settings.libsInstalled
+				: this.t.settings.libsMissing;
+			statusEl.classList.toggle("is-installed", installed);
+		} catch {
+			statusEl.textContent = this.t.settings.libsMissing;
+			statusEl.classList.remove("is-installed");
+		}
+	}
+
+	private setLibStatus(statusEl: HTMLElement, state: LibLifecycle): void {
+		statusEl.classList.toggle("is-installed", state === "installed");
+		statusEl.classList.toggle("is-downloading", state === "downloading");
+		statusEl.classList.toggle("is-error", state === "error");
+		switch (state) {
+			case "installed":
+				statusEl.textContent = this.t.settings.libsInstalled;
+				break;
+			case "downloading":
+				statusEl.textContent = this.t.settings.libsDownloading;
+				break;
+			case "error":
+			case "missing":
+				statusEl.textContent = this.t.settings.libsMissing;
+				break;
+		}
+	}
+
+	private async handleLibDownload(libId: string, statusEl: HTMLElement, btn: { setDisabled(b: boolean): void }): Promise<void> {
+		btn.setDisabled(true);
+		this.setLibStatus(statusEl, "downloading");
+		try {
+			await this.plugin.libManager.downloadById(libId);
+			this.setLibStatus(statusEl, "installed");
+			new Notice(this.t.settings.libsDownloaded.replace("{name}", libId), 4000);
+		} catch (error) {
+			this.setLibStatus(statusEl, "error");
+			const reason = error instanceof Error ? error.message : String(error);
+			new Notice(this.t.settings.libsDownloadFailed.replace("{name}", libId).replace("{reason}", reason), 6000);
+		} finally {
+			btn.setDisabled(false);
+		}
+	}
+
+	private async handleLibDelete(libId: string, statusEl: HTMLElement, btn: { setDisabled(b: boolean): void }): Promise<void> {
+		btn.setDisabled(true);
+		try {
+			await this.plugin.libManager.removeById(libId);
+			this.setLibStatus(statusEl, "missing");
+			new Notice(this.t.settings.libsDeleted.replace("{name}", libId), 4000);
+		} catch (error) {
+			this.setLibStatus(statusEl, "error");
+			const reason = error instanceof Error ? error.message : String(error);
+			new Notice(this.t.settings.libsDeleteFailed.replace("{name}", libId).replace("{reason}", reason), 6000);
+		} finally {
+			btn.setDisabled(false);
+		}
+	}
 
 	/**
 	 * Top-level component group (ADR-0004/ADR-0005):

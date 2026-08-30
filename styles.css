@@ -911,6 +911,34 @@ body.theme-dark .ts-tags {
 	height: 14px;
 }
 
+/* Third-party library status label (chart library manager) */
+.tessera-lib-status {
+	align-self: center;
+	margin-right: 8px;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 2px 8px;
+	border-radius: 999px;
+	color: var(--text-muted);
+	background: var(--background-secondary);
+	white-space: nowrap;
+}
+
+.tessera-lib-status.is-installed {
+	color: var(--color-green);
+	background: color-mix(in srgb, var(--color-green) 12%, transparent);
+}
+
+.tessera-lib-status.is-downloading {
+	color: var(--text-accent);
+	background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+}
+
+.tessera-lib-status.is-error {
+	color: var(--color-red);
+	background: color-mix(in srgb, var(--color-red) 12%, transparent);
+}
+
 /* ============================================================================
    Chart group (ADR-0005) — ECharts-backed, Lieflat mono style
    ============================================================================ */

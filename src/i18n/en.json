@@ -8,7 +8,18 @@
 		"restoreButton": "Restore Defaults",
 		"restoreNotice": "Restore all settings to their default values. This action cannot be undone.",
 		"resetField": "Reset to default",
-		"chartDesc": "Manage the chart component group (ECharts, lazy-loaded) and its availability."
+		"chartDesc": "Manage the chart component group (ECharts, lazy-loaded) and its availability.",
+		"libsTitle": "Chart Libraries",
+		"libsDesc": "Third-party libraries used by chart components are downloaded on demand. Charts work immediately after install; delete to free space when unused.",
+		"libsDownload": "Download",
+		"libsDelete": "Delete",
+		"libsInstalled": "Installed",
+		"libsMissing": "Not installed",
+		"libsDownloading": "Downloading…",
+		"libsDownloaded": "{name} downloaded",
+		"libsDeleted": "{name} deleted",
+		"libsDeleteFailed": "Failed to delete {name}: {reason}",
+		"libsDownloadFailed": "Failed to download {name}: {reason}"
 	},
 	"components": {
 		"card": {

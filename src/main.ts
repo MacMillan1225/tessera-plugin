@@ -6,6 +6,8 @@
 import { Notice, Plugin } from "obsidian";
 import { card, heatmap, progressbar, list, tags } from "./components/core";
 import { createChartGroup } from "./components/chart/index";
+import { resetEchartsCache } from "./components/chart/loader";
+import { LibManager, MANAGED_LIBS } from "./lib-manager";
 
 import type { PluginSettings, TesseraAPI } from "./settings";
 import { DEFAULT_SETTINGS, TesseraSettingTab } from "./settings";
@@ -16,6 +18,8 @@ import { DEFAULT_SETTINGS, TesseraSettingTab } from "./settings";
 
 export default class TesseraPlugin extends Plugin {
 	settings: PluginSettings = DEFAULT_SETTINGS;
+	/** Runtime manager for third-party libraries (ECharts today, extensible). */
+	libManager!: LibManager;
 
 	async onload() {
 		// Load settings
@@ -32,15 +36,26 @@ export default class TesseraPlugin extends Plugin {
 			return;
 		}
 
+		// Third-party library manager (settings UI downloads/deletes libs).
+		this.libManager = new LibManager({
+			pluginDir: this.manifest.dir ?? "",
+			adapter: this.app.vault.adapter,
+			libs: MANAGED_LIBS,
+			// After a download/delete, drop the loader cache so the next chart
+			// use re-checks the file (no app reload required).
+			onChanged: () => {
+				resetEchartsCache();
+			},
+		});
+
 		// Create tessera API object with config injection
 		// Namespace: tessera.core.<component> / tessera.chart.<component> (ADR-0003/0005)
 		// coreEnabled/chartEnabled are the master switches for each group (ADR-0004)
 		const coreEnabled = this.settings.coreEnabled;
 		const chartEnabled = this.settings.chartEnabled;
 
-		// Chart library (ECharts) resource URL — lazily loaded on first chart use.
-		// Resolved via the vault adapter so it works regardless of vault location.
-		const echartsUrl = this.getEchartsUrl();
+		// ECharts resource URL — resolved lazily on first chart use.
+		const echartsUrl = await this.getEchartsUrl();
 
 		const tessera: TesseraAPI = {
 			version: this.manifest.version,
@@ -189,11 +204,20 @@ export default class TesseraPlugin extends Plugin {
 	/**
 	 * Resource URL for lib/echarts.min.js (ADR-0005 lazy loading).
 	 * Uses the vault adapter to build a loadable URL for the plugin's lib folder.
+	 * Returns an empty string when the library file is missing — callers
+	 * (chart render paths) treat that as "ECharts not installed" and show a
+	 * friendly hint pointing to the settings "图表库" section.
 	 */
-	private getEchartsUrl(): string {
+	private async getEchartsUrl(): Promise<string> {
 		const adapter = this.app.vault.adapter;
 		const pluginDir = this.manifest.dir ?? "";
 		const libPath = `${pluginDir}/lib/echarts.min.js`.replace(/^\/+/, "");
+
+		// Library not installed → signal the loader to show a setup hint.
+		if (!(await adapter.exists(libPath))) {
+			return "";
+		}
+
 		const resourcePath = (adapter as { getResourcePath?: (path: string) => string }).getResourcePath;
 		if (typeof resourcePath === "function") {
 			return resourcePath.call(adapter, libPath);

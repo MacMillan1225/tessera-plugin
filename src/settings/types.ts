@@ -47,6 +47,13 @@ export interface PluginSettings {
 }
 
 // ============================================================================
+// Third-Party Library Settings Types
+// ============================================================================
+
+/** Lifecycle state of a managed third-party library (src/lib-manager.ts). */
+export type LibLifecycle = "installed" | "missing" | "downloading" | "error";
+
+// ============================================================================
 // Settings Field Types
 // ============================================================================
 
@@ -90,6 +97,28 @@ export interface Translations {
 		coreDesc: string;
 		/** Description for the chart group header (ADR-0005). */
 		chartDesc: string;
+		/** Heading for the third-party library manager section. */
+		libsTitle: string;
+		/** Description for the library manager section. */
+		libsDesc: string;
+		/** Download button label. */
+		libsDownload: string;
+		/** Delete button label. */
+		libsDelete: string;
+		/** Status text: library installed. */
+		libsInstalled: string;
+		/** Status text: library missing. */
+		libsMissing: string;
+		/** Status text: downloading in progress. */
+		libsDownloading: string;
+		/** Notice after a successful download. */
+		libsDownloaded: string;
+		/** Notice after deletion. */
+		libsDeleted: string;
+		/** Notice shown when deletion fails. */
+		libsDeleteFailed: string;
+		/** Notice shown when download fails (with reason). */
+		libsDownloadFailed: string;
 	};
 	components: {
 		card: { name: string; desc: string };
