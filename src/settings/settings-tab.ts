@@ -6,10 +6,10 @@
  */
 
 import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
-import type { PluginSettings, SettingField, ComponentDefinition, ComponentKey, Translations } from "./types";
+import type { PluginSettings, SettingField, ComponentDefinition, ComponentKey, Translations, GroupKey } from "./types";
 import { getTranslations, getFieldLabel, getTooltipText, getGroupLabel, getComponentName, getComponentDesc, logValidationWarnings } from "./i18n";
 import { rgbaToHex, hexToRgba, extractAlpha, isColorLike } from "./color-utils";
-import { COMPONENTS, DEFAULT_SETTINGS } from "./fields";
+import { COMPONENTS, DEFAULT_SETTINGS, GROUPS } from "./fields";
 
 // ============================================================================
 // Settings Tab Class
@@ -52,8 +52,10 @@ export class TesseraSettingTab extends PluginSettingTab {
 		// Reload button (hidden by default)
 		this.renderReloadSection(containerEl);
 
-		// Core group (group → component → field hierarchy)
-		this.renderCoreGroup(containerEl);
+		// Component groups (group → component → field hierarchy)
+		for (const group of GROUPS) {
+			this.renderGroup(containerEl, group.key, group.enabledKey, group.descKey, group.components);
+		}
 
 		// Restore defaults section
 		this.renderRestoreSection(containerEl);
@@ -64,16 +66,22 @@ export class TesseraSettingTab extends PluginSettingTab {
 	// ============================================================================
 
 	/**
-	 * Top-level "core" group (ADR-0004):
+	 * Top-level component group (ADR-0004/ADR-0005):
 	 * group header with master toggle + collapsible component sections.
 	 */
-	private renderCoreGroup(containerEl: HTMLElement): void {
+	private renderGroup(
+		containerEl: HTMLElement,
+		groupKey: GroupKey,
+		enabledKey: "coreEnabled" | "chartEnabled",
+		descKey: "coreDesc" | "chartDesc",
+		componentKeys: ComponentKey[],
+	): void {
 		const section = containerEl.createDiv({ cls: "tessera-settings-section tessera-core-section" });
-		const isCollapsed = this.collapsedSections.has("core");
+		const isCollapsed = this.collapsedSections.has(groupKey);
 
 		const headerSetting = new Setting(section);
-		headerSetting.setName(getGroupLabel(this.t, "core"));
-		headerSetting.setDesc(this.t.settings.coreDesc);
+		headerSetting.setName(getGroupLabel(this.t, groupKey));
+		headerSetting.setDesc(this.t.settings[descKey]);
 
 		// Collapse button
 		// eslint-disable-next-line obsidianmd/prefer-active-doc
@@ -83,19 +91,19 @@ export class TesseraSettingTab extends PluginSettingTab {
 		collapseBtn.addEventListener("click", (e) => {
 			e.stopPropagation();
 			if (isCollapsed) {
-				this.collapsedSections.delete("core");
+				this.collapsedSections.delete(groupKey);
 			} else {
-				this.collapsedSections.add("core");
+				this.collapsedSections.add(groupKey);
 			}
 			this.refreshSettings();
 		});
 		headerSetting.settingEl.prepend(collapseBtn);
 
-		// Master toggle for the whole core group
+		// Master toggle for the whole group
 		headerSetting.addToggle((toggle) => {
-			toggle.setValue(this.plugin.settings.coreEnabled);
+			toggle.setValue(this.plugin.settings[enabledKey]);
 			toggle.onChange(async (value) => {
-				this.plugin.settings.coreEnabled = value;
+				this.plugin.settings[enabledKey] = value;
 				await this.plugin.saveSettings();
 				this.showReloadButton();
 				this.refreshSettings();
@@ -103,10 +111,10 @@ export class TesseraSettingTab extends PluginSettingTab {
 		});
 
 		// Component sections — visible only when group expanded AND enabled
-		if (!isCollapsed && this.plugin.settings.coreEnabled) {
+		if (!isCollapsed && this.plugin.settings[enabledKey]) {
 			const content = section.createDiv({ cls: "tessera-settings-content" });
-			for (const [key, definition] of Object.entries(COMPONENTS)) {
-				this.renderCollapsibleSection(content, key as ComponentKey, definition);
+			for (const key of componentKeys) {
+				this.renderCollapsibleSection(content, key, COMPONENTS[key]);
 			}
 		}
 	}

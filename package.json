@@ -26,6 +26,7 @@
 		"@eslint/js": "^9.39.4",
 		"@types/node": "^22.15.17",
 		"chart.js": "^4.5.1",
+		"echarts": "^6.1.0",
 		"esbuild": "0.25.5",
 		"eslint": "^9.39.4",
 		"eslint-plugin-obsidianmd": "^0.3.0",

@@ -7,7 +7,8 @@
 		"reloadButton": "適用してリロード",
 		"restoreButton": "デフォルトに戻す",
 		"restoreNotice": "すべての設定をデフォルト値に戻します。この操作は元に戻せません。",
-		"resetField": "デフォルトに戻す"
+		"resetField": "デフォルトに戻す",
+		"chartDesc": "チャートコンポーネントグループ（ECharts、遅延読み込み）とその可用性を管理します。"
 	},
 	"components": {
 		"card": {
@@ -21,6 +22,22 @@
 		"progressbar": {
 			"name": "プログレスバー",
 			"desc": "進捗を表示するプログレスバーコンポーネント"
+		},
+		"line": {
+			"name": "折れ線",
+			"desc": "Lieflat スタイルの折れ線チャート (ECharts)"
+		},
+		"bar": {
+			"name": "棒グラフ",
+			"desc": "Lieflat スタイルの太い棒グラフ (ECharts)"
+		},
+		"gauge": {
+			"name": "ティックゲージ",
+			"desc": "丸みのあるティックゲージ、中央に大きな数値"
+		},
+		"rose": {
+			"name": "ペタルローズ",
+			"desc": "値で花びらを分けたレイヤーローズチャート"
 		}
 	},
 	"fields": {
@@ -73,7 +90,16 @@
 		"flags.showAnimated": "アニメーションを表示",
 		"layout.width": "幅",
 		"layout.height": "高さ",
-		"value": "値 (0..1)"
+		"value": "値 (0..1)",
+		"flags.smooth": "スムーズ曲線",
+		"flags.area": "エリア塗りつぶし",
+		"flags.showLabels": "ラベルを表示",
+		"flags.showTicks": "目盛りを表示",
+		"colors.light.grid": "ライトグリッド",
+		"colors.dark.grid": "ダークグリッド",
+		"colors.light.track": "ライトトラック",
+		"colors.dark.track": "ダークトラック",
+		"label": "中央ラベル"
 	},
 	"groups": {
 		"core": "コア",
@@ -82,7 +108,8 @@
 		"settings": "設定",
 		"colors": "カラー",
 		"colors.light": "ライトテーマ",
-		"colors.dark": "ダークテーマ"
+		"colors.dark": "ダークテーマ",
+		"chart": "チャート"
 	},
 	"tooltips": {
 		"flags.showHeader": "カードの上部にタイトルとメタデータ領域を表示",
@@ -127,6 +154,18 @@
 		"progressbar.labelFormat": "ラベル形式。{value} は整数パーセント(50)、{raw} は比率(0.5)",
 		"progressbar.showStriped": "ストライプ塗りつぶしパターンを表示",
 		"progressbar.showAnimated": "ストライプパターンをアニメーション",
-		"progressbar.value": "進捗値は比率です。例: 0.5 = 50%"
+		"progressbar.value": "進捗値は比率です。例: 0.5 = 50%",
+		"chart.showLegend": "チャート上部に凡例を表示",
+		"chart.showTooltip": "ホバー時にツールチップを表示",
+		"chart.showGrid": "水平グリッド線を表示",
+		"chart.smooth": "線をスムーズな曲線で描画",
+		"chart.area": "線の下の領域を塗りつぶす",
+		"chart.showLabels": "花びらの外側に値ラベルを表示",
+		"gauge.value": "ゲージの値は比率です。例: 0.73 = 73%",
+		"gauge.label": "中央の大きな数値の下のラベル（空欄=残りティック数）",
+		"gauge.showLabel": "中央ラベルを表示",
+		"gauge.showTicks": "ゲージの円弧に沿って目盛りを表示",
+		"colors.grid": "グリッド線の色",
+		"colors.track": "トラック（未塗りつぶし部分）の色"
 	}
 }

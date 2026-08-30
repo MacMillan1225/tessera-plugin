@@ -7,8 +7,9 @@ import { Notice, Plugin } from "obsidian";
 import { card } from "./components/card/index";
 import { heatmap } from "./components/heatmap/index";
 import { progressbar } from "./components/progressbar/index";
+import { createChartGroup } from "./components/chart/index";
 
-import type { PluginSettings, TesseraAPI } from "./settings";
+import type { PluginSettings, TesseraAPI, ComponentKey } from "./settings";
 import { DEFAULT_SETTINGS, TesseraSettingTab } from "./settings";
 
 // ============================================================================
@@ -34,9 +35,15 @@ export default class TesseraPlugin extends Plugin {
 		}
 
 		// Create tessera API object with config injection
-		// Namespace: tessera.core.<component> (ADR-0003)
-		// coreEnabled is the master switch for the whole core group (ADR-0004)
+		// Namespace: tessera.core.<component> / tessera.chart.<component> (ADR-0003/0005)
+		// coreEnabled/chartEnabled are the master switches for each group (ADR-0004)
 		const coreEnabled = this.settings.coreEnabled;
+		const chartEnabled = this.settings.chartEnabled;
+
+		// Chart library (ECharts) resource URL — lazily loaded on first chart use.
+		// Resolved via the vault adapter so it works regardless of vault location.
+		const echartsUrl = this.getEchartsUrl();
+
 		const tessera: TesseraAPI = {
 			version: "1.0.0",
 			core: {
@@ -51,6 +58,20 @@ export default class TesseraPlugin extends Plugin {
 					? (options) => progressbar(this.mergeComponentConfig(this.settings.progressbar.config, options))
 					: undefined,
 			},
+			chart: chartEnabled
+				? createChartGroup({
+					echartsUrl,
+					lineEnabled: this.settings.line.enabled,
+					barEnabled: this.settings.bar.enabled,
+					gaugeEnabled: this.settings.gauge.enabled,
+					roseEnabled: this.settings.rose.enabled,
+				})
+				: {
+					line: undefined,
+					bar: undefined,
+					gauge: undefined,
+					rose: undefined,
+				},
 		};
 
 		// Mount to window
@@ -65,6 +86,10 @@ export default class TesseraPlugin extends Plugin {
 					this.settings.card.enabled ? "core.card" : null,
 					this.settings.heatmap.enabled ? "core.heatmap" : null,
 					this.settings.progressbar.enabled ? "core.progressbar" : null,
+					this.settings.line.enabled ? "chart.line" : null,
+					this.settings.bar.enabled ? "chart.bar" : null,
+					this.settings.gauge.enabled ? "chart.gauge" : null,
+					this.settings.rose.enabled ? "chart.rose" : null,
 				].filter(Boolean);
 
 				new Notice(
@@ -99,6 +124,7 @@ export default class TesseraPlugin extends Plugin {
 		this.settings = {
 			version: DEFAULT_SETTINGS.version,
 			coreEnabled: loaded.coreEnabled ?? DEFAULT_SETTINGS.coreEnabled,
+			chartEnabled: loaded.chartEnabled ?? DEFAULT_SETTINGS.chartEnabled,
 			card: {
 				enabled: loaded.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.card.config, loaded.card?.config),
@@ -111,6 +137,22 @@ export default class TesseraPlugin extends Plugin {
 				enabled: loaded.progressbar?.enabled ?? DEFAULT_SETTINGS.progressbar.enabled,
 				config: this.deepMerge(DEFAULT_SETTINGS.progressbar.config, loaded.progressbar?.config),
 			},
+			line: {
+				enabled: loaded.line?.enabled ?? DEFAULT_SETTINGS.line.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.line.config, loaded.line?.config),
+			},
+			bar: {
+				enabled: loaded.bar?.enabled ?? DEFAULT_SETTINGS.bar.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.bar.config, loaded.bar?.config),
+			},
+			gauge: {
+				enabled: loaded.gauge?.enabled ?? DEFAULT_SETTINGS.gauge.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.gauge.config, loaded.gauge?.config),
+			},
+			rose: {
+				enabled: loaded.rose?.enabled ?? DEFAULT_SETTINGS.rose.enabled,
+				config: this.deepMerge(DEFAULT_SETTINGS.rose.config, loaded.rose?.config),
+			},
 		};
 	}
 
@@ -121,6 +163,22 @@ export default class TesseraPlugin extends Plugin {
 	async resetSettings() {
 		this.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS)) as PluginSettings;
 		await this.saveSettings();
+	}
+
+	/**
+	 * Resource URL for lib/echarts.min.js (ADR-0005 lazy loading).
+	 * Uses the vault adapter to build a loadable URL for the plugin's lib folder.
+	 */
+	private getEchartsUrl(): string {
+		const adapter = this.app.vault.adapter;
+		const pluginDir = this.manifest.dir ?? "";
+		const libPath = `${pluginDir}/lib/echarts.min.js`.replace(/^\/+/, "");
+		const resourcePath = (adapter as { getResourcePath?: (path: string) => string }).getResourcePath;
+		if (typeof resourcePath === "function") {
+			return resourcePath.call(adapter, libPath);
+		}
+		// Fallback: relative URL (works when the vault is served from a web root)
+		return libPath;
 	}
 
 	/**

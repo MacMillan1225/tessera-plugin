@@ -685,3 +685,22 @@ body.theme-dark .ts-progressbar {
 	width: 14px;
 	height: 14px;
 }
+
+/* ============================================================================
+   Chart group (ADR-0005) — ECharts-backed, Lieflat mono style
+   ============================================================================ */
+
+.ts-chart {
+	display: block;
+	font-family: var(--font-interface);
+	color: var(--text-normal);
+}
+
+.ts-chart__canvas {
+	display: block;
+}
+
+/* Chart tooltip uses inline ECharts styling; ensure it doesn't leak outside the vault */
+.ts-chart svg {
+	display: block;
+}

@@ -7,7 +7,8 @@
 		"reloadButton": "应用并重载",
 		"restoreButton": "恢复默认设置",
 		"restoreNotice": "将所有配置恢复为默认值。此操作不可撤销。",
-		"resetField": "恢复默认值"
+		"resetField": "恢复默认值",
+		"chartDesc": "管理图表组件组（ECharts，懒加载）及其可用性。"
 	},
 	"components": {
 		"card": {
@@ -21,6 +22,22 @@
 		"progressbar": {
 			"name": "进度条",
 			"desc": "用于显示进度的进度条组件"
+		},
+		"line": {
+			"name": "折线图",
+			"desc": "Lieflat 风格折线图 (ECharts)"
+		},
+		"bar": {
+			"name": "柱状图",
+			"desc": "Lieflat 风格粗柱状图 (ECharts)"
+		},
+		"gauge": {
+			"name": "刻度量表",
+			"desc": "圆角刻度量表，中心大数字"
+		},
+		"rose": {
+			"name": "花瓣玫瑰图",
+			"desc": "按值分层着色的玫瑰图"
 		}
 	},
 	"fields": {
@@ -73,7 +90,16 @@
 		"flags.showAnimated": "显示动画效果",
 		"layout.width": "宽度",
 		"layout.height": "高度",
-		"value": "值 (0..1)"
+		"value": "值 (0..1)",
+		"flags.smooth": "平滑曲线",
+		"flags.area": "面积填充",
+		"flags.showLabels": "显示标签",
+		"flags.showTicks": "显示刻度",
+		"colors.light.grid": "亮色网格线",
+		"colors.dark.grid": "暗色网格线",
+		"colors.light.track": "亮色轨道",
+		"colors.dark.track": "暗色轨道",
+		"label": "中心标签"
 	},
 	"groups": {
 		"core": "核心组件",
@@ -82,7 +108,8 @@
 		"settings": "设置",
 		"colors": "颜色",
 		"colors.light": "亮色主题",
-		"colors.dark": "暗色主题"
+		"colors.dark": "暗色主题",
+		"chart": "图表"
 	},
 	"tooltips": {
 		"flags.showHeader": "是否在卡片顶部显示标题和元数据区域",
@@ -127,6 +154,18 @@
 		"progressbar.labelFormat": "标签格式。{value} 替换为整数百分比(50)，{raw} 替换为原始值(0.5)",
 		"progressbar.showStriped": "显示条纹填充效果",
 		"progressbar.showAnimated": "条纹动画滚动效果",
-		"progressbar.value": "进度值，0.5 表示 50%"
+		"progressbar.value": "进度值，0.5 表示 50%",
+		"chart.showLegend": "在图表顶部显示图例",
+		"chart.showTooltip": "悬停时显示提示",
+		"chart.showGrid": "显示水平网格线",
+		"chart.smooth": "以平滑曲线渲染线条",
+		"chart.area": "填充线条下方区域",
+		"chart.showLabels": "在花瓣外侧显示数值标签",
+		"gauge.value": "量表值，0.73 表示 73%",
+		"gauge.label": "中心大数字下方的标签（留空=剩余刻度数）",
+		"gauge.showLabel": "显示中心标签",
+		"gauge.showTicks": "沿量表弧线显示刻度",
+		"colors.grid": "网格线颜色",
+		"colors.track": "轨道（未填充弧）颜色"
 	}
 }

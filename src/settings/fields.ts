@@ -7,6 +7,10 @@ import type { ComponentDefinition, ComponentKey, PluginSettings } from "./types"
 import { CARD_DEFAULTS } from "../components/card/config";
 import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
 import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
+import { LINE_DEFAULTS } from "../components/chart/config";
+import { BAR_DEFAULTS } from "../components/chart/config";
+import { GAUGE_DEFAULTS } from "../components/chart/config";
+import { ROSE_DEFAULTS } from "../components/chart/config";
 
 /**
  * Component settings definitions
@@ -125,15 +129,119 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
 		],
 	},
+	// ---- Chart group components (ADR-0005) ----
+	line: {
+		componentKey: "line",
+		fields: [
+			// Flags
+			{ key: "flags.showLegend", type: "toggle", description: "tooltip.chart.showLegend" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.chart.showTooltip" },
+			{ key: "flags.showGrid", type: "toggle", description: "tooltip.chart.showGrid" },
+			{ key: "flags.smooth", type: "toggle", description: "tooltip.chart.smooth" },
+			{ key: "flags.area", type: "toggle", description: "tooltip.chart.area" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			// Colors (Light)
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
+	bar: {
+		componentKey: "bar",
+		fields: [
+			// Flags
+			{ key: "flags.showLegend", type: "toggle", description: "tooltip.chart.showLegend" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.chart.showTooltip" },
+			{ key: "flags.showGrid", type: "toggle", description: "tooltip.chart.showGrid" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			// Colors (Light)
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.grid", type: "color", description: "tooltip.colors.grid" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
+	gauge: {
+		componentKey: "gauge",
+		fields: [
+			// Basic
+			{ key: "value", type: "number", placeholder: "0.5", description: "tooltip.gauge.value" },
+			{ key: "label", type: "text", description: "tooltip.gauge.label" },
+			// Flags
+			{ key: "flags.showLabel", type: "toggle", description: "tooltip.gauge.showLabel" },
+			{ key: "flags.showTicks", type: "toggle", description: "tooltip.gauge.showTicks" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.chart.showTooltip" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			// Colors (Light)
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.track", type: "color", description: "tooltip.colors.track" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
+	rose: {
+		componentKey: "rose",
+		fields: [
+			// Flags
+			{ key: "flags.showLegend", type: "toggle", description: "tooltip.chart.showLegend" },
+			{ key: "flags.showTooltip", type: "toggle", description: "tooltip.chart.showTooltip" },
+			{ key: "flags.showLabels", type: "toggle", description: "tooltip.chart.showLabels" },
+			// Layout
+			{ key: "layout.maxWidth", type: "text", description: "tooltip.layout.maxWidth" },
+			{ key: "layout.height", type: "text", description: "tooltip.layout.height" },
+			// Colors (Light)
+			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.light.accent", type: "color", description: "tooltip.colors.accent" },
+			// Colors (Dark)
+			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+			{ key: "colors.dark.accent", type: "color", description: "tooltip.colors.accent" },
+		],
+	},
 };
+
+/**
+ * Component group definitions (ADR-0004/ADR-0005 hierarchy: group → component → field).
+ * Each group has its own master switch and its own set of components.
+ */
+export const GROUPS: { key: "core" | "chart"; enabledKey: "coreEnabled" | "chartEnabled"; descKey: "coreDesc" | "chartDesc"; components: ComponentKey[] }[] = [
+	{
+		key: "core",
+		enabledKey: "coreEnabled",
+		descKey: "coreDesc",
+		components: ["card", "heatmap", "progressbar"],
+	},
+	{
+		key: "chart",
+		enabledKey: "chartEnabled",
+		descKey: "chartDesc",
+		components: ["line", "bar", "gauge", "rose"],
+	},
+];
 
 /**
  * Default settings for all components
  * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
-	version: 2,
+	version: 3,
 	coreEnabled: true,
+	chartEnabled: true,
 	card: {
 		enabled: true,
 		config: CARD_DEFAULTS,
@@ -145,5 +253,21 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	progressbar: {
 		enabled: true,
 		config: PROGRESSBAR_DEFAULTS,
+	},
+	line: {
+		enabled: true,
+		config: LINE_DEFAULTS,
+	},
+	bar: {
+		enabled: true,
+		config: BAR_DEFAULTS,
+	},
+	gauge: {
+		enabled: true,
+		config: GAUGE_DEFAULTS,
+	},
+	rose: {
+		enabled: true,
+		config: ROSE_DEFAULTS,
 	},
 };
