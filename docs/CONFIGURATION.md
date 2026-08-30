@@ -1,402 +1,221 @@
 # TesseraScript 配置系统详解
 
+本文档说明 TesseraScript 的配置架构与**所有组件的完整配置字段**。配置机制本身（优先级、深合并、版本门槛、单一数据源）见 [ARCHITECTURE.md](./ARCHITECTURE.md) 第 4-6 节；这里聚焦"每个组件能配什么"。
+
 ## 目录
 
 1. [配置架构概述](#1-配置架构概述)
-2. [组件配置文件](#2-组件配置文件)
-3. [Settings 系统集成](#3-settings-系统集成)
-4. [配置优先级](#4-配置优先级)
-5. [添加新配置字段](#5-添加新配置字段)
-6. [配置数据流](#6-配置数据流)
+2. [配置优先级](#2-配置优先级)
+3. [core 分组组件](#3-core-分组组件)
+   - [card](#card)
+   - [heatmap](#heatmap)
+   - [progressbar](#progressbar)
+4. [chart 分组组件](#4-chart-分组组件)
+   - [line / bar](#line--bar)
+   - [gauge](#gauge)
+   - [rose](#rose)
+5. [设置面板与 data.json](#5-设置面板与-datajson)
 
 ---
 
 ## 1. 配置架构概述
 
-TesseraScript 采用**单一数据源**的配置架构，每个组件的默认配置只在一个地方定义：
+- 每个组件一个 `config.ts`（`XXX_DEFAULTS`），是**单一数据源**：运行时默认值、设置面板字段、DEFAULT_SETTINGS 都引用它
+- 颜色键统一语义（ADR-0002）：`background / border / text / accent`，图表另有 `grid / track / series`
+- 深浅主题分离：`colors.light.*` / `colors.dark.*`；也支持扁平共享键（`resolveThemeColors` 自动展开到两主题）
+- 所有字段均有默认值（极简路线，ADR-0002），用户只需覆盖想改的部分
+
+## 2. 配置优先级
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    配置数据流                                │
-└─────────────────────────────────────────────────────────────┘
-
-┌──────────────────────┐
-│ components/*/config.ts│  ← 单一数据源（默认配置）
-└──────────┬───────────┘
-           │ 导入引用
-           ▼
-┌──────────────────────┐
-│ settings/fields.ts   │  ← DEFAULT_SETTINGS 引用 config.ts
-└──────────┬───────────┘
-           │ 深度合并
-           ▼
-┌──────────────────────┐
-│ main.ts              │  ← loadSettings() 合并用户配置
-└──────────┬───────────┘
-           │ 注入到组件
-           ▼
-┌──────────────────────┐
-│ window.tessera.xxx   │  ← 组件函数接收完整配置
-└──────────────────────┘
+调用时 options  >  设置面板 config（组件默认）  >  组件内部 DEFAULTS
 ```
 
-### 优势
+`main.ts` 的 `mergeComponentConfig` 做深合并：`tessera.core.card({ flags: { showHeader: false } })` 只会覆盖该键，其余 flags 保留设置面板默认。
 
-| 优势 | 说明 |
-|------|------|
-| **无重复** | 每个配置值只定义一次 |
-| **易于维护** | 修改配置只需改一个文件 |
-| **类型安全** | TypeScript 自动推导类型 |
-| **易于扩展** | 添加新字段只需修改 config.ts |
+## 3. core 分组组件
 
----
+### card
 
-## 2. 组件配置文件
-
-### 2.1 文件位置
-
-每个组件的配置文件位于：
-
-```
-src/components/<name>/config.ts
+```dataviewjs
+tessera.core.card({
+  title: "标题",        // 头部左侧
+  meta: "META",         // 头部右侧（大写小字）
+  value: "42",          // 中部大数值
+  content: "内容",      // 内容区（string | HTMLElement | 数组）
+  children: el,         // 同 content（优先）
+  emptyText: "无内容",  // 内容为空时的占位
+  className: "extra",
+})
 ```
 
-现有组件：
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| flags | showHeader | boolean | true | 显示头部 |
+| flags | showHeaderSep | boolean | true | 头部与正文分隔线 |
+| flags | showTitle | boolean | true | 显示标题 |
+| flags | showMeta | boolean | true | 显示元信息 |
+| flags | showValue | boolean | true | 显示大数值 |
+| layout | maxWidth | string | "100%" | 最大宽度 |
+| layout | padding | string | "16px" | 内边距 |
+| layout | radius | string | "14px" | 圆角 |
+| layout | gap | string | "14px" | 头部/正文间距 |
+| layout | bodyGap | string | "12px" | 正文内部间距 |
+| colors.light/dark | background | string | 见下 | 卡片底色 |
+| colors.light/dark | border | string | transparent | 边框色（默认无边框） |
+| colors.light/dark | text | string | var(--text-normal) | 文字色 |
+| colors.light/dark | accent | string | var(--text-normal) | 强调色（value 用） |
 
-| 组件 | 配置文件 | 常量名 |
-|------|----------|--------|
-| Card | `src/components/card/config.ts` | `CARD_DEFAULTS` |
-| Heatmap | `src/components/heatmap/config.ts` | `HEATMAP_DEFAULTS` |
-| Progressbar | `src/components/progressbar/config.ts` | `PROGRESSBAR_DEFAULTS` |
-| Example | `src/components/example/config.ts` | `EXAMPLE_DEFAULTS` |
+默认底色：light `rgba(245,248,252,0.9)` / dark `rgba(30,41,59,0.72)`（Lieflat 风格靠背景色差分层，无边框无阴影）。
 
-### 2.2 配置文件结构
+### heatmap
 
-```typescript
-// src/components/card/config.ts
-
-export const CARD_DEFAULTS = {
-  // 功能开关
-  flags: {
-    showHeader: true,
-    showHeaderSep: true,
-    showTitle: true,
-    showMeta: true,
-    showValue: true,
-  },
-  
-  // 布局配置
-  layout: {
-    maxWidth: "100%",
-    padding: "16px",
-    radius: "16px",
-    gap: "14px",
-    bodyGap: "12px",
-  },
-  
-  // 颜色配置（支持 Light/Dark 主题）
-  colors: {
-    light: {
-      background: "rgba(245, 248, 252, 0.9)",
-      border: "rgba(120, 140, 160, 0.18)",
-      shadow: "0 12px 28px rgba(15, 23, 42, 0.08)",
-      hoverAccent: "var(--interactive-accent)",
-      value: "var(--text-accent, var(--text-normal))",
-    },
-    dark: {
-      background: "rgba(30, 41, 59, 0.72)",
-      border: "rgba(148, 163, 184, 0.18)",
-      shadow: "0 16px 36px rgba(2, 6, 23, 0.28)",
-      hoverAccent: "var(--interactive-accent)",
-      value: "var(--text-accent, var(--text-normal))",
-    },
-  },
-};
-
-// 导出类型（可选，用于类型推导）
-export type CardConfig = typeof CARD_DEFAULTS;
+```dataviewjs
+tessera.core.heatmap({
+  data: { "2026-08-01": 5, "2026-08-02": { total: 10, completed: 7 } },
+  startDate: "2026-01-01",  // 或 Date
+  endDate: "2026-12-31",
+  settings: { rangeMode: "year" },
+  flags: { mondayFirst: true },
+})
 ```
 
-### 2.3 在组件中使用配置
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| （顶层） | data | Record/Map<string, number\|entry> | {} | 日期键 `YYYY-MM-DD` → 数值或 `{total,completed}` 对象 |
+| （顶层） | startDate / endDate | string \| Date | 自适应 | 日期范围（fixed/year 模式生效） |
+| （顶层） | getData | fn({start,end,locale}) → data | — | 动态取数回调（替代 data） |
+| （顶层） | getCellStyle | fn(ctx) → level\|color\|style | — | 自定义单元格样式 |
+| （顶层） | renderTooltip | fn(ctx) → html | 默认 | 自定义 tooltip 内容 |
+| flags | showMonthLabels | boolean | true | 月份标签 |
+| flags | showWeekLabels | boolean | true | 周几标签 |
+| flags | showLegend | boolean | true | 图例 |
+| flags | showTooltip | boolean | true | 悬浮提示 |
+| flags | mondayFirst | boolean | true | 周一为每周第一天 |
+| settings | rangeMode | "adaptive"\|"fixed"\|"year" | adaptive | 自适应宽度 / 固定天数 / 全年 |
+| settings | minWeeks | number | 12 | adaptive 最少周数 |
+| settings | fixedDays | number | 84 | fixed/year 模式天数 |
+| settings | locale | string | zh-CN | 日期/tooltip 语言 |
+| settings | monthNames | string[] | 1月..12月 | 月份名 |
+| settings | weekLabels | string[] | 一/三/五/日 | 周标签 |
+| settings | legend | string\|false | "少 $#color$… 多" | 图例文本（`$#hex$` 色块标记） |
+| settings | tooltipId | string | ts-heatmap-tooltip | tooltip 元素 id |
+| layout | cellSize / cellGap / cellRadius | number/string | 11 / 2 / 3px | 单元格尺寸 |
+| layout | weekLabelWidth / weekLabelGap | string | auto / 9px | 周标签宽度/间距 |
+| layout | monthLabelHeight / monthOffset / gridTopOffset | string | 18px/28px/4px | 月标签布局 |
+| layout | monthLabelSize / weekLabelSize | string | 9px / 9px | 标签字号 |
+| layout | legendGap / legendTop / legendSwatchSize | string | 3px/6px/9px | 图例布局 |
+| colors.light/dark | background | string | #fafaf9 / #1c1917 | 空单元格底色 |
+| colors.light/dark | text | string | var(--text-muted) | 标签文字色 |
+| colors.light/dark | tooltip / tooltipBg | string | 白/深 | tooltip 色 |
+| colors.light/dark | levels | string[9] | 灰阶梯度 | 分级色（Lv0..Lv8） |
 
-```typescript
-// src/components/card/index.ts
+值分级：`{total,completed}` → 完成比例 `ceil(ratio*8)`；纯数字 → `ceil(value)`（>0）；`level` 键直接取。levels 默认灰阶（light `#fafaf9→#1c1917`，dark 反转），Lieflat 单色风。
 
-import { CARD_DEFAULTS } from "./config";
+### progressbar
 
-export function card(options: CardOptions = {}): HTMLElement {
-  // 合并默认配置和用户选项
-  const flags = { ...CARD_DEFAULTS.flags, ...options.flags };
-  const layout = { ...CARD_DEFAULTS.layout, ...options.layout };
-  const colors = {
-    light: { ...CARD_DEFAULTS.colors.light, ...options.colors?.light },
-    dark: { ...CARD_DEFAULTS.colors.dark, ...options.colors?.dark },
-  };
-  
-  // 使用配置...
-}
+```dataviewjs
+tessera.core.progressbar({
+  value: 0.5,           // ★ 0..1 小数，0.5 = 50%
+  labelFormat: "{value}%",  // {value}=整数百分比, {raw}=原始比例
+  flags: { showLabel: true },
+})
 ```
 
----
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| （顶层） | value | number | 0 | **进度比例 0..1**（0.5 = 50%） |
+| （顶层） | labelFormat | string | "{value}%" | 标签模板：`{value}`→整数百分比，`{raw}`→原始比例 |
+| flags | showLabel | boolean | true | 显示百分比标签 |
+| flags | showStriped | boolean | false | 条纹样式 |
+| flags | showAnimated | boolean | false | 条纹动画 |
+| layout | width | string | "100%" | 宽度 |
+| layout | height | string | "8px" | 高度 |
+| layout | radius | string | "4px" | 圆角 |
+| colors.light/dark | background | string | #e7e5e4 / #44403c | 轨道色 |
+| colors.light/dark | border | string | transparent | 边框 |
+| colors.light/dark | text | string | var(--text-normal) | 标签文字色 |
+| colors.light/dark | accent | string | var(--text-normal) | 填充色（强调色） |
 
-## 3. Settings 系统集成
+> **v3 变更**（任务需求）：`value` 语义从"绝对值+min/max"改为 **0..1 比例**。旧 `max/min` 字段已移除。`labelFormat` 现同时支持 `{value}`（整数百分比，如 50）与 `{raw}`（原始小数，如 0.5）。
 
-### 3.1 fields.ts 引用配置
+## 4. chart 分组组件
 
-`src/settings/fields.ts` 导入组件配置并创建 `DEFAULT_SETTINGS`：
+所有图表共享：`layout.maxWidth`（默认 100%）、`layout.height`（line/bar/rose 默认 240px，gauge 220px）、`className`、`colors.light/dark`。数据统一 `ChartData { labels: string[], values: number[], series?: {name, values}[] }`。
 
-```typescript
-// src/settings/fields.ts
+### line / bar
 
-import type { ComponentDefinition, PluginSettings } from "./types";
-import { CARD_DEFAULTS } from "../components/card/config";
-import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
-import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
-
-// 字段定义（驱动 Settings UI）
-export const COMPONENTS: Record<keyof PluginSettings, ComponentDefinition> = {
-  card: {
-    componentKey: "card",
-    fields: [
-      { key: "flags.showHeader", type: "toggle", description: "tooltip.flags.showHeader" },
-      { key: "layout.padding", type: "text", description: "tooltip.layout.padding" },
-      { key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
-      // ...
-    ],
-  },
-  // ...
-};
-
-// 默认配置（引用组件配置）
-export const DEFAULT_SETTINGS: PluginSettings = {
-  card: {
-    enabled: true,
-    config: CARD_DEFAULTS as unknown as Record<string, unknown>,
-  },
-  heatmap: {
-    enabled: true,
-    config: HEATMAP_DEFAULTS as unknown as Record<string, unknown>,
-  },
-  progressbar: {
-    enabled: true,
-    config: PROGRESSBAR_DEFAULTS as unknown as Record<string, unknown>,
-  },
-};
+```dataviewjs
+tessera.chart.line({
+  data: { labels: ["A","B","C"], values: [1,2,3] },
+  flags: { smooth: true, area: true },
+})
+tessera.chart.bar({
+  data: { labels: ["A","B","C"], values: [4,7,3] },
+})
 ```
 
-### 3.2 main.ts 加载配置
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| flags(line) | showLegend / showTooltip / showGrid | boolean | false / true / true | 图例/提示/网格线 |
+| flags(line) | smooth | boolean | false | 平滑曲线 |
+| flags(line) | area | boolean | false | 面积填充（opacity 0.08） |
+| flags(bar) | showLegend / showTooltip / showGrid | boolean | false / true / true | 同上 |
+| colors.light/dark | text | string | #8F8E88 | 轴文字 |
+| colors.light/dark | grid | string | #DEDDD6 / #2E2D29 | 网格线 |
+| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 主色（单系列） |
+| colors.light/dark | series | string[] | mono 色板 | 系列色板（多系列轮转；bar 单系列逐柱取色） |
 
-```typescript
-// src/main.ts
+### gauge
 
-import { DEFAULT_SETTINGS } from "./settings";
-
-export default class TesseraPlugin extends Plugin {
-  settings: PluginSettings = DEFAULT_SETTINGS;
-  
-  async onload() {
-    await this.loadSettings();
-    
-    // 注册组件，注入配置
-    const tessera: TesseraAPI = {
-      card: this.settings.card.enabled 
-        ? ((options) => card({ ...this.settings.card.config, ...options }))
-        : undefined,
-      // ...
-    };
-  }
-  
-  async loadSettings() {
-    const loaded = await this.loadData();
-    
-    this.settings = {
-      card: {
-        enabled: loaded?.card?.enabled ?? DEFAULT_SETTINGS.card.enabled,
-        config: this.deepMerge(
-          DEFAULT_SETTINGS.card.config,  // 来自 CARD_DEFAULTS
-          loaded?.card?.config
-        ),
-      },
-      // ...
-    };
-  }
-}
+```dataviewjs
+tessera.chart.gauge({
+  value: 0.73,          // ★ 0..1 比例，73%
+  label: "PROGRESS",    // 中央大数下方标签（缺省显示 "27 TO GO"）
+})
 ```
 
----
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| （顶层） | value | number | 0 | **进度比例 0..1** |
+| （顶层） | label | string | "" | 中央标签（缺省自动显示剩余量 "N TO GO"） |
+| flags | showLabel | boolean | true | 显示中央标签 |
+| flags | showTicks | boolean | true | 显示刻度（10 等分） |
+| flags | showTooltip | boolean | true | 悬浮提示 |
+| colors.light/dark | text | string | #8F8E88 | 刻度/标签色 |
+| colors.light/dark | track | string | #DEDDD6 / #2E2D29 | 轨道色 |
+| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 进度弧色 |
 
-## 4. 配置优先级
+### rose
 
-配置按以下优先级合并（从低到高）：
-
-```
-1. 组件 config.ts 默认值    ← 最低优先级
-2. 用户在 Settings UI 的修改
-3. 用户调用时传入的选项      ← 最高优先级
-```
-
-### 4.1 合并示例
-
-```typescript
-// 1. 组件 config.ts 定义默认值
-const CARD_DEFAULTS = {
-  layout: { padding: "16px", radius: "16px" },
-  colors: { light: { background: "rgba(245, 248, 252, 0.9)" } }
-};
-
-// 2. 用户在 Settings UI 修改了 padding
-this.settings.card.config = {
-  layout: { padding: "24px" }  // 只保存修改的字段
-};
-
-// 3. 用户调用时传入选项
-tessera.card({
-  layout: { radius: "8px" },
-  title: "Hello"
-});
-
-// 最终传给 card() 函数的配置
-card({
-  layout: { padding: "24px", radius: "8px" },  // 合并结果
-  colors: { light: { background: "rgba(245, 248, 252, 0.9)" } },
-  title: "Hello"
-});
+```dataviewjs
+tessera.chart.rose({
+  data: { labels: ["A","B","C","D"], values: [18,12,9,15] },
+})
 ```
 
----
+| 配置组 | 字段 | 类型 | 默认 | 说明 |
+|--------|------|------|------|------|
+| flags | showLegend | boolean | false | 图例（底部） |
+| flags | showTooltip | boolean | true | 悬浮提示 |
+| flags | showLabels | boolean | true | 花瓣外标签 `name value` |
+| colors.light/dark | text | string | #8F8E88 | 标签文字色 |
+| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 花瓣基色 |
+| colors.light/dark | series | string[] | mono 色板 | 花瓣分档色板（t>0.8/0.6/0.35 取前 4 档） |
 
-## 5. 添加新配置字段
+## 5. 设置面板与 data.json
 
-### 5.1 步骤
+- 设置面板按 **分组 → 组件 → 字段分组** 层级展示（ADR-0004）：每个组件 section 有 enabled 开关，字段按 `flags/layout/settings/colors.light/colors.dark` 前缀自动归组
+- `core` / `chart` 两个分组各有总开关（coreEnabled / chartEnabled）
+- 修改后点 **应用并重载** 生效（Obsidian reload 插件）
+- `data.json` 只存**被修改过的字段**（深合并）；`PluginSettings.version` 变更时旧配置整体重置（当前 v3）
 
-1. **修改组件 config.ts**：添加新字段和默认值
-2. **修改 settings/fields.ts**：添加字段定义（驱动 UI）
-3. **添加 i18n 翻译**：翻译字段标签和 tooltip
-
-### 5.2 示例：为 Card 添加 `showIcon` 字段
-
-#### 步骤 1：修改 config.ts
-
-```typescript
-// src/components/card/config.ts
-
-export const CARD_DEFAULTS = {
-  flags: {
-    showHeader: true,
-    showHeaderSep: true,
-    showTitle: true,
-    showMeta: true,
-    showValue: true,
-    showIcon: false,  // ← 新增
-  },
-  // ...
-};
-```
-
-#### 步骤 2：修改 fields.ts
-
-```typescript
-// src/settings/fields.ts
-
-card: {
-  componentKey: "card",
-  fields: [
-    // ... 现有字段 ...
-    { key: "flags.showIcon", type: "toggle", description: "tooltip.flags.showIcon" },  // ← 新增
-  ],
-},
-```
-
-#### 步骤 3：添加翻译
-
-```json
-// src/i18n/en.json
-{
-  "fields": {
-    "flags.showIcon": "Show Icon"
-  },
-  "tooltips": {
-    "flags.showIcon": "Display icon in the header"
-  }
-}
-```
-
----
-
-## 6. 配置数据流
-
-### 6.1 完整数据流图
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         配置数据流                                   │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  components/     │     │  settings/       │     │  用户调用        │
-│  */config.ts     │     │  fields.ts       │     │  tessera.xxx()   │
-│  (默认配置)      │     │  (DEFAULT_SETTINGS)    │  (用户选项)      │
-└────────┬─────────┘     └────────┬─────────┘     └────────┬─────────┘
-         │                        │                         │
-         │    导入引用             │    深度合并             │
-         └────────────────┬───────┘                         │
-                          │                                 │
-                          ▼                                 │
-                 ┌──────────────────┐                       │
-                 │  main.ts         │                       │
-                 │  loadSettings()  │                       │
-                 └────────┬─────────┘                       │
-                          │                                 │
-                          │    注入配置                      │
-                          ▼                                 │
-                 ┌──────────────────┐                       │
-                 │  window.tessera  │                       │
-                 │  .xxx(config)    │                       │
-                 └────────┬─────────┘                       │
-                          │                                 │
-                          │    展开合并                      │
-                          ▼                                 ▼
-                 ┌────────────────────────────────────────────┐
-                 │           组件函数 card(options)           │
-                 │           heatmap(options)                 │
-                 │           progressbar(options)             │
-                 └────────────────────────────────────────────┘
-                          │
-                          ▼
-                 ┌────────────────┐
-                 │  HTMLElement   │
-                 └────────────────┘
-```
-
-### 6.2 配置存储
-
-**磁盘存储位置：** `<vault>/.obsidian/plugins/tessera-plugin/data.json`
-
-**存储格式：** 只保存用户修改过的字段
-
-```json
-{
-  "card": {
-    "enabled": true,
-    "config": {
-      "layout": {
-        "padding": "24px"  // 只有用户修改的字段
-      }
-    }
-  }
-}
-```
-
-**其他字段从 config.ts 读取默认值。**
-
----
-
-## 附录：关键文件索引
+### 配置与代码的映射
 
 | 文件 | 职责 |
 |------|------|
-| `src/components/*/config.ts` | 组件默认配置（单一数据源） |
-| `src/settings/fields.ts` | 字段定义 + DEFAULT_SETTINGS |
-| `src/settings/types.ts` | TypeScript 类型定义 |
-| `src/settings/settings-tab.ts` | Settings UI 实现 |
-| `src/main.ts` | 配置加载和组件注册 |
+| `src/components/<name>/config.ts` | 默认值（单一数据源） |
+| `src/settings/fields.ts` | 设置面板字段定义（引用 config.ts） |
+| `src/main.ts` | 加载/深合并/版本门槛 |
+| `src/settings/settings-tab.ts` | 渲染设置面板 |
+| `src/i18n/*.json` | 字段名/tooltip 翻译 |

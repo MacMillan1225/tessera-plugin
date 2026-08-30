@@ -1,458 +1,281 @@
 # TesseraScript Plugin
 
-A modular component library for Obsidian's DataviewJS. Build beautiful dashboards, cards, heatmaps, and more with simple, composable components.
+基于 **Obsidian + DataviewJS** 的组件库插件。在 `dataviewjs` 代码块中直接调用 `tessera` 全局对象，即可渲染卡片、热力图、进度条与图表。
 
-## Features
+- 命名空间：`tessera.core.*`（基础组件）、`tessera.chart.*`（图表，ADR-0005）
+- 每个组件可独立开关，分组有总开关（ADR-0004）
+- 视觉风格：Lieflat 单色克制风，无边框靠背景色差分层，圆角优雅，hover 克制（ADR-0001）
+- 配置键统一语义：`background / border / text / accent`（ADR-0002）
 
-- 🎨 **Beautiful Components**: Pre-built card, heatmap, and progressbar components
-- 🎯 **TypeScript**: Full type safety and IntelliSense support
-- 🌓 **Dark Mode**: Automatic theme switching with Obsidian
-- ⚡ **Performance**: Lazy-loaded styles and optimized rendering
-- 🔧 **Configurable**: Deep customization for every component
-- 📦 **Modular**: Use only what you need
+## 安装
 
-## Installation
+### 社区插件（发布后）
 
-### From Community Plugins
+1. 打开 Obsidian **Settings → Community plugins**
+2. 搜索 "TesseraScript"，安装并启用
 
-1. Open Obsidian Settings
-2. Go to Community Plugins
-3. Search for "TesseraScript"
-4. Install and enable
+### 手动安装（开发阶段）
 
-### Manual Installation
+1. 构建：`npm run build`
+2. 将 `main.js`、`manifest.json`、`styles.css` 复制到 `<Vault>/.obsidian/plugins/tessera-plugin/`
+3. 在 Obsidian **Settings → Community plugins** 中启用
 
-1. Download `main.js`, `styles.css`, and `manifest.json` from the latest release
-2. Create a folder `tessera-script` in your vault's `.obsidian/plugins/` directory
-3. Copy the files into the folder
-4. Enable the plugin in Obsidian Settings
+**前置依赖**：插件依赖 [Dataview](https://github.com/blacksmithgu/obsidian-dataview) 插件，未安装/未启用时会提示并退出。
 
-## Quick Start
-
-After enabling the plugin, you can use TesseraScript components in any DataviewJS code block:
+## 快速开始
 
 ```dataviewjs
-// Import components
-const { card, heatmap, progressbar } = Tessera.use("components");
-
-// Create a simple card
-dv.container.appendChild(card({
-  title: "Hello World",
-  meta: "GREETING",
-  value: 42,
-  content: "This is a TesseraScript card!"
-}));
-```
-
-## Components
-
-### Card
-
-A general-purpose card component for dashboards and panels.
-
-```dataviewjs
-const { card } = Tessera.use("components");
-
-dv.container.appendChild(card({
-  title: "Today's Tasks",
+// 卡片
+dv.container.appendChild(tessera.core.card({
+  title: "任务总览",
   meta: "TODO",
-  value: 5,
-  content: "Tasks completed today",
-  flags: {
-    showHeader: true,
-    showHeaderSep: true
-  },
-  layout: {
-    padding: "16px",
-    radius: "16px"
-  }
+  value: 42,
+  content: "今日待办",
+}));
+
+// 进度条（value 为 0..1 小数，0.5 = 50%）
+dv.container.appendChild(tessera.core.progressbar({
+  value: 0.5,
+  labelFormat: "{value}%",
 }));
 ```
 
-#### Card Options
+## 组件总览
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `title` | `string` | `""` | Card title |
-| `meta` | `string` | `""` | Meta information (shown in header) |
-| `value` | `any` | `null` | Main value to display |
-| `content` | `any` | `undefined` | Card content |
-| `children` | `any` | `undefined` | Custom child elements |
-| `emptyText` | `string` | `"No content"` | Text when content is empty |
-| `flags.showHeader` | `boolean` | `true` | Show header section |
-| `flags.showHeaderSep` | `boolean` | `true` | Show header separator |
-| `layout.padding` | `string` | `"16px"` | Card padding |
-| `layout.radius` | `string` | `"16px"` | Border radius |
+| 分组 | 组件 | 说明 |
+|------|------|------|
+| `tessera.core` | `card` | 卡片外壳（标题/元信息/数值/内容区） |
+| `tessera.core` | `heatmap` | 日历热力图（活动/提交记录） |
+| `tessera.core` | `progressbar` | 进度条（**value 为 0..1 小数**） |
+| `tessera.chart` | `line` | 折线图（ECharts，SVG 渲染） |
+| `tessera.chart` | `bar` | 柱状图（Lieflat "chunky bars" 胶囊圆角柱） |
+| `tessera.chart` | `gauge` | Tick Gauge 刻度量表（进度弧 + 刻度） |
+| `tessera.chart` | `rose` | Petal Rose 花瓣玫瑰图（三层叠加） |
 
-### Heatmap
+> **懒加载**：`tessera.chart.*` 组件基于 ECharts，但库文件（`lib/echarts.min.js`）只在**首次实际调用图表组件时**才注入页面。关闭图表分组后，ECharts 完全不加载（ADR-0005）。
 
-A calendar heatmap component for data visualization.
+### 开关与默认配置
+
+- 每个组件在 **Settings → TesseraScript** 中有独立开关（enabled）
+- `core` / `chart` 两个分组各有总开关（coreEnabled / chartEnabled）
+- 组件被禁用时，对应 API 为 `undefined`，调用会报错——请先检查：
 
 ```dataviewjs
-const { heatmap } = Tessera.use("components");
+if (tessera.core.card) {
+  dv.container.appendChild(tessera.core.card({ title: "OK" }));
+} else {
+  dv.paragraph("card 组件未启用");
+}
+```
 
-// Generate sample data
+## 组件示例
+
+### card
+
+```dataviewjs
+dv.container.appendChild(tessera.core.card({
+  title: "读书进度",
+  meta: "READING",
+  value: "3/5",
+  content: "《代码整洁之道》",
+  flags: { showHeaderSep: true },
+  layout: { maxWidth: "320px" },
+}));
+```
+
+`card` 是自由容器：`content` 可以是任意 DOM 元素或元素数组，也可以直接 `appendChild` 到 `.parts.body`。
+
+### heatmap
+
+```dataviewjs
 const data = {};
-const today = new Date();
-for (let i = 0; i < 365; i++) {
-  const date = new Date(today);
-  date.setDate(date.getDate() - i);
-  const dateStr = date.toISOString().split("T")[0];
-  data[dateStr] = Math.floor(Math.random() * 10);
-}
-
-dv.container.appendChild(heatmap({
-  data: data,
-  cellSize: 12,
-  cellGap: 2
-}));
-```
-
-#### Heatmap Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `data` | `Record<string, number>` | `{}` | Date-value pairs |
-| `cellSize` | `number` | `12` | Cell size in pixels |
-| `cellGap` | `number` | `2` | Gap between cells |
-| `colors.light.empty` | `string` | `"rgba(0,0,0,0.05)"` | Empty cell color (light) |
-| `colors.light.levels` | `string[]` | Green gradient | Level colors (light) |
-
-### Progressbar
-
-A progress bar component for displaying progress.
-
-```dataviewjs
-const { progressbar } = Tessera.use("components");
-
-dv.container.appendChild(progressbar({
-  value: 75,
-  max: 100,
-  showLabel: true,
-  labelFormat: "{percentage}%"
-}));
-```
-
-#### Progressbar Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `value` | `number` | `0` | Current value |
-| `max` | `number` | `100` | Maximum value |
-| `min` | `number` | `0` | Minimum value |
-| `showLabel` | `boolean` | `true` | Show percentage label |
-| `labelFormat` | `string` | `"{value}%"` | Label format string |
-
-## Advanced Usage
-
-### Custom Styling
-
-Override component styles using CSS variables:
-
-```dataviewjs
-const { card } = Tessera.use("components");
-
-dv.container.appendChild(card({
-  title: "Custom Card",
-  content: "With custom colors",
-  colors: {
-    light: {
-      background: "rgba(59, 130, 246, 0.1)",
-      border: "rgba(59, 130, 246, 0.3)"
-    },
-    dark: {
-      background: "rgba(59, 130, 246, 0.2)",
-      border: "rgba(59, 130, 246, 0.4)"
-    }
-  }
-}));
-```
-
-### Combining Components
-
-Create complex layouts by combining components:
-
-```dataviewjs
-const { card, progressbar } = Tessera.use("components");
-
-// Create a card with progress bar inside
-const container = document.createElement("div");
-container.style.display = "grid";
-container.style.gridTemplateColumns = "repeat(3, 1fr)";
-container.style.gap = "16px";
-
-for (let i = 0; i < 3; i++) {
-  const progressBar = progressbar({
-    value: Math.floor(Math.random() * 100),
-    labelFormat: "Progress {percentage}%"
-  });
-  
-  const cardEl = card({
-    title: `Project ${i + 1}`,
-    meta: "STATUS",
-    children: progressBar
-  });
-  
-  container.appendChild(cardEl);
-}
-
-dv.container.appendChild(container);
-```
-
-### Accessing Component Parts
-
-Access internal elements for further customization:
-
-```dataviewjs
-const { card } = Tessera.use("components");
-
-const cardEl = card({
-  title: "Dynamic Card",
-  content: "Initial content"
+const pages = dv.pages('"Daily"');
+pages.forEach(p => {
+  data[p.file.name] = p.tasks?.length || 0;  // YYYY-MM-DD → number
 });
 
-// Access parts
-const { title, body } = cardEl.parts;
-
-// Modify after creation
-title.textContent = "Updated Title";
-body.innerHTML = "<p>New content!</p>";
-
-dv.container.appendChild(cardEl);
+dv.container.appendChild(tessera.core.heatmap({
+  data,
+  settings: { rangeMode: "adaptive" },
+  flags: { mondayFirst: true },
+}));
 ```
 
-## Configuration
+支持 `total/completed` 对象值（按完成比例分级）或 `value` 数值（按大小分级）。`getData`/`getCellStyle`/`renderTooltip` 回调可深度定制。
 
-### Plugin Settings
-
-Access plugin settings via Settings → TesseraScript:
-
-- **Enable Legacy Mode**: Allow loading modules via `dv.view()` (deprecated)
-- **Show Deprecation Warnings**: Show warnings for deprecated features
-- **Default Theme**: Auto, Light, or Dark
-
-### Component Configuration
-
-Each component can be configured globally or per-instance:
+### progressbar
 
 ```dataviewjs
-// Load and update global config
-const { loadCardConfig, updateCardConfig } = Tessera.use("components/card");
+// value 是 0..1 的小数比例
+dv.container.appendChild(tessera.core.progressbar({
+  value: 0.73,
+  labelFormat: "{value}%",      // {value} → 73（整数百分比）
+  flags: { showLabel: true },
+}));
+```
 
-// Update global defaults
-updateCardConfig({
-  layout: {
-    padding: "24px",
-    radius: "12px"
+`labelFormat` 占位符：`{value}` = 整数百分比（50），`{raw}` = 原始比例（0.5）。
+
+### chart.line
+
+```dataviewjs
+dv.container.appendChild(tessera.chart.line({
+  data: {
+    labels: ["周一", "周二", "周三", "周四", "周五"],
+    values: [12, 19, 8, 25, 16],
   },
-  colors: {
-    light: {
-      background: "rgba(255, 255, 255, 0.9)"
-    }
-  }
-});
-
-// All subsequent cards will use these defaults
-dv.container.appendChild(card({ title: "Uses new defaults" }));
+  flags: { smooth: true, area: true, showGrid: false },
+}));
 ```
 
-## API Reference
-
-### Global Object
-
-The plugin exposes a global `Tessera` object:
-
-```javascript
-// Import modules
-const module = Tessera.use("module-name");
-
-// Check if module exists
-Tessera.has("components/card"); // true
-
-// Get version
-Tessera.version; // "1.0.0"
-```
-
-### Module System
-
-```javascript
-// Define a custom module
-Tessera.define("my-module", function(require, module, exports) {
-  const { createElement } = require("core/dom");
-  
-  exports.myFunction = function() {
-    return createElement("div", { text: "Hello" });
-  };
-});
-
-// Use it
-const { myFunction } = Tessera.use("my-module");
-```
-
-## Troubleshooting
-
-### Components not rendering
-
-1. Ensure Dataview plugin is installed and enabled
-2. Check that you're using DataviewJS code blocks (not regular Dataview)
-3. Check the console for error messages
-
-### Styles not applying
-
-1. Try reloading the plugin (Command Palette → Reload TesseraScript)
-2. Check if your theme overrides component styles
-3. Ensure `styles.css` is present in the plugin folder
-
-### Performance issues
-
-1. Avoid creating too many components in a single code block
-2. Use `fragment()` for batch DOM operations
-3. Consider using `requestAnimationFrame()` for animations
-
-## Examples
-
-### Dashboard
+多系列用 `series`：
 
 ```dataviewjs
-const { card, progressbar } = Tessera.use("components");
+dv.container.appendChild(tessera.chart.line({
+  data: {
+    labels: ["1月", "2月", "3月"],
+    series: [
+      { name: "收入", values: [30, 45, 22] },
+      { name: "支出", values: [20, 15, 30] },
+    ],
+  },
+  flags: { showLegend: true },
+}));
+```
 
+### chart.bar
+
+```dataviewjs
+dv.container.appendChild(tessera.chart.bar({
+  data: {
+    labels: ["A", "B", "C", "D"],
+    values: [4, 7, 3, 9],
+  },
+}));
+```
+
+单系列时每根柱从 mono 色板轮转取色（Lieflat chunky bars）；多系列时每系列一色、分组排列。
+
+### chart.gauge
+
+```dataviewjs
+dv.container.appendChild(tessera.chart.gauge({
+  value: 0.73,          // 0..1，73%
+  label: "PROGRESS",    // 中央大数字下方的标签（缺省显示 "27 TO GO"）
+}));
+```
+
+### chart.rose
+
+```dataviewjs
+dv.container.appendChild(tessera.chart.rose({
+  data: {
+    labels: ["笔记", "待办", "阅读", "项目"],
+    values: [18, 12, 9, 15],
+  },
+  flags: { showLabels: true },
+}));
+```
+
+花瓣明度按数值分档（越高越浅），三层结构：底色盘 → 花瓣层 → 标签层。
+
+## 主题适配
+
+所有组件自动跟随 Obsidian 深浅主题（`body.theme-dark/theme-light`），并通过 `theme` 观察器实时切换：
+
+- 组件根元素带 `theme-dark` / `theme-light` class
+- 颜色用 CSS 变量 `--ts-<component>-*-light/-dark` 或内联 current 变量
+- 图表组件主题切换时自动 `setOption(..., { notMerge: true })` 重渲染
+
+## 设置面板
+
+**Settings → TesseraScript**，层级结构：
+
+```
+TesseraScript 配置
+├── 核心组件 (core 总开关)
+│   ├── card        [enabled] → flags / layout / colors…
+│   ├── heatmap     [enabled] → …
+│   └── progressbar [enabled] → …
+└── 图表 (chart 总开关)
+    ├── line   [enabled] → …
+    ├── bar    [enabled] → …
+    ├── gauge  [enabled] → …
+    └── rose   [enabled] → …
+```
+
+- 每个字段可单独恢复默认值（↺ 按钮）
+- 修改后需点击 **应用并重载**（Obsidian 会重载插件）
+- 取色器内嵌 alpha 滑杆（alpha = 1 存 hex，否则存 rgba）
+
+## 高级用法
+
+### 组合组件
+
+```dataviewjs
 const dashboard = document.createElement("div");
-dashboard.style.cssText = `
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  padding: 16px;
-`;
+dashboard.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:16px";
 
-// Stats cards
-const stats = [
-  { title: "Total Notes", value: "1,234", meta: "NOTES" },
-  { title: "This Week", value: "56", meta: "CREATED" },
-  { title: "In Progress", value: "12", meta: "TASKS" },
-  { title: "Completed", value: "89%", meta: "RATE" }
-];
+dashboard.appendChild(tessera.core.card({
+  title: "活动热力图",
+  children: tessera.core.heatmap({ data }),
+}));
 
-stats.forEach(stat => {
-  dashboard.appendChild(card(stat));
-});
+dashboard.appendChild(tessera.core.card({
+  title: "本月进度",
+  children: tessera.chart.gauge({ value: 0.8 }),
+}));
 
-// Progress section
-const progressSection = document.createElement("div");
-progressSection.style.cssText = `
-  grid-column: span 4;
-  padding: 16px;
-`;
-
-["Project A", "Project B", "Project C"].forEach((name, i) => {
-  const wrapper = document.createElement("div");
-  wrapper.style.marginBottom = "12px";
-  
-  const label = document.createElement("div");
-  label.textContent = name;
-  label.style.marginBottom = "4px";
-  label.style.fontWeight = "600";
-  
-  wrapper.appendChild(label);
-  wrapper.appendChild(progressbar({
-    value: [75, 45, 90][i],
-    showLabel: true,
-    labelFormat: "{percentage}%"
-  }));
-  
-  progressSection.appendChild(wrapper);
-});
-
-dashboard.appendChild(progressSection);
 dv.container.appendChild(dashboard);
 ```
 
-### Activity Heatmap
+### 访问内部 DOM（parts）
+
+所有组件实例是 `HTMLElement`，可直接 `appendChild`，并暴露 `parts`：
 
 ```dataviewjs
-const { heatmap, card } = Tessera.use("components");
+const cardEl = tessera.core.card({ title: "动态卡片", content: "初始内容" });
+cardEl.parts.body.appendChild(document.createTextNode("追加内容"));
+cardEl.parts.value.textContent = "99";
+dv.container.appendChild(cardEl);
+```
 
-// Get data from your vault (example)
-const data = {};
-const pages = dv.pages('"Daily"');
+### 响应式属性
 
-pages.forEach(page => {
-  const date = page.file.name;
-  data[date] = page.tasks?.length || 0;
+部分组件支持响应式属性，赋值自动刷新：
+
+```dataviewjs
+const bar = tessera.chart.bar({ data });
+dv.container.appendChild(bar);
+bar.data = { labels: ["X", "Y"], values: [1, 2] };  // 自动重渲染
+```
+
+支持响应式属性的组件：`card`(title/meta/value/content)、`heatmap`(data/startDate/endDate)、`progressbar`(value)、`chart.*`(data，gauge 另有 value/label)。
+
+### 自定义样式
+
+组件根元素有稳定的 class（`.ts-card`、`.ts-heatmap`、`.ts-progressbar`、`.ts-chart ts-chart-line` 等），颜色走 CSS 变量。可用 `styles` 选项直接注入内联样式：
+
+```dataviewjs
+tessera.core.card({
+  title: "自定义",
+  styles: { card: { marginBottom: "8px" } },
+  colors: { light: { background: "#ffffff" } },
 });
-
-// Create card with heatmap
-dv.container.appendChild(card({
-  title: "Activity",
-  meta: "LAST 365 DAYS",
-  children: heatmap({
-    data: data,
-    cellSize: 12,
-    cellGap: 2
-  }),
-  layout: {
-    padding: "24px"
-  }
-}));
 ```
 
-## Development
+## 检查状态
 
-### Building from Source
+命令面板运行 **Check status** 可查看 Dataview 与各组件启用状态。
 
-```bash
-# Clone the repository
-git clone https://github.com/tessera-script/tessera-plugin.git
+## 开发
 
-# Install dependencies
-cd tessera-plugin
-npm install
+- 架构：见 [ARCHITECTURE.md](./ARCHITECTURE.md)
+- 新组件开发：见 [COMPONENT_DEVELOPMENT_GUIDE.md](./COMPONENT_DEVELOPMENT_GUIDE.md)
+- 配置系统：见 [CONFIGURATION.md](./CONFIGURATION.md)
+- 构建与调试：见 [DEVELOPMENT.md](./DEVELOPMENT.md)
+- 设计决策：见 [decisions/](./decisions/)
 
-# Development mode
-npm run dev
+## 许可证
 
-# Production build
-npm run build
-```
-
-### Project Structure
-
-```
-tessera-plugin/
-├── src/
-│   ├── main.ts              # Plugin entry point
-│   ├── runtime/
-│   │   └── bootstrap.ts     # Module system
-│   ├── core/
-│   │   ├── dom.ts           # DOM utilities
-│   │   ├── css.ts           # CSS management
-│   │   ├── config.ts        # Configuration
-│   │   └── file.ts          # File operations
-│   ├── components/
-│   │   ├── card/            # Card component
-│   │   ├── heatmap/         # Heatmap component
-│   │   ├── progressbar/     # Progressbar component
-│   │   └── index.ts         # Component registry
-│   └── utils/
-│       ├── logger.ts        # Logging utility
-│       └── style-manager.ts # Style management
-├── styles.css               # Base styles
-├── manifest.json            # Plugin manifest
-└── package.json             # Dependencies
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-BSD License - see [LICENSE](LICENSE) file
-
-## Support
-
-- [GitHub Issues](https://github.com/tessera-script/tessera-plugin/issues)
-- [Documentation](https://github.com/tessera-script/tessera-plugin/wiki)
+BSD License - 见 [LICENSE](../LICENSE)
