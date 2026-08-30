@@ -4,11 +4,7 @@
  */
 
 import { Notice, Plugin } from "obsidian";
-import { card } from "./components/card/index";
-import { heatmap } from "./components/heatmap/index";
-import { progressbar } from "./components/progressbar/index";
-import { list } from "./components/list/index";
-import { tags } from "./components/tags/index";
+import { card, heatmap, progressbar, list, tags } from "./components/core";
 import { createChartGroup } from "./components/chart/index";
 
 import type { PluginSettings, TesseraAPI } from "./settings";

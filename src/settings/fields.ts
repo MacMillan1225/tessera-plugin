@@ -4,11 +4,7 @@
  */
 
 import type { ComponentDefinition, ComponentKey, PluginSettings } from "./types";
-import { CARD_DEFAULTS } from "../components/card/config";
-import { HEATMAP_DEFAULTS } from "../components/heatmap/config";
-import { PROGRESSBAR_DEFAULTS } from "../components/progressbar/config";
-import { LIST_DEFAULTS } from "../components/list/config";
-import { TAGS_DEFAULTS } from "../components/tags/config";
+import { CARD_DEFAULTS, HEATMAP_DEFAULTS, PROGRESSBAR_DEFAULTS, LIST_DEFAULTS, TAGS_DEFAULTS } from "../components/core/config";
 import { LINE_DEFAULTS } from "../components/chart/config";
 import { BAR_DEFAULTS } from "../components/chart/config";
 import { GAUGE_DEFAULTS } from "../components/chart/config";

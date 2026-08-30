@@ -2,11 +2,11 @@
  * Settings type definitions
  */
 
-import type { CardOptions, CardInstance } from "../components/card/index";
-import type { HeatmapOptions, HeatmapInstance } from "../components/heatmap/index";
-import type { ProgressbarOptions, ProgressbarInstance } from "../components/progressbar/index";
-import type { ListOptions, ListInstance } from "../components/list/index";
-import type { TagsOptions, TagsInstance } from "../components/tags/index";
+import type { CardOptions, CardInstance } from "../components/core/card";
+import type { HeatmapOptions, HeatmapInstance } from "../components/core/heatmap";
+import type { ProgressbarOptions, ProgressbarInstance } from "../components/core/progressbar";
+import type { ListOptions, ListInstance } from "../components/core/list";
+import type { TagsOptions, TagsInstance } from "../components/core/tags";
 import type { LineOptions, LineInstance } from "../components/chart/line";
 import type { BarOptions, BarInstance } from "../components/chart/bar";
 import type { GaugeOptions, GaugeInstance } from "../components/chart/gauge";
