@@ -18,6 +18,9 @@ main.js
 # obsidian
 data.json
 
+# Third-party libs (runtime-downloaded via Settings -> Chart Libraries)
+/lib/
+
 # Design reference images (stay local, not versioned)
 /reference/
 
