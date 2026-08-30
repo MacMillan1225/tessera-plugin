@@ -1,243 +1,50 @@
-# TesseraScript Obsidian Plugin
+# TesseraScript
 
-A modular component library for Obsidian's DataviewJS. Build beautiful dashboards, cards, heatmaps, and more with simple, composable components.
+基于 **Obsidian + DataviewJS** 的组件库插件。在 `dataviewjs` 代码块中直接调用 `tessera` 全局对象，即可渲染卡片、热力图、进度条与图表，快速搭建个人看板。
 
-![TesseraScript](https://img.shields.io/badge/TesseraScript-v1.0.0-blue)
-![Obsidian](https://img.shields.io/badge/Obsidian-v1.5.0+-purple)
-![License](https://img.shields.io/badge/License-BSD-green)
+## 特性
 
-## Features
+- **core 组件**：`tessera.core.card` / `heatmap` / `progressbar` / `list` / `tags`
+- **chart 组件**：`tessera.chart.line` / `bar` / `gauge` / `rose` / `radar`（ECharts，懒加载，关闭分组零加载）
+- **Lieflat 视觉**：单色克制风，无边框靠背景色差分层，圆角优雅，hover 克制，自动适配明暗主题
+- **语义化配置**：统一 `background / border / text / accent` 键，极简默认值，每个组件可独立开关
+- **设置层级化**：分组总开关 → 组件开关 → 字段配置
+- **AI Skill**：内置 `skills/tessera-dashboard/`，让 AI 基于本插件自动生成看板（需配合支持 skill 的 AI 工具使用）
 
-- 🎨 **Beautiful Components**: Pre-built card, heatmap, and progressbar components
-- 🎯 **TypeScript**: Full type safety and IntelliSense support
-- 🌓 **Dark Mode**: Automatic theme switching with Obsidian
-- ⚡ **Performance**: Lazy-loaded styles and optimized rendering
-- 🔧 **Configurable**: Deep customization for every component
-- 📦 **Modular**: Use only what you need
-
-## Quick Start
-
-### Installation
-
-1. Open Obsidian Settings
-2. Go to Community Plugins
-3. Search for "TesseraScript"
-4. Install and enable
-
-### Basic Usage
+## 快速开始
 
 ```dataviewjs
-// Import components
-const { card, heatmap, progressbar } = Tessera.use("components");
-
-// Create a simple card
-dv.container.appendChild(card({
-  title: "Hello World",
-  meta: "GREETING",
-  value: 42,
-  content: "This is a TesseraScript card!"
-}));
-```
-
-## Components
-
-### Card
-
-```dataviewjs
-const { card } = Tessera.use("components");
-
-dv.container.appendChild(card({
-  title: "Today's Tasks",
+// 卡片
+dv.container.appendChild(tessera.core.card({
+  title: "任务总览",
   meta: "TODO",
-  value: 5,
-  content: "Tasks completed today"
+  value: 42,
+}));
+
+// 进度条（value 为 0..1 小数，0.5 = 50%）
+dv.container.appendChild(tessera.core.progressbar({
+  value: 0.5,
+  labelFormat: "{value}%",
 }));
 ```
 
-### Heatmap
+## 安装
 
-```dataviewjs
-const { heatmap } = Tessera.use("components");
+1. 构建：`npm run build`
+2. 将 `main.js`、`manifest.json`、`styles.css` 复制到 `<Vault>/.obsidian/plugins/tessera-plugin/`
+3. 在 Obsidian **Settings → Community plugins** 中启用
 
-const data = {};
-for (let i = 0; i < 365; i++) {
-  const date = new Date();
-  date.setDate(date.getDate() - i);
-  data[date.toISOString().split("T")[0]] = Math.floor(Math.random() * 10);
-}
+**前置依赖**：[Dataview](https://github.com/blacksmithgu/obsidian-dataview) 插件。
 
-dv.container.appendChild(heatmap({ data }));
-```
+## 文档
 
-### Progressbar
-
-```dataviewjs
-const { progressbar } = Tessera.use("components");
-
-dv.container.appendChild(progressbar({
-  value: 75,
-  showLabel: true,
-  labelFormat: "{percentage}%"
-}));
-```
-
-## Advanced Usage
-
-### Custom Styling
-
-```dataviewjs
-dv.container.appendChild(card({
-  title: "Custom Card",
-  colors: {
-    light: {
-      background: "rgba(59, 130, 246, 0.1)",
-      border: "rgba(59, 130, 246, 0.3)"
-    },
-    dark: {
-      background: "rgba(59, 130, 246, 0.2)",
-      border: "rgba(59, 130, 246, 0.4)"
-    }
-  }
-}));
-```
-
-### Combining Components
-
-```dataviewjs
-const { card, progressbar } = Tessera.use("components");
-
-const dashboard = document.createElement("div");
-dashboard.style.display = "grid";
-dashboard.style.gridTemplateColumns = "repeat(3, 1fr)";
-dashboard.style.gap = "16px";
-
-for (let i = 0; i < 3; i++) {
-  dashboard.appendChild(card({
-    title: `Project ${i + 1}`,
-    children: progressbar({
-      value: Math.floor(Math.random() * 100),
-      labelFormat: "Progress {percentage}%"
-    })
-  }));
-}
-
-dv.container.appendChild(dashboard);
-```
-
-## Documentation
-
-- [User Guide](docs/README.md) - Complete usage documentation
-- [Development Guide](docs/DEVELOPMENT.md) - For contributors and custom component developers
-
-## Development
-
-### Building from Source
-
-```bash
-# Clone the repository
-git clone https://github.com/tessera-script/tessera-plugin.git
-
-# Install dependencies
-cd tessera-plugin
-npm install
-
-# Development mode
-npm run dev
-
-# Production build
-npm run build
-```
-
-### Project Structure
-
-```
-tessera-plugin/
-├── src/
-│   ├── main.ts              # Plugin entry point
-│   ├── runtime/
-│   │   └── bootstrap.ts     # Module system
-│   ├── core/
-│   │   ├── dom.ts           # DOM utilities
-│   │   ├── css.ts           # CSS management
-│   │   ├── config.ts        # Configuration
-│   │   └── file.ts          # File operations
-│   ├── components/
-│   │   ├── card/            # Card component
-│   │   ├── heatmap/         # Heatmap component
-│   │   ├── progressbar/     # Progressbar component
-│   │   └── index.ts         # Component registry
-│   └── utils/
-│       ├── logger.ts        # Logging utility
-│       └── style-manager.ts # Style management
-├── styles.css               # Base styles
-├── manifest.json            # Plugin manifest
-└── package.json             # Dependencies
-```
-
-## API Reference
-
-### Global Object
-
-```javascript
-// Import modules
-const module = Tessera.use("module-name");
-
-// Check if module exists
-Tessera.has("components/card"); // true
-
-// Get version
-Tessera.version; // "1.0.0"
-```
-
-### Component Options
-
-#### Card Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `title` | `string` | `""` | Card title |
-| `meta` | `string` | `""` | Meta information |
-| `value` | `any` | `null` | Main value |
-| `content` | `any` | `undefined` | Card content |
-| `flags.showHeader` | `boolean` | `true` | Show header |
-| `layout.padding` | `string` | `"16px"` | Padding |
-
-#### Heatmap Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `data` | `Record<string, number>` | `{}` | Date-value pairs |
-| `cellSize` | `number` | `12` | Cell size |
-| `cellGap` | `number` | `2` | Cell gap |
-
-#### Progressbar Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `value` | `number` | `0` | Current value |
-| `max` | `number` | `100` | Maximum value |
-| `showLabel` | `boolean` | `true` | Show label |
-| `labelFormat` | `string` | `"{value}%"` | Label format |
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- [用户手册](docs/README.md) — 全部组件的用法与示例
+- [配置参考](docs/CONFIGURATION.md) — 全部可调参数的完整说明
+- [架构说明](docs/ARCHITECTURE.md) — 插件内部结构与设计决策
+- [开发指南](docs/DEVELOPMENT.md) — 构建、调试与发布
+- [组件开发指南](docs/COMPONENT_DEVELOPMENT_GUIDE.md) — 如何新增组件
+- [设计决策记录](docs/decisions/) — ADR-0001 ~ ADR-0005
 
 ## License
 
-BSD License - see [LICENSE](LICENSE) file
-
-## Support
-
-- [GitHub Issues](https://github.com/tessera-script/tessera-plugin/issues)
-- [Documentation](https://github.com/tessera-script/tessera-plugin/wiki)
-
-## Acknowledgments
-
-- [Obsidian](https://obsidian.md/) - The knowledge base
-- [Dataview](https://blacksmithgu.github.io/obsidian-dataview/) - Data query engine
-- [Obsidian Plugin API](https://docs.obsidian.md/) - Plugin development
+BSD
