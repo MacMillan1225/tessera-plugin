@@ -301,29 +301,48 @@ function ensureTooltip(id: string): HTMLElement {
 	return tooltip;
 }
 
-function positionTooltipAtCursor(id: string, x: number, y: number): void {
+/**
+ * Anchor the tooltip to a cell (above it, horizontally centered) instead of
+ * the raw cursor. While the tooltip stays active, moving to another cell
+ * glides smoothly via the CSS left/top transition; when (re)appearing from
+ * hidden it lands instantly (no cross-grid glide), then fades in.
+ */
+function positionTooltipAtCell(id: string, cell: HTMLElement): void {
 	const tooltip = ensureTooltip(id);
 	const tipRect = tooltip.getBoundingClientRect();
+	const rect = cell.getBoundingClientRect();
 
-	let left = x + 14;
-	let top = y + 16;
+	let left = rect.left + rect.width / 2 - tipRect.width / 2;
+	let top = rect.top - tipRect.height - 8;
 
+	if (left < 10) left = 10;
 	if (left + tipRect.width > window.innerWidth - 10) {
-		left = x - tipRect.width - 12;
+		left = window.innerWidth - tipRect.width - 10;
 	}
-	if (top + tipRect.height > window.innerHeight - 10) {
-		top = y - tipRect.height - 12;
-	}
+	if (top < 10) top = rect.bottom + 8;
 
+	const wasActive = tooltip.classList.contains("is-active");
+	if (!wasActive) {
+		tooltip.classList.add("ts-tooltip-no-anim");
+	}
 	tooltip.style.left = `${left}px`;
 	tooltip.style.top = `${top}px`;
+	if (!wasActive) {
+		void tooltip.offsetWidth; // flush layout so the next move animates
+		tooltip.classList.remove("ts-tooltip-no-anim");
+	}
 	tooltip.classList.add("is-active");
 }
 
-function applyTooltipTheme(root: HTMLElement, tooltip: HTMLElement): void {
-	const computed = getComputedStyle(root);
-	tooltip.style.setProperty("--ts-heatmap-tooltip-fg", computed.getPropertyValue("--ts-heatmap-tooltip-current").trim());
-	tooltip.style.setProperty("--ts-heatmap-tooltip-bg", computed.getPropertyValue("--ts-heatmap-tooltip-bg-current").trim());
+function applyTooltipTheme(tooltip: HTMLElement): void {
+	// Lieflat paper/ink, detected from the live theme. Tooltip colors are a
+	// design-system constant on purpose: saved settings can go stale (Obsidian
+	// rewrites data.json from in-memory state), and the tooltip must stay
+	// consistent with the chart tooltips regardless.
+	// eslint-disable-next-line obsidianmd/prefer-active-doc
+	const dark = document.body.classList.contains("theme-dark");
+	tooltip.style.setProperty("--ts-heatmap-tooltip-fg", dark ? "#F0EFEB" : "#1C1C1A");
+	tooltip.style.setProperty("--ts-heatmap-tooltip-bg", dark ? "#1C1C1A" : "#F0EFEB");
 }
 
 function defaultTooltipRenderer(context: HeatmapCellContext & { visual: HeatmapCellStyle }): string {
@@ -628,7 +647,7 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 			? options.renderTooltip({ ...context, visual })
 			: defaultTooltipRenderer({ ...context, visual });
 
-		applyTooltipTheme(root, tooltip);
+		applyTooltipTheme(tooltip);
 	}
 
 	// Event delegation: chart-style tooltip that follows the pointer
@@ -683,8 +702,8 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 				showTooltipContent(context, visual);
 			}
 
-			// Follow the pointer (chart-tooltip behavior)
-			positionTooltipAtCursor(tooltipId, event.clientX, event.clientY);
+			// Anchor above the hovered cell (glides between cells while active)
+			positionTooltipAtCell(tooltipId, cell);
 		});
 
 		gridEl.addEventListener("mouseleave", () => {
@@ -914,7 +933,7 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 			// eslint-disable-next-line obsidianmd/prefer-active-doc
 			const tooltip = document.getElementById(tooltipId);
 			if (tooltip) {
-				applyTooltipTheme(root, tooltip);
+				applyTooltipTheme(tooltip);
 			}
 		})
 		: null;

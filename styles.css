@@ -9,14 +9,20 @@
    ========================================================================== */
 
 body {
+	/* CJK fallback shared by every stack: keeps Chinese glyphs on the
+	   platform sans (PingFang / YaHei / Noto) instead of a serif default,
+	   so mixed CJK+Latin text stays visually consistent. */
+	--ts-font-cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", "Source Han Sans SC";
 	/* Interface text (labels, list items, tooltips) */
-	--ts-font-ui: var(--font-interface);
+	--ts-font-ui: var(--font-interface), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
 	/* Long-form body text inside cards */
-	--ts-font-body: var(--font-text, var(--font-interface));
+	--ts-font-body: var(--font-text, var(--font-interface)), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
 	/* Card & section titles */
-	--ts-font-title: var(--font-interface);
-	/* Numeric values, badges, monospace metadata */
-	--ts-font-mono: "JetBrains Mono", "Cascadia Mono", "SF Mono", "Fira Code", "IBM Plex Mono", Consolas, "Courier New", monospace;
+	--ts-font-title: var(--font-interface), "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+	/* Numeric values, badges, monospace metadata — Latin digits use the mono
+	   stack, CJK characters fall through to the sans list so labels like
+	   "进度" beside "68%" don't render in a mismatched serif. */
+	--ts-font-mono: "JetBrains Mono", "Cascadia Mono", "SF Mono", "Fira Code", "IBM Plex Mono", Consolas, "Courier New", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", monospace;
 }
 
 /* ==========================================================================
@@ -429,7 +435,7 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 	line-height: 1.4;
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 0.12s ease;
+	transition: opacity 0.15s ease, left 0.18s ease, top 0.18s ease;
 }
 
 .ts-heatmap-tooltip.is-active {
@@ -949,7 +955,7 @@ body.theme-dark .ts-tags {
 	font-family: var(--ts-font-ui, var(--font-interface));
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	opacity: 0;
-	transition: opacity 0.15s ease;
+	transition: opacity 0.15s ease, left 0.18s ease, top 0.18s ease;
 }
 .ts-chart-radar-tooltip.is-active {
 	opacity: 1;
@@ -961,4 +967,10 @@ body.theme-dark .ts-tags {
 .ts-chart-radar-tooltip__value {
 	font-weight: 700;
 	margin-top: 2px;
+}
+
+/* Tooltip anchor transition bypass: when a tooltip first appears it must land
+   instantly at the anchor point (no fly-in), then glide between anchors. */
+.ts-tooltip-no-anim {
+	transition: none !important;
 }

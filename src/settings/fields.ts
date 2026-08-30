@@ -95,16 +95,12 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 			{ key: "layout.monthLabelSize", type: "text", description: "tooltip.heatmap.monthLabelSize" },
 			{ key: "layout.weekLabelSize", type: "text", description: "tooltip.heatmap.weekLabelSize" },
 			// Colors (Light)
-			{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
-			{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
-			{ key: "colors.light.tooltip", type: "color", description: "tooltip.colors.tooltipText" },
-			{ key: "colors.light.tooltipBg", type: "color", description: "tooltip.colors.tooltipBg" },
-			// Colors (Dark)
-			{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
-			{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
-			{ key: "colors.dark.tooltip", type: "color", description: "tooltip.colors.tooltipText" },
-			{ key: "colors.dark.tooltipBg", type: "color", description: "tooltip.colors.tooltipBg" },
-		],
+	{ key: "colors.light.background", type: "color", description: "tooltip.colors.background" },
+	{ key: "colors.light.text", type: "color", description: "tooltip.colors.text" },
+
+	{ key: "colors.dark.background", type: "color", description: "tooltip.colors.background" },
+	{ key: "colors.dark.text", type: "color", description: "tooltip.colors.text" },
+],
 	},
 	progressbar: {
 		componentKey: "progressbar",

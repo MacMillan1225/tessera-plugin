@@ -242,7 +242,13 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 			}, 50);
 		};
 
-		const showTooltip = (label: string, seriesName: string | undefined, valueText: string, x: number, y: number): void => {
+		/**
+		 * Anchor the tooltip at the snapped dimension's data vertex (above it,
+		 * horizontally centered) instead of the raw cursor. While active, snap
+		 * changes glide smoothly via the CSS left/top transition; appearing
+		 * from hidden lands instantly, then fades in.
+		 */
+		const showTooltip = (dimIdx: number): void => {
 			if (hideTimeout) {
 				window.clearTimeout(hideTimeout);
 				hideTimeout = null;
@@ -255,24 +261,49 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 			tooltipEl.style.setProperty("--ts-radar-tooltip-bg", paper);
 			tooltipEl.style.setProperty("--ts-radar-tooltip-fg", ink);
 
-			// Build content with text nodes (no innerHTML)
+			const label = _data.labels[dimIdx] ?? "";
+			// Single series → values[dimIdx]; multi series → first series' value
+			const values = _data.series?.length ? _data.series[0]?.values : _data.values;
+			const value = values?.[dimIdx];
+			const seriesName = _data.series?.length ? _data.series[0]?.name : undefined;
 			tooltipEl.replaceChildren(
 				createElement("div", { className: "ts-chart-radar-tooltip__label", text: label }),
-				createElement("div", { className: "ts-chart-radar-tooltip__value", text: `${seriesName ? `${seriesName} · ` : ""}${valueText}` }),
+				createElement("div", { className: "ts-chart-radar-tooltip__value", text: `${seriesName ? `${seriesName} · ` : ""}${valueToText(value)}` }),
 			);
 
-			const canvasRect = instance.parts.canvas.getBoundingClientRect();
-			let left = canvasRect.left + x + 12;
-			let top = canvasRect.top + y + 12;
+			// Vertex pixel position (mirrors ECharts RadarCoordSystem math and
+			// the scale computed by buildRadarOption via niceMax)
+			const rect = instance.parts.canvas.getBoundingClientRect();
+			const cx = rect.width * RADAR_CENTER_X;
+			const cy = rect.height * RADAR_CENTER_Y;
+			const r = (Math.min(rect.width, rect.height) / 2) * RADAR_RADIUS;
+			const n = _data.labels.length;
+			const allValues = _data.series?.length ? _data.series.flatMap((s) => s.values) : _data.values;
+			const maxV = niceMax(allValues, _max);
+			const t = maxV > 0 ? Math.max(0, Math.min(1, Number(value) / maxV)) : 0;
+			const angle = Math.PI / 2 + (dimIdx * 2 * Math.PI) / n;
+			const vx = rect.left + cx + t * r * Math.cos(angle);
+			const vy = rect.top + cy - t * r * Math.sin(angle);
+
 			const tipRect = tooltipEl.getBoundingClientRect();
+			let left = vx - tipRect.width / 2;
+			let top = vy - tipRect.height - 10;
+			if (left < 10) left = 10;
 			if (left + tipRect.width > window.innerWidth - 10) {
-				left = canvasRect.left + x - tipRect.width - 12;
+				left = window.innerWidth - tipRect.width - 10;
 			}
-			if (top + tipRect.height > window.innerHeight - 10) {
-				top = canvasRect.top + y - tipRect.height - 12;
+			if (top < 10) top = vy + 14;
+
+			const wasActive = tooltipEl.classList.contains("is-active");
+			if (!wasActive) {
+				tooltipEl.classList.add("ts-tooltip-no-anim");
 			}
 			tooltipEl.style.left = `${left}px`;
 			tooltipEl.style.top = `${top}px`;
+			if (!wasActive) {
+				void tooltipEl.offsetWidth; // flush layout so the next snap animates
+				tooltipEl.classList.remove("ts-tooltip-no-anim");
+			}
 			tooltipEl.classList.add("is-active");
 		};
 
@@ -378,12 +409,8 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 					activeDim = dimIdx;
 				}
 
-				const label = _data.labels[dimIdx] ?? "";
-				// Single series → values[dimIdx]; multi series → first series' value
-				const values = _data.series?.length ? _data.series[0]?.values : _data.values;
-				const value = values?.[dimIdx];
-				const seriesName = _data.series?.length ? _data.series[0]?.name : undefined;
-				showTooltip(label, seriesName, valueToText(value), x, y);
+				// Anchor the tooltip at the snapped dimension's data vertex
+				showTooltip(dimIdx);
 			});
 			zr.on("globalout", () => {
 				leave();
