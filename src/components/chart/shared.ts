@@ -6,6 +6,7 @@
 
 import type { EChartsType, EChartsOption } from "echarts";
 import { loadEcharts } from "./loader";
+import { createElement } from "../../utils/dom";
 
 // ============================================================================
 // Shared Chart Types
@@ -86,15 +87,19 @@ export function lieflatTooltip(theme: "light" | "dark"): Record<string, unknown>
  * is initialized once ECharts finishes loading (lazy, ADR-0005).
  */
 export function createChartBase(options: ChartBaseOptions): HTMLElement & ChartBaseInstance {
-	const root = document.createElement("div");
-	root.className = options.className;
-	root.style.maxWidth = options.maxWidth || "100%";
+	const root = createElement("div", {
+		className: options.className,
+		style: { maxWidth: options.maxWidth || "100%" },
+	});
 
 	// Canvas host — needs explicit height for ECharts
-	const canvas = document.createElement("div");
-	canvas.className = "ts-chart__canvas";
-	canvas.style.width = "100%";
-	canvas.style.height = options.height || "240px";
+	const canvas = createElement("div", {
+		className: "ts-chart__canvas",
+		style: {
+			width: "100%",
+			height: options.height || "240px",
+		},
+	});
 	root.appendChild(canvas);
 
 	// Theme class sync (heatmap-style)
@@ -145,7 +150,7 @@ export function createChartBase(options: ChartBaseOptions): HTMLElement & ChartB
 		}
 	}
 
-	const instance = root as HTMLElement & ChartBaseInstance;
+	const instance = root as unknown as HTMLElement & ChartBaseInstance;
 	Object.defineProperty(instance, "chart", {
 		get: () => chart,
 		enumerable: true,

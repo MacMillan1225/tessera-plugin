@@ -135,7 +135,7 @@ function buildRoseOption(
 				data: items,
 				z: 3,
 			},
-		],
+		] as EChartsOption["series"],
 	};
 }
 

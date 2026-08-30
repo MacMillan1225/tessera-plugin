@@ -6,6 +6,7 @@
 export type {
 	PluginSettings,
 	TesseraAPI,
+	ComponentKey,
 } from "./types";
 
 // Field definitions

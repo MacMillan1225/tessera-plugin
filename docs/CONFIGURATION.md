@@ -2,6 +2,8 @@
 
 本文档说明 TesseraScript 的配置架构与**所有组件的完整配置字段**。配置机制本身（优先级、深合并、版本门槛、单一数据源）见 [ARCHITECTURE.md](./ARCHITECTURE.md) 第 4-6 节；这里聚焦"每个组件能配什么"。
 
+> **示例说明**：以下 `dataviewjs` 代码块均以 `dv.container.appendChild(...)` 包裹，复制到笔记中即可直接运行。组件禁用时对应 API 为 `undefined`，运行前请确认已在设置中启用。
+
 ## 目录
 
 1. [配置架构概述](#1-配置架构概述)
@@ -38,15 +40,15 @@
 ### card
 
 ```dataviewjs
-tessera.core.card({
+dv.container.appendChild(tessera.core.card({
   title: "标题",        // 头部左侧
   meta: "META",         // 头部右侧（大写小字）
   value: "42",          // 中部大数值
   content: "内容",      // 内容区（string | HTMLElement | 数组）
-  children: el,         // 同 content（优先）
+  children: dv.el("div", "子元素"),  // 同 content（优先）
   emptyText: "无内容",  // 内容为空时的占位
   className: "extra",
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |
@@ -71,13 +73,13 @@ tessera.core.card({
 ### heatmap
 
 ```dataviewjs
-tessera.core.heatmap({
+dv.container.appendChild(tessera.core.heatmap({
   data: { "2026-08-01": 5, "2026-08-02": { total: 10, completed: 7 } },
   startDate: "2026-01-01",  // 或 Date
   endDate: "2026-12-31",
   settings: { rangeMode: "year" },
   flags: { mondayFirst: true },
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |
@@ -115,11 +117,11 @@ tessera.core.heatmap({
 ### progressbar
 
 ```dataviewjs
-tessera.core.progressbar({
+dv.container.appendChild(tessera.core.progressbar({
   value: 0.5,           // ★ 0..1 小数，0.5 = 50%
   labelFormat: "{value}%",  // {value}=整数百分比, {raw}=原始比例
   flags: { showLabel: true },
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |
@@ -146,13 +148,13 @@ tessera.core.progressbar({
 ### line / bar
 
 ```dataviewjs
-tessera.chart.line({
+dv.container.appendChild(tessera.chart.line({
   data: { labels: ["A","B","C"], values: [1,2,3] },
   flags: { smooth: true, area: true },
-})
-tessera.chart.bar({
+}))
+dv.container.appendChild(tessera.chart.bar({
   data: { labels: ["A","B","C"], values: [4,7,3] },
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |
@@ -169,10 +171,10 @@ tessera.chart.bar({
 ### gauge
 
 ```dataviewjs
-tessera.chart.gauge({
+dv.container.appendChild(tessera.chart.gauge({
   value: 0.73,          // ★ 0..1 比例，73%
   label: "PROGRESS",    // 中央大数下方标签（缺省显示 "27 TO GO"）
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |
@@ -189,9 +191,9 @@ tessera.chart.gauge({
 ### rose
 
 ```dataviewjs
-tessera.chart.rose({
+dv.container.appendChild(tessera.chart.rose({
   data: { labels: ["A","B","C","D"], values: [18,12,9,15] },
-})
+}))
 ```
 
 | 配置组 | 字段 | 类型 | 默认 | 说明 |

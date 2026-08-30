@@ -7,8 +7,20 @@
 
 import type { EChartsType } from "echarts";
 
+/**
+ * The global ECharts constructor exposed by lib/echarts.min.js (UMD build).
+ * It has a static `init` method that creates chart instances.
+ */
+export type EChartsConstructor = typeof import("echarts") & {
+	init: (
+		dom: HTMLElement,
+		theme?: string | object | null,
+		opts?: Record<string, unknown>,
+	) => EChartsType;
+};
+
 let echartsUrl = "";
-let echartsPromise: Promise<EChartsType> | null = null;
+let echartsPromise: Promise<EChartsConstructor> | null = null;
 
 /** Set the resource URL for lib/echarts.min.js (called once from main.ts). */
 export function configureEchartsUrl(url: string): void {
@@ -20,13 +32,13 @@ export function configureEchartsUrl(url: string): void {
  * Injects a <script> tag on first use; subsequent calls reuse the resolved
  * instance. Resets the cache on load failure so a retry is possible.
  */
-export function loadEcharts(): Promise<EChartsType> {
+export function loadEcharts(): Promise<EChartsConstructor> {
 	if (echartsPromise) {
 		return echartsPromise;
 	}
 
-	echartsPromise = new Promise<EChartsType>((resolve, reject) => {
-		const win = window as unknown as { echarts?: EChartsType };
+	echartsPromise = new Promise<EChartsConstructor>((resolve, reject) => {
+		const win = window as unknown as { echarts?: EChartsConstructor };
 		if (win.echarts) {
 			resolve(win.echarts);
 			return;

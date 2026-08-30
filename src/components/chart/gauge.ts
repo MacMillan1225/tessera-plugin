@@ -113,7 +113,7 @@ function buildGaugeOption(
 					},
 				data: [{ value: percent, name: "" }],
 			},
-		],
+		] as EChartsOption["series"],
 		tooltip: flags.showTooltip === false ? undefined : lieflatTooltip(theme),
 	};
 }

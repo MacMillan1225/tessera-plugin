@@ -16,6 +16,7 @@ export default tseslint.config(
 		'tsconfig.json',
 		'docs/**',  // Ignore reference documentation
 		'reference/**',  // Ignore design reference assets & example skills
+		'lib/**',  // Ignore vendored runtime libraries (ECharts)
 	]),
 	{
 		languageOptions: {

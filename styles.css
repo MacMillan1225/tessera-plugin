@@ -449,6 +449,15 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
    ========================================================================== */
 
 .ts-progressbar {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	width: var(--ts-progressbar-width, 100%);
+	color: var(--ts-progressbar-text-current, var(--text-normal));
+	font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+}
+
+.ts-progressbar__track {
 	background: var(
 		--ts-progressbar-background-current,
 		var(--ts-progressbar-background-light, #e7e5e4)
@@ -459,12 +468,10 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 			var(--ts-progressbar-border-light, transparent)
 		);
 	border-radius: var(--ts-progressbar-radius, 4px);
-	display: block;
-	font-family: var(--ts-font-ui, var(--ts-font-body, var(--font-interface)));
+	flex: 1 1 auto;
 	height: var(--ts-progressbar-height, 8px);
 	overflow: hidden;
 	position: relative;
-	color: var(--ts-progressbar-text-current, var(--text-normal));
 }
 
 body.theme-light .ts-progressbar {
@@ -491,6 +498,20 @@ body.theme-dark .ts-progressbar {
 	);
 	--ts-progressbar-accent-current: var(--ts-progressbar-accent-dark, var(--text-normal));
 	--ts-progressbar-text-current: var(--ts-progressbar-text-dark, var(--text-normal));
+}
+
+/* Progressbar Label */
+.ts-progressbar__label {
+	color: var(--ts-progressbar-text-current, var(--text-normal));
+	flex: 0 0 auto;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.ts-progressbar--no-label .ts-progressbar__label {
+	display: none;
 }
 
 /* Progressbar Fill */
@@ -542,6 +563,26 @@ body.theme-dark .ts-progressbar {
 	to {
 		background-position: 18px 0, 0 0;
 	}
+}
+
+/* Progressbar Label */
+.ts-progressbar {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+}
+
+.ts-progressbar__label {
+	color: var(--ts-progressbar-text-current, var(--text-normal));
+	flex: 0 0 auto;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.ts-progressbar--no-label .ts-progressbar__label {
+	display: none;
 }
 
 /* ==========================================================================

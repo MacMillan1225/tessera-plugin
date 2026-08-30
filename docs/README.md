@@ -213,6 +213,8 @@ TesseraScript 配置
 ### 组合组件
 
 ```dataviewjs
+const data = { "2026-08-24": 5, "2026-08-25": 8, "2026-08-26": 3, "2026-08-27": 6 };  // 日期 → 数值（自适应窗口内）
+
 const dashboard = document.createElement("div");
 dashboard.style.cssText = "display:grid;grid-template-columns:repeat(2,1fr);gap:16px";
 
@@ -245,7 +247,9 @@ dv.container.appendChild(cardEl);
 部分组件支持响应式属性，赋值自动刷新：
 
 ```dataviewjs
-const bar = tessera.chart.bar({ data });
+const bar = tessera.chart.bar({
+  data: { labels: ["A", "B", "C"], values: [4, 7, 3] },
+});
 dv.container.appendChild(bar);
 bar.data = { labels: ["X", "Y"], values: [1, 2] };  // 自动重渲染
 ```
@@ -257,11 +261,12 @@ bar.data = { labels: ["X", "Y"], values: [1, 2] };  // 自动重渲染
 组件根元素有稳定的 class（`.ts-card`、`.ts-heatmap`、`.ts-progressbar`、`.ts-chart ts-chart-line` 等），颜色走 CSS 变量。可用 `styles` 选项直接注入内联样式：
 
 ```dataviewjs
-tessera.core.card({
+const card = tessera.core.card({
   title: "自定义",
   styles: { card: { marginBottom: "8px" } },
   colors: { light: { background: "#ffffff" } },
 });
+dv.container.appendChild(card);
 ```
 
 ## 检查状态

@@ -9,7 +9,7 @@ import { heatmap } from "./components/heatmap/index";
 import { progressbar } from "./components/progressbar/index";
 import { createChartGroup } from "./components/chart/index";
 
-import type { PluginSettings, TesseraAPI, ComponentKey } from "./settings";
+import type { PluginSettings, TesseraAPI } from "./settings";
 import { DEFAULT_SETTINGS, TesseraSettingTab } from "./settings";
 
 // ============================================================================

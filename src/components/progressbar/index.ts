@@ -120,12 +120,35 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 		},
 	});
 
+	// Visible label (rendered when showLabel !== false)
+	const labelEl = createElement("span", {
+		className: "ts-progressbar__label",
+		text: formatLabel(options.labelFormat ?? PROGRESSBAR_DEFAULTS.labelFormat, progress.ratio, progress.percent),
+	});
+
+	// Track (visual progress bar)
+	const track = createElement("div", {
+		className: "ts-progressbar__track",
+		style: {
+			"--ts-progressbar-height": layout.height || "10px",
+			"--ts-progressbar-radius": layout.radius || "999px",
+			"--ts-progressbar-background-light": colors.light.background,
+			"--ts-progressbar-background-dark": colors.dark.background,
+			"--ts-progressbar-border-light": colors.light.border,
+			"--ts-progressbar-border-dark": colors.dark.border,
+			"--ts-progressbar-accent-light": colors.light.accent,
+			"--ts-progressbar-accent-dark": colors.dark.accent,
+		},
+		children: fill,
+	});
+
 	// Create root element
 	const root = createElement("div", {
 		className: [
 			"ts-progressbar",
 			flags.showAnimated === false && "ts-progressbar--static",
 			flags.showStriped === true && "ts-progressbar--striped",
+			flags.showLabel === false && "ts-progressbar--no-label",
 			options.className,
 		].filter(Boolean) as string[],
 		attrs: {
@@ -138,18 +161,10 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 		style: {
 			...styles.root,
 			width: layout.width || "100%",
-			"--ts-progressbar-height": layout.height || "10px",
-			"--ts-progressbar-radius": layout.radius || "999px",
-			"--ts-progressbar-background-light": colors.light.background,
-			"--ts-progressbar-background-dark": colors.dark.background,
-			"--ts-progressbar-border-light": colors.light.border,
-			"--ts-progressbar-border-dark": colors.dark.border,
 			"--ts-progressbar-text-light": colors.light.text,
 			"--ts-progressbar-text-dark": colors.dark.text,
-			"--ts-progressbar-accent-light": colors.light.accent,
-			"--ts-progressbar-accent-dark": colors.dark.accent,
 		},
-		children: fill,
+		children: [track, labelEl],
 	});
 
 	// Expose parts
@@ -167,6 +182,11 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 		root.setAttribute(
 			"aria-label",
 			formatLabel(options.labelFormat ?? PROGRESSBAR_DEFAULTS.labelFormat, progress.ratio, progress.percent),
+		);
+		labelEl.textContent = formatLabel(
+			options.labelFormat ?? PROGRESSBAR_DEFAULTS.labelFormat,
+			progress.ratio,
+			progress.percent,
 		);
 	}
 
