@@ -105,7 +105,7 @@ function replaceBodyContent(
 	bodySection: HTMLElement,
 	protectedNode: HTMLElement,
 	newContent: unknown,
-	emptyEl: HTMLElement,
+	emptyEl: HTMLElement | null,
 ): void {
 	// Remove every child except the protected node
 	for (const child of Array.from(bodySection.childNodes)) {
@@ -114,8 +114,12 @@ function replaceBodyContent(
 		}
 	}
 
-	if (newContent == null) {
-		bodySection.appendChild(emptyEl);
+	// Empty state is opt-in: only rendered when the caller passed an
+	// `emptyText` (dashboards use cards as pure stat/value blocks).
+	if (newContent == null || emptyEl == null) {
+		if (emptyEl != null) {
+			bodySection.appendChild(emptyEl);
+		}
 		return;
 	}
 
@@ -205,11 +209,14 @@ export function card(options: CardOptions = {}): CardInstance {
 
 	const initialContentItems = normalizeChildren(_content);
 
-	const emptyEl = createElement("div", {
-		className: "ts-card__empty",
-		style: styles.empty,
-		text: options.emptyText || "No content",
-	});
+	// Empty state is opt-in — only rendered when the caller passed `emptyText`.
+	const emptyEl = options.emptyText != null
+		? createElement("div", {
+			className: "ts-card__empty",
+			style: styles.empty,
+			text: options.emptyText,
+		})
+		: null;
 
 	const bodySection = createElement("section", {
 		className: "ts-card__body",
@@ -217,7 +224,9 @@ export function card(options: CardOptions = {}): CardInstance {
 		children:
 			initialContentItems.length > 0
 				? [valueEl, ...initialContentItems]
-				: [valueEl, emptyEl],
+				: emptyEl
+					? [valueEl, emptyEl]
+					: [valueEl],
 	});
 
 	// ---- Card element -------------------------------------------------------

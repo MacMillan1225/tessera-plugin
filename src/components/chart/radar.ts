@@ -51,6 +51,20 @@ export interface RadarInstance extends HTMLElement {
 }
 
 // ============================================================================
+// Geometry Constants (must mirror buildRadarOption's radar config — the snap
+// math in the component relies on the same center/radius/angles)
+// ============================================================================
+
+/** Radar center X as a fraction of canvas width. */
+const RADAR_CENTER_X = 0.5;
+/** Radar center Y as a fraction of canvas height. */
+const RADAR_CENTER_Y = 0.54;
+/** Radar radius as a fraction of min(canvas width, height) / 2. */
+const RADAR_RADIUS = 0.68;
+/** Vertex emphasis scale factor while a dimension is snapped. */
+const RADAR_SNAP_SCALE = 1.6;
+
+// ============================================================================
 // Option Builder
 // ============================================================================
 
@@ -164,8 +178,8 @@ function buildRadarOption(
 		radar: {
 			indicator: indicators,
 			splitNumber: 4,
-			center: ["50%", "54%"],
-			radius: "68%",
+			center: [`${RADAR_CENTER_X * 100}%`, `${RADAR_CENTER_Y * 100}%`],
+			radius: `${RADAR_RADIUS * 100}%`,
 			axisName: flags.showLabels === false
 				? { show: false }
 				: { color: text, fontSize: 10, padding: [4, 4] },
@@ -272,13 +286,96 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 			}
 
 			const zr = chart.getZr();
+			let activeDim = -1;
+
+			// ---- Vertex emphasis: scale the snapped dimension's symbols ----
+			// RadarView builds each symbol path centered on its origin with a
+			// base scale of symbolSize/2, so animate base * factor (never to an
+			// absolute scale) and remember the base on first touch.
+			const displayList = (): Array<Record<string, unknown>> => {
+				const storage = (zr as unknown as { storage?: { getDisplayList?: () => unknown[] } }).storage;
+				return (storage?.getDisplayList?.() ?? []) as Array<Record<string, unknown>>;
+			};
+
+			const animateDim = (dimIdx: number, factor: number): void => {
+				if (dimIdx < 0) return;
+				for (const el of displayList()) {
+					if (el.__dimIdx !== dimIdx) continue;
+					const target = el as {
+						scaleX?: number;
+						scaleY?: number;
+						__tsBaseScaleX?: number;
+						__tsBaseScaleY?: number;
+						animateTo?: (props: Record<string, number>, opts?: Record<string, unknown>) => void;
+					};
+					if (typeof target.animateTo !== "function") continue;
+					let baseX = target.__tsBaseScaleX;
+					let baseY = target.__tsBaseScaleY;
+					if (baseX == null || baseY == null) {
+						baseX = target.scaleX ?? 1;
+						baseY = target.scaleY ?? 1;
+						target.__tsBaseScaleX = baseX;
+						target.__tsBaseScaleY = baseY;
+					}
+					target.animateTo(
+						{ scaleX: baseX * factor, scaleY: baseY * factor },
+						{ duration: 160, easing: "cubicOut" },
+					);
+				}
+			};
+
+			// ---- Sector snap: nearest dimension by angle (mirrors ECharts'
+			// RadarCoordSystem math: startAngle 90°, counterclockwise, pixels
+			// x = cx + r·cos(a), y = cy − r·sin(a)) ----
+			const nearestDimension = (x: number, y: number): { dimIdx: number; maxDist: number; dist: number } => {
+				const rect = instance.parts.canvas.getBoundingClientRect();
+				const cx = rect.width * RADAR_CENTER_X;
+				const cy = rect.height * RADAR_CENTER_Y;
+				const r = (Math.min(rect.width, rect.height) / 2) * RADAR_RADIUS;
+				const dx = x - cx;
+				const dy = y - cy;
+				const dist = Math.hypot(dx, dy);
+				const n = _data.labels.length;
+
+				let best = -1;
+				let bestDiff = Number.POSITIVE_INFINITY;
+				if (n > 0) {
+					const cursorAngle = Math.atan2(-dy, dx);
+					for (let i = 0; i < n; i += 1) {
+						const angle = Math.PI / 2 + (i * 2 * Math.PI) / n;
+						const diff = Math.abs(Math.atan2(Math.sin(cursorAngle - angle), Math.cos(cursorAngle - angle)));
+						if (diff < bestDiff) {
+							bestDiff = diff;
+							best = i;
+						}
+					}
+				}
+				return { dimIdx: best, maxDist: r * 1.15, dist };
+			};
+
+			const leave = (): void => {
+				animateDim(activeDim, 1);
+				activeDim = -1;
+				hideTooltip();
+			};
+
 			zr.on("mousemove", (event: unknown) => {
-				const e = event as { target?: { __dimIdx?: number } | null; offsetX?: number; offsetY?: number };
-				const target = e.target;
-				const dimIdx = typeof target?.__dimIdx === "number" ? target.__dimIdx : -1;
-				if (dimIdx < 0 || dimIdx >= _data.labels.length) {
-					hideTooltip();
+				const e = event as { offsetX?: number; offsetY?: number };
+				const x = e.offsetX ?? 0;
+				const y = e.offsetY ?? 0;
+				const { dimIdx, maxDist, dist } = nearestDimension(x, y);
+
+				// Outside the radar area (with a small margin) — release everything
+				if (dimIdx < 0 || dist > maxDist) {
+					leave();
 					return;
+				}
+
+				// Snap: emphasize the nearest dimension's vertices
+				if (dimIdx !== activeDim) {
+					animateDim(activeDim, 1);
+					animateDim(dimIdx, RADAR_SNAP_SCALE);
+					activeDim = dimIdx;
 				}
 
 				const label = _data.labels[dimIdx] ?? "";
@@ -286,10 +383,10 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 				const values = _data.series?.length ? _data.series[0]?.values : _data.values;
 				const value = values?.[dimIdx];
 				const seriesName = _data.series?.length ? _data.series[0]?.name : undefined;
-				showTooltip(label, seriesName, valueToText(value), e.offsetX ?? 0, e.offsetY ?? 0);
+				showTooltip(label, seriesName, valueToText(value), x, y);
 			});
-			zr.on("mouseout", () => {
-				hideTooltip();
+			zr.on("globalout", () => {
+				leave();
 			});
 		};
 
@@ -308,7 +405,7 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 				if (chart) {
 					const zr = chart.getZr();
 					zr.off("mousemove");
-					zr.off("mouseout");
+					zr.off("globalout");
 				}
 				bound = false;
 			}

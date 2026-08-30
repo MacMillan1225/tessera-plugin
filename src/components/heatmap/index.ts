@@ -301,21 +301,23 @@ function ensureTooltip(id: string): HTMLElement {
 	return tooltip;
 }
 
-function positionTooltip(tooltip: HTMLElement, cell: HTMLElement): void {
-	const rect = cell.getBoundingClientRect();
+function positionTooltipAtCursor(id: string, x: number, y: number): void {
+	const tooltip = ensureTooltip(id);
 	const tipRect = tooltip.getBoundingClientRect();
 
-	let top = rect.top - tipRect.height - 8;
-	let left = rect.left + rect.width / 2 - tipRect.width / 2;
+	let left = x + 14;
+	let top = y + 16;
 
-	if (left < 10) left = 10;
 	if (left + tipRect.width > window.innerWidth - 10) {
-		left = window.innerWidth - tipRect.width - 10;
+		left = x - tipRect.width - 12;
 	}
-	if (top < 10) top = rect.bottom + 10;
+	if (top + tipRect.height > window.innerHeight - 10) {
+		top = y - tipRect.height - 12;
+	}
 
 	tooltip.style.left = `${left}px`;
 	tooltip.style.top = `${top}px`;
+	tooltip.classList.add("is-active");
 }
 
 function applyTooltipTheme(root: HTMLElement, tooltip: HTMLElement): void {
@@ -614,8 +616,8 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 		}, 50);
 	}
 
-	// Show tooltip for a cell
-	function showTooltip(cell: HTMLElement, context: HeatmapCellContext, visual: HeatmapCellStyle): void {
+	// Show tooltip content for a cell (rebuilds markup only when the hovered cell changes)
+	function showTooltipContent(context: HeatmapCellContext, visual: HeatmapCellStyle): void {
 		if (tooltipHideTimeout) {
 			window.clearTimeout(tooltipHideTimeout);
 			tooltipHideTimeout = null;
@@ -627,63 +629,66 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 			: defaultTooltipRenderer({ ...context, visual });
 
 		applyTooltipTheme(root, tooltip);
-		positionTooltip(tooltip, cell);
-		window.requestAnimationFrame(() => {
-			tooltip.classList.add("is-active");
-		});
 	}
 
-	// Event delegation for tooltips on grid
+	// Event delegation: chart-style tooltip that follows the pointer
 	if (flags.showTooltip !== false) {
-		gridEl.addEventListener("mouseover", (event) => {
+		let currentCell: HTMLElement | null = null;
+
+		gridEl.addEventListener("mousemove", (event) => {
 			const target = event.target as HTMLElement;
 			const cell = target.closest<HTMLElement>(".ts-heatmap__cell");
-			if (!cell || !cell.dataset.tooltipReady) return;
-
-			// Rebuild context for this cell
-			const dateKey = cell.dataset.dateKey;
-			if (!dateKey) return;
-
-			const date = normalizeDate(dateKey);
-			if (!date) return;
-
-			// Parse entry from dataset
-			let entry: HeatmapEntry | undefined;
-			try {
-				const entryData = cell.dataset.entry;
-				if (entryData && entryData !== "null") {
-					entry = JSON.parse(entryData) as HeatmapEntry;
+			if (!cell || !cell.dataset.tooltipReady) {
+				if (currentCell) {
+					currentCell = null;
+					clearTooltip();
 				}
-			} catch {
-				entry = undefined;
+				return;
 			}
 
-			const context: HeatmapCellContext = {
-				entry,
-				date,
-				dateKey,
-				theme: colors,
-				locale,
-			};
+			if (cell !== currentCell) {
+				currentCell = cell;
 
-			// Get visual from cell classes
-			const levelMatch = Array.from(cell.classList).find(c => c.startsWith("is-level-"));
-			const level = levelMatch ? parseInt(levelMatch.replace("is-level-", ""), 10) : 0;
-			const visual: HeatmapCellStyle = { level };
+				// Rebuild context for this cell
+				const dateKey = cell.dataset.dateKey;
+				if (!dateKey) return;
 
-			showTooltip(cell, context, visual);
+				const date = normalizeDate(dateKey);
+				if (!date) return;
+
+				// Parse entry from dataset
+				let entry: HeatmapEntry | undefined;
+				try {
+					const entryData = cell.dataset.entry;
+					if (entryData && entryData !== "null") {
+						entry = JSON.parse(entryData) as HeatmapEntry;
+					}
+				} catch {
+					entry = undefined;
+				}
+
+				const context: HeatmapCellContext = {
+					entry,
+					date,
+					dateKey,
+					theme: colors,
+					locale,
+				};
+
+				// Get visual from cell classes
+				const levelMatch = Array.from(cell.classList).find(c => c.startsWith("is-level-"));
+				const level = levelMatch ? parseInt(levelMatch.replace("is-level-", ""), 10) : 0;
+				const visual: HeatmapCellStyle = { level };
+
+				showTooltipContent(context, visual);
+			}
+
+			// Follow the pointer (chart-tooltip behavior)
+			positionTooltipAtCursor(tooltipId, event.clientX, event.clientY);
 		});
 
-		gridEl.addEventListener("mouseout", (event) => {
-			const target = event.target as HTMLElement;
-			const cell = target.closest(".ts-heatmap__cell");
-			if (!cell) return;
-
-			// Check if we're moving to another cell
-			const relatedTarget = event.relatedTarget as HTMLElement | null;
-			if (relatedTarget && relatedTarget.closest(".ts-heatmap__cell")) {
-				return; // Moving to another cell, don't hide
-			}
+		gridEl.addEventListener("mouseleave", () => {
+			currentCell = null;
 			clearTooltip();
 		});
 	}

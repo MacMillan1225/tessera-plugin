@@ -4,11 +4,27 @@
  */
 
 /* ==========================================================================
+   Typography Tokens — single font management point.
+   Override these variables (e.g. in a CSS snippet) to swap component fonts.
+   ========================================================================== */
+
+body {
+	/* Interface text (labels, list items, tooltips) */
+	--ts-font-ui: var(--font-interface);
+	/* Long-form body text inside cards */
+	--ts-font-body: var(--font-text, var(--font-interface));
+	/* Card & section titles */
+	--ts-font-title: var(--font-interface);
+	/* Numeric values, badges, monospace metadata */
+	--ts-font-mono: "JetBrains Mono", "Cascadia Mono", "SF Mono", "Fira Code", "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+
+/* ==========================================================================
    Base Container
    ========================================================================== */
 
 .ts-container {
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 	color: var(--text-normal);
 	line-height: 1.5;
 }
@@ -508,6 +524,7 @@ body.theme-dark .ts-progressbar {
 	font-weight: 600;
 	line-height: 1;
 	white-space: nowrap;
+	font-family: var(--ts-font-mono, var(--font-monospace));
 }
 
 .ts-progressbar--no-label .ts-progressbar__label {
@@ -565,26 +582,6 @@ body.theme-dark .ts-progressbar {
 	}
 }
 
-/* Progressbar Label */
-.ts-progressbar {
-	align-items: center;
-	display: flex;
-	gap: 8px;
-}
-
-.ts-progressbar__label {
-	color: var(--ts-progressbar-text-current, var(--text-normal));
-	flex: 0 0 auto;
-	font-size: 11px;
-	font-weight: 600;
-	line-height: 1;
-	white-space: nowrap;
-}
-
-.ts-progressbar--no-label .ts-progressbar__label {
-	display: none;
-}
-
 /* ==========================================================================
    List Component
    ========================================================================== */
@@ -599,7 +596,7 @@ body.theme-dark .ts-progressbar {
 	border-radius: var(--ts-list-radius, 12px);
 	padding: var(--ts-list-padding, 14px);
 	color: var(--ts-list-text-current, var(--ts-list-light-text, var(--text-normal)));
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 	max-width: 100%;
 }
 
@@ -617,10 +614,13 @@ body.theme-dark .ts-list {
 	--ts-list-accent-current: var(--ts-list-dark-accent, var(--text-normal));
 }
 
-.ts-list__items {
+/* Double class selector: beats Obsidian's `.markdown-rendered ul` indent,
+   which otherwise re-applies its `padding-inline-start` to our list. */
+.ts-list ul.ts-list__items {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	padding-inline-start: 0;
 	display: flex;
 	flex-direction: column;
 	gap: var(--ts-list-gap, 8px);
@@ -628,7 +628,7 @@ body.theme-dark .ts-list {
 
 .ts-list__item {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	gap: 10px;
 	padding: 2px 6px;
 	margin: 0 -6px;
@@ -659,8 +659,6 @@ body.theme-dark .ts-list {
 	height: var(--ts-list-bullet-size, 5px);
 	border-radius: 50%;
 	background: var(--ts-list-accent-current, var(--text-normal));
-	align-self: center;
-	margin-top: 0.35em;
 }
 
 .ts-list--no-bullets .ts-list__bullet {
@@ -680,6 +678,7 @@ body.theme-dark .ts-list {
 	font-weight: 600;
 	color: var(--ts-text-muted, var(--text-muted));
 	font-variant-numeric: tabular-nums;
+	font-family: var(--ts-font-mono, var(--font-monospace));
 	white-space: nowrap;
 }
 
@@ -703,7 +702,7 @@ body.theme-dark .ts-list {
 	border-radius: var(--ts-tags-radius, 12px);
 	padding: var(--ts-tags-padding, 12px);
 	color: var(--ts-tags-text-current, var(--ts-tags-light-text, var(--text-normal)));
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 	max-width: 100%;
 }
 
@@ -780,7 +779,7 @@ body.theme-dark .ts-tags {
    ========================================================================== */
 
 .tessera-notice {
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 }
 
 .tessera-notice pre {
@@ -923,7 +922,7 @@ body.theme-dark .ts-tags {
 
 .ts-chart {
 	display: block;
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 	color: var(--text-normal);
 }
 
@@ -947,7 +946,7 @@ body.theme-dark .ts-tags {
 	padding: 8px 12px;
 	font-size: 12px;
 	line-height: 1.5;
-	font-family: var(--font-interface);
+	font-family: var(--ts-font-ui, var(--font-interface));
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	opacity: 0;
 	transition: opacity 0.15s ease;
