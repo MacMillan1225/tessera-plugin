@@ -1,269 +1,110 @@
-# Obsidian community plugin
+# TesseraScript 插件开发指南（AGENTS.md）
 
-## Project overview
+## 项目概述
 
-- Target: Obsidian Community Plugin (TypeScript → bundled JavaScript).
-- Entry point: `src/main.ts` compiled to `main.js` and loaded by Obsidian.
-- Required release artifacts: `main.js`, `manifest.json`, and optional `styles.css`.
+TesseraScript 是 Obsidian 组件库插件：在 `dataviewjs` 代码块中通过 `window.tessera` 全局对象调用组件（卡片、热力图、进度条、列表、标签、折线/柱状/刻度盘/玫瑰/雷达图），快速搭建个人看板。
 
-## Environment & tooling
+- **入口**：`src/main.ts` → `main.js`（esbuild 打包，Obsidian 加载）
+- **发布产物**：`main.js` + `manifest.json` + `styles.css` + `lib/echarts.min.js`
+- **硬依赖**：Dataview 插件（缺失时 `onload` 提示并退出）
+- **视觉风格**：Lieflat 单色克制风（ADR-0001）：无边框靠背景色差分层、大圆角、hover 克制、自动适配明暗主题
+- **文档**：`docs/README.md`（用户手册）、`docs/ARCHITECTURE.md`（架构）、`docs/CONFIGURATION.md`（全部配置字段）、`docs/decisions/`（ADR-0001~0005）、`docs/COMPONENT_DEVELOPMENT_GUIDE.md`（新增组件教程）
 
-- Node.js: use current LTS (Node 18+ recommended).
-- **Package manager: npm** (required for this sample - `package.json` defines npm scripts and dependencies).
-- **Bundler: esbuild** (required for this sample - `esbuild.config.mjs` and build scripts depend on it). Alternative bundlers like Rollup or webpack are acceptable for other projects if they bundle all external dependencies into `main.js`.
-- Types: `obsidian` type definitions.
+## 环境与命令
 
-**Note**: This sample project has specific technical dependencies on npm and esbuild. If you're creating a plugin from scratch, you can choose different tools, but you'll need to replace the build configuration accordingly.
+- Node.js 18+，npm
+- `npm run dev`：watch 模式（esbuild）
+- `npm run build`：tsc 类型检查 + esbuild 生产打包（**tsc 失败会短路，不产出 main.js**）
+- `npm run lint`：eslint（obsidianmd 规则集，零警告是硬要求）
+- 版本发布：`npm version <x.y.z>`（触发 version-bump.mjs 同步 manifest/versions.json）→ 打 tag → GitHub Release（release.yml 自动构建并附带 lib/）
 
-### Install
+## 目录结构
 
-```bash
-npm install
+```
+src/
+├── main.ts                    # 生命周期 + window.tessera 构建 + 设置注册（保持精简）
+├── components/
+│   ├── core/                  # tessera.core.{card,heatmap,progressbar,list,tags}
+│   │   ├── <name>.ts          # 每个组件一个文件（工厂函数 + 类型）
+│   │   ├── config.ts          # 全部 core 组件的默认配置（单一数据源）
+│   │   └── index.ts           # barrel re-export
+│   └── chart/                 # tessera.chart.{line,bar,gauge,rose,radar}
+│       ├── loader.ts          # ECharts UMD 懒加载（<script> 注入，单例缓存）
+│       ├── shared.ts          # createChartBase 公共生命周期 + lieflatTooltip
+│       ├── config.ts          # 全部图表默认配置
+│       ├── index.ts           # createChartGroup 工厂
+│       └── <name>.ts          # 每个图表一个文件
+├── settings/
+│   ├── types.ts               # PluginSettings / TesseraAPI / 组件类型
+│   ├── fields.ts              # COMPONENTS 字段定义 + GROUPS + DEFAULT_SETTINGS
+│   ├── settings-tab.ts        # 设置面板（分组→组件→字段层级渲染）
+│   ├── i18n.ts / color-utils.ts
+├── i18n/{en,ja,zh}.json       # 三语设置界面文案
+└── utils/dom.ts               # createElement 等 DOM 工具
+types/global.d.ts              # window.tessera 全局类型
+lib/echarts.min.js             # ECharts UMD（vendored，运行时懒加载，不入 bundle）
+styles.css                     # 全部组件样式（ts- 前缀）+ 设置面板样式（tessera- 前缀）
+skills/tessera-dashboard/      # AI skill：让 AI 基于本插件生成看板
+examples/DASHBOARDS.md         # 可直接运行的完整看板示例
 ```
 
-### Dev (watch)
+## 核心约定（改代码前必读）
 
-```bash
-npm run dev
-```
+### 组件工厂模式（core 组件）
+每个组件是一个 `export function <name>(options): <Name>Instance`：
+1. `const flags = { ...X_DEFAULTS.flags, ...options.flags }`（三段合并：flags/layout/colors，其余直接取）
+2. 用 `createElement`（src/utils/dom.ts）构建 DOM；根元素带 `ts-<name>` class
+3. 颜色经 `resolveThemeColors`（共享键 background/border/text/accent + 主题拆分）
+4. 响应式属性用 `Object.defineProperty(instance, "key", { get, set })`，set 触发重渲染
+5. 暴露 `.parts`（内部 DOM 引用）与 `.destroy()`（清理 observer/timer）
+6. 主题切换用 `MutationObserver(document.body, { attributeFilter: ["class"] })`
 
-### Production build
+### 图表组件模式（chart 分组）
+复用 `createChartBase`（shared.ts）：自动处理懒加载/init/主题/ResizeObserver/destroy。只需：
+1. `build<Name>Option(...): EChartsOption` 纯函数
+2. 工厂内 `createChartBase({ className, maxWidth, height, colors, buildOption })`
+3. tooltip 统一 `lieflatTooltip(theme)`；数据统一 `ChartData { labels, values, series? }`
 
-```bash
-npm run build
-```
+### 新增组件六步（详见 COMPONENT_DEVELOPMENT_GUIDE.md）
+1. `config.ts` 加 `X_DEFAULTS`（`as const`，语义键）→ 组件文件
+2. `settings/types.ts`：`ComponentKey` + `PluginSettings` + `Translations.components` + `TesseraAPI`
+3. `settings/fields.ts`：`COMPONENTS` 字段 + `GROUPS` 数组 + `DEFAULT_SETTINGS`
+4. `settings-tab.ts` 自动渲染（GROUPS 驱动，无需改）
+5. `main.ts`：分组内挂工厂（包 `mergeComponentConfig`）+ `loadSettings` + check-status
+6. i18n 三语 JSON 同步（缺失键会 console.warn，须清零）+ styles.css 样式
 
-## Linting
+### 配置与版本
+- 配置优先级：`options > 插件设置 > DEFAULT_SETTINGS`（main.ts 包装层深合并）
+- `PluginSettings.version` 是**破坏性变更门槛**：字段结构变化时必须递增，旧配置整体重置
+- 当前 version：**4**（core 重构后）；manifest 版本 1.15.0
+- `data.json` 由 Obsidian 管理（gitignore），只存被修改过的字段
 
-- ESLint is preconfigured with `eslint-plugin-obsidianmd` for Obsidian-specific rules.
-- Run `npm run lint` to lint the project.
-- A GitHub Action automatically lints every commit on all branches.
+### 样式约定
+- 组件类：`ts-` 前缀；设置面板类：`tessera-` 前缀
+- CSS 变量：`--ts-<name>-<key>-light/dark`（主题分离），使用处 `var(--ts-<name>-<key>-current)` 或按 `body.theme-light/dark` 选择
+- 颜色统一语义键：`background / border / text / accent`（chart 另加 grid/track/series）
+- 字体：`var(--ts-font-ui/body/title/mono)`（含 CJK 回退链）
 
-## File & folder conventions
+### 代码质量
+- `"strict": true`；`noUncheckedIndexedAccess` 启用（数组访问需处理 undefined）
+- 禁止 `any`/`@ts-ignore`/`console.log`；lint 零警告（obsidianmd 规则：sentence case、no-global-this、稳定命令 ID）
+- 文件 ≤200-300 行；main.ts 保持精简
+- 单文件改动后跑 `npm run build && npm run lint`（或全量）
 
-- **Organize code into multiple files**: Split functionality across separate modules rather than putting everything in `main.ts`.
-- Source lives in `src/`. Keep `main.ts` small and focused on plugin lifecycle (loading, unloading, registering commands).
-- **Example file structure**:
-    ```
-    src/
-      main.ts           # Plugin entry point, lifecycle management
-      settings.ts       # Settings interface and defaults
-      commands/         # Command implementations
-        command1.ts
-        command2.ts
-      ui/              # UI components, modals, views
-        modal.ts
-        view.ts
-      utils/           # Utility functions, helpers
-        helpers.ts
-        constants.ts
-      types.ts         # TypeScript interfaces and types
-    ```
-- **Do not commit build artifacts**: Never commit `node_modules/`, `main.js`, or other generated files to version control.
-- Keep the plugin small. Avoid large dependencies. Prefer browser-compatible packages.
-- Generated output should be placed at the plugin root or `dist/` depending on your build setup. Release artifacts must end up at the top level of the plugin folder in the vault (`main.js`, `manifest.json`, `styles.css`).
+## 提交规范
 
-## Manifest rules (`manifest.json`)
+- 中文提交信息，前缀：`feat:` / `fix:` / `refactor:` / `style:` / `docs:` / `chore:` / `test:`
+- 每阶段：改 → build → lint → 提交
 
-- Must include (non-exhaustive):
-    - `id` (plugin ID; for local dev it should match the folder name)
-    - `name`
-    - `version` (Semantic Versioning `x.y.z`)
-    - `minAppVersion`
-    - `description`
-    - `isDesktopOnly` (boolean)
-    - Optional: `author`, `authorUrl`, `fundingUrl` (string or map)
-- Never change `id` after release. Treat it as stable API.
-- Keep `minAppVersion` accurate when using newer APIs.
-- Canonical requirements are coded here: https://github.com/obsidianmd/obsidian-releases/blob/master/.github/workflows/validate-plugin-entry.yml
+## 安全与合规
 
-## Testing
+- 全本地运行，无网络请求（ECharts 从插件自带 lib/ 懒加载）
+- 不读取 vault 外文件；无遥测
+- 所有 listener/observer 必须可清理（destroy/onunload 断开）
 
-- Manual install for testing: copy `main.js`, `manifest.json`, `styles.css` (if any) to:
-    ```
-    <Vault>/.obsidian/plugins/<plugin-id>/
-    ```
-- Reload Obsidian and enable the plugin in **Settings → Community plugins**.
+## 常见任务
 
-## Commands & settings
-
-- Any user-facing commands should be added via `this.addCommand(...)`.
-- If the plugin has configuration, provide a settings tab and sensible defaults.
-- Persist settings using `this.loadData()` / `this.saveData()`.
-- Use stable command IDs; avoid renaming once released.
-
-## Versioning & releases
-
-- Bump `version` in `manifest.json` (SemVer) and update `versions.json` to map plugin version → minimum app version.
-- Create a GitHub release whose tag exactly matches `manifest.json`'s `version`. Do not use a leading `v`.
-- Attach `manifest.json`, `main.js`, and `styles.css` (if present) to the release as individual assets.
-- After the initial release, follow the process to add/update your plugin in the community catalog as required.
-
-## Security, privacy, and compliance
-
-Follow Obsidian's **Developer Policies** and **Plugin Guidelines**. In particular:
-
-- Default to local/offline operation. Only make network requests when essential to the feature.
-- No hidden telemetry. If you collect optional analytics or call third-party services, require explicit opt-in and document clearly in `README.md` and in settings.
-- Never execute remote code, fetch and eval scripts, or auto-update plugin code outside of normal releases.
-- Minimize scope: read/write only what's necessary inside the vault. Do not access files outside the vault.
-- Clearly disclose any external services used, data sent, and risks.
-- Respect user privacy. Do not collect vault contents, filenames, or personal information unless absolutely necessary and explicitly consented.
-- Avoid deceptive patterns, ads, or spammy notifications.
-- Register and clean up all DOM, app, and interval listeners using the provided `register*` helpers so the plugin unloads safely.
-
-## UX & copy guidelines (for UI text, commands, settings)
-
-- Prefer sentence case for headings, buttons, and titles.
-- Use clear, action-oriented imperatives in step-by-step copy.
-- Use **bold** to indicate literal UI labels. Prefer "select" for interactions.
-- Use arrow notation for navigation: **Settings → Community plugins**.
-- Keep in-app strings short, consistent, and free of jargon.
-
-## Performance
-
-- Keep startup light. Defer heavy work until needed.
-- Avoid long-running tasks during `onload`; use lazy initialization.
-- Batch disk access and avoid excessive vault scans.
-- Debounce/throttle expensive operations in response to file system events.
-
-## Coding conventions
-
-- TypeScript with `"strict": true` preferred.
-- **Keep `main.ts` minimal**: Focus only on plugin lifecycle (onload, onunload, addCommand calls). Delegate all feature logic to separate modules.
-- **Split large files**: If any file exceeds ~200-300 lines, consider breaking it into smaller, focused modules.
-- **Use clear module boundaries**: Each file should have a single, well-defined responsibility.
-- Bundle everything into `main.js` (no unbundled runtime deps).
-- Avoid Node/Electron APIs if you want mobile compatibility; set `isDesktopOnly` accordingly.
-- Prefer `async/await` over promise chains; handle errors gracefully.
-
-## Mobile
-
-- Where feasible, test on iOS and Android.
-- Don't assume desktop-only behavior unless `isDesktopOnly` is `true`.
-- Avoid large in-memory structures; be mindful of memory and storage constraints.
-
-## Agent do/don't
-
-**Do**
-
-- Add commands with stable IDs (don't rename once released).
-- Provide defaults and validation in settings.
-- Write idempotent code paths so reload/unload doesn't leak listeners or intervals.
-- Use `this.register*` helpers for everything that needs cleanup.
-
-**Don't**
-
-- Introduce network calls without an obvious user-facing reason and documentation.
-- Ship features that require cloud services without clear disclosure and explicit opt-in.
-- Store or transmit vault contents unless essential and consented.
-
-## Common tasks
-
-### Organize code across multiple files
-
-**main.ts** (minimal, lifecycle only):
-
-```ts
-import { Plugin } from 'obsidian';
-import { MySettings, DEFAULT_SETTINGS } from './settings';
-import { registerCommands } from './commands';
-
-export default class MyPlugin extends Plugin {
-	settings!: MySettings;
-
-	async onload() {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<MySettings>,
-		);
-		registerCommands(this);
-	}
-}
-```
-
-**settings.ts**:
-
-```ts
-export interface MySettings {
-	enabled: boolean;
-	apiKey: string;
-}
-
-export const DEFAULT_SETTINGS: MySettings = {
-	enabled: true,
-	apiKey: '',
-};
-```
-
-**commands/index.ts**:
-
-```ts
-import { Plugin } from 'obsidian';
-import { doSomething } from './my-command';
-
-export function registerCommands(plugin: Plugin) {
-	plugin.addCommand({
-		id: 'do-something',
-		name: 'Do something',
-		callback: () => doSomething(plugin),
-	});
-}
-```
-
-### Add a command
-
-```ts
-this.addCommand({
-	id: 'your-command-id',
-	name: 'Do the thing',
-	callback: () => this.doTheThing(),
-});
-```
-
-### Persist settings
-
-```ts
-interface MySettings { enabled: boolean }
-const DEFAULT_SETTINGS: MySettings = { enabled: true };
-
-async onload() {
-  this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<MySettings>);
-  await this.saveData(this.settings);
-}
-```
-
-### Register listeners safely
-
-```ts
-this.registerEvent(
-	this.app.workspace.on('file-open', (f) => {
-		/* ... */
-	}),
-);
-this.registerDomEvent(activeWindow, 'resize', () => {
-	/* ... */
-});
-this.registerInterval(
-	window.setInterval(() => {
-		/* ... */
-	}, 1000),
-);
-```
-
-## Troubleshooting
-
-- Plugin doesn't load after build: ensure `main.js` and `manifest.json` are at the top level of the plugin folder under `<Vault>/.obsidian/plugins/<plugin-id>/`.
-- Build issues: if `main.js` is missing, run `npm run build` or `npm run dev` to compile your TypeScript source code.
-- Commands not appearing: verify `addCommand` runs after `onload` and IDs are unique.
-- Settings not persisting: ensure `loadData`/`saveData` are awaited and you re-render the UI after changes.
-- Mobile-only issues: confirm you're not using desktop-only APIs; check `isDesktopOnly` and adjust.
-
-## References
-
-- Obsidian sample plugin: https://github.com/obsidianmd/obsidian-sample-plugin
-- API documentation: https://docs.obsidian.md
-- Developer policies: https://docs.obsidian.md/Developer+policies
-- Plugin guidelines: https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines
-- Style guide: https://help.obsidian.md/style-guide
+- **改组件配置**：config.ts 改默认 → fields.ts 加字段（dot-path）→ i18n 加词条（fields + tooltip）→ 递增 version（如需重置用户配置）
+- **加图表组件**：见 COMPONENT_DEVELOPMENT_GUIDE.md §5（pie 完整示例）
+- **发布新版本**：`npm version patch/minor` → `git push --tags` → release.yml 自动构建（含 lib/）→ 在 GitHub 确认 draft release
+- **更新 ECharts**：`npm i -D echarts@latest` → 复制 `node_modules/echarts/dist/echarts.min.js` → `lib/echarts.min.js`（**禁止运行时 import echarts**，仅 `import type`）

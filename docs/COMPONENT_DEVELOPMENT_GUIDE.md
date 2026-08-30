@@ -21,7 +21,7 @@
 每个组件一个目录，统一约定：
 
 ```
-src/components/<name>/
+src/components/core/
 ├── config.ts    # 默认配置（单一数据源，as const）
 ├── index.ts     # 组件工厂函数 + Options/Instance 类型
 └── style.css    # （可选）组件专用样式——当前全部集中在 styles.css
@@ -37,7 +37,7 @@ src/components/<name>/
 ### 步骤 1：创建 config.ts（默认配置）
 
 ```typescript
-// src/components/badge/config.ts
+// src/components/core/config.ts (以 badge 为例，合并于同一文件)
 export const BADGE_DEFAULTS = {
 	text: "",
 	flags: {
@@ -73,7 +73,7 @@ export const BADGE_DEFAULTS = {
 ### 步骤 2：创建 index.ts（组件工厂）
 
 ```typescript
-// src/components/badge/index.ts
+// src/components/core/badge.ts
 import { createElement } from "../../utils/dom";
 import { BADGE_DEFAULTS } from "./config";
 

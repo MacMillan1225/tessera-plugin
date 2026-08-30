@@ -43,7 +43,7 @@ export default class TesseraPlugin extends Plugin {
 		const echartsUrl = this.getEchartsUrl();
 
 		const tessera: TesseraAPI = {
-			version: "1.0.0",
+			version: this.manifest.version,
 			core: {
 				// Wrap each component to inject settings config as deep-merged defaults
 				card: coreEnabled && this.settings.card.enabled

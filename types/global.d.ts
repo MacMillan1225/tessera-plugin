@@ -2,11 +2,11 @@
  * Global type declarations for TesseraScript
  */
 
-import type { CardOptions, CardInstance } from "../src/components/card/index";
-import type { HeatmapOptions, HeatmapInstance } from "../src/components/heatmap/index";
-import type { ProgressbarOptions, ProgressbarInstance } from "../src/components/progressbar/index";
-import type { ListOptions, ListInstance } from "../src/components/list/index";
-import type { TagsOptions, TagsInstance } from "../src/components/tags/index";
+import type { CardOptions, CardInstance } from "../src/components/core/card";
+import type { HeatmapOptions, HeatmapInstance } from "../src/components/core/heatmap";
+import type { ProgressbarOptions, ProgressbarInstance } from "../src/components/core/progressbar";
+import type { ListOptions, ListInstance } from "../src/components/core/list";
+import type { TagsOptions, TagsInstance } from "../src/components/core/tags";
 import type { LineOptions, LineInstance } from "../src/components/chart/line";
 import type { BarOptions, BarInstance } from "../src/components/chart/bar";
 import type { GaugeOptions, GaugeInstance } from "../src/components/chart/gauge";

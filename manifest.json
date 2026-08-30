@@ -1,11 +1,11 @@
 {
 	"id": "tessera-script",
 	"name": "TesseraScript",
-	"version": "1.0.0",
+	"version": "1.15.0",
 	"minAppVersion": "1.13.0",
-	"description": "Modular component library for DataviewJS - Build beautiful dashboards, cards, heatmaps, and more",
-	"author": "TesseraScript",
-	"authorUrl": "https://github.com/tessera-script/tessera-plugin",
-	"fundingUrl": "https://github.com/tessera-script/tessera-plugin",
+	"description": "基于 DataviewJS 的组件库插件 - 卡片、热力图、进度条与图表，快速搭建个人看板",
+	"author": "猫佑Millan",
+	"authorUrl": "https://github.com/MacMillan1225",
+	"fundingUrl": "https://github.com/MacMillan1225/tessera-plugin",
 	"isDesktopOnly": false
 }

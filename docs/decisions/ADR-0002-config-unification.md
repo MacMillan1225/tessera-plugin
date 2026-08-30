@@ -30,7 +30,7 @@
 
 ## 相关文件
 
-- `src/components/{card,heatmap,progressbar}/config.ts`
+- `src/components/core/config.ts`
 - `src/settings/fields.ts`
 - `src/settings/types.ts`
 - `src/main.ts`（loadSettings 旧数据迁移）

@@ -37,5 +37,5 @@
 - `src/main.ts`
 - `src/settings/types.ts`
 - `types/global.d.ts`
-- `src/components/{card,heatmap,progressbar}/index.ts`
+- `src/components/core/index.ts`
 - `docs/README.md` 等

@@ -17,6 +17,7 @@ export default tseslint.config(
 		'docs/**',  // Ignore reference documentation
 		'reference/**',  // Ignore design reference assets & example skills
 		'lib/**',  // Ignore vendored runtime libraries (ECharts)
+		'tests/**',  // Test code runs in jsdom, not the Obsidian popout context
 	]),
 	{
 		languageOptions: {
@@ -25,7 +26,7 @@ export default tseslint.config(
 			},
 			parserOptions: {
 				projectService: {
-					allowDefaultProject: ['eslint.config.mts', 'manifest.json'],
+					allowDefaultProject: ['eslint.config.mts', 'manifest.json', 'vitest.config.ts'],
 				},
 				tsconfigRootDir: import.meta.dirname,
 				extraFileExtensions: ['.json'],

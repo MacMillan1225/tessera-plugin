@@ -380,7 +380,7 @@ dv.container.appendChild(tessera.chart.radar({
 
 | 文件 | 职责 |
 |------|------|
-| `src/components/<name>/config.ts` | 默认值（单一数据源） |
+| `src/components/core/config.ts` | 默认值（单一数据源） |
 | `src/settings/fields.ts` | 设置面板字段定义（引用 config.ts） |
 | `src/main.ts` | 加载/深合并/版本门槛 |
 | `src/settings/settings-tab.ts` | 渲染设置面板 |

@@ -16,7 +16,7 @@
 
 ## 决策
 
-1. **分组**: 新增 `tessera.chart` 分组（与 `tessera.core` 平级），受独立总开关 `chartEnabled` 控制（复用 ADR-0004 分组层级结构）。chart 关闭时四个 API 均为 `undefined`。
+1. **分组**: 新增 `tessera.chart` 分组（与 `tessera.core` 平级），受独立总开关 `chartEnabled` 控制（复用 ADR-0004 分组层级结构）。chart 关闭时五个 API 均为 `undefined`。
 2. **图表库选型: ECharts**（非 Chart.js）。理由：
    - lieflat 参考的 Petal Rose 正是 ECharts `roseType: "area"` 双层实现；Tick Gauge 参考亦可用 ECharts gauge 系列 1:1 还原
    - 一个库覆盖四种图，风格一致，SVG renderer 与 Obsidian 主题/阴影兼容性好
@@ -28,9 +28,9 @@
 
 ## 后果
 
-- 新增 `src/components/chart/`：`loader.ts`（懒加载）、`shared.ts`（公共生命周期）、`config.ts`（4 组默认配置）、`line.ts`/`bar.ts`/`gauge.ts`/`rose.ts`、`index.ts`（createChartGroup）。
-- `settings/types.ts`：`ComponentKey` 扩展 4 个图表键；`PluginSettings` 加 `chartEnabled` + 4 组件；`TesseraAPI` 加 `chart` 分组。`PluginSettings.version` 2→3。
-- `settings/fields.ts`：GROUPS 数组驱动（core + chart 两组渲染）；DEFAULT_SETTINGS 加 4 组件。
+- 新增 `src/components/chart/`：`loader.ts`（懒加载）、`shared.ts`（公共生命周期）、`config.ts`（5 组默认配置）、`line.ts`/`bar.ts`/`gauge.ts`/`rose.ts`/`radar.ts`、`index.ts`（createChartGroup）。
+- `settings/types.ts`：`ComponentKey` 扩展 5 个图表键；`PluginSettings` 加 `chartEnabled` + 5 组件；`TesseraAPI` 加 `chart` 分组。`PluginSettings.version` 2→3。
+- `settings/fields.ts`：GROUPS 数组驱动（core + chart 两组渲染）；DEFAULT_SETTINGS 加 5 组件。
 - `settings-tab.ts`：renderCoreGroup 泛化为 renderGroup（分组渲染由 GROUPS 数据驱动）。
 - `main.ts`：`getEchartsUrl()` 用 vault adapter 解析 lib 资源路径；createChartGroup 按 enabled 挂工厂；loadSettings/check-status 同步。
 - `lib/echarts.min.js` 从 node_modules 复制（更新流程见 DEVELOPMENT.md）；`import type` 保证不打进 bundle。
@@ -40,7 +40,7 @@
 
 ## 相关文件
 
-- `src/components/chart/*`（loader/shared/config/line/bar/gauge/rose/index）
+- `src/components/chart/*`（loader/shared/config/line/bar/gauge/rose/radar/index）
 - `src/main.ts`（getEchartsUrl / createChartGroup）
 - `src/settings/{types,fields,settings-tab}.ts`
 - `src/i18n/{en,zh,ja}.json`

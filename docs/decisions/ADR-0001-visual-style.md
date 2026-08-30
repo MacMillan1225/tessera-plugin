@@ -33,5 +33,5 @@
 ## 相关文件
 
 - `styles.css`
-- `src/components/{card,heatmap,progressbar}/config.ts`
-- `src/components/{card,heatmap,progressbar}/index.ts`（hover 交互逻辑如有）
+- `src/components/core/config.ts`
+- `src/components/core/index.ts`（hover 交互逻辑如有）

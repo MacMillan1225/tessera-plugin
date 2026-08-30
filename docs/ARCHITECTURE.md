@@ -28,14 +28,20 @@ Obsidian
     │   ├── tessera 全局对象构建    # core + chart 两个分组
     │   └── addCommand / addSettingTab
     ├── src/components/
-    │   ├── card/                   # tessera.core.card
-    │   ├── heatmap/                # tessera.core.heatmap
-    │   ├── progressbar/            # tessera.core.progressbar
-    │   └── chart/                  # tessera.chart.{line,bar,gauge,rose}
+    │   ├── core/                   # tessera.core.{card,heatmap,progressbar,list,tags}
+    │   │   ├── card.ts             # 卡片
+    │   │   ├── heatmap.ts          # 热力图
+    │   │   ├── progressbar.ts      # 进度条
+    │   │   ├── list.ts             # 列表
+    │   │   ├── tags.ts             # 标签
+    │   │   ├── config.ts           # 5 个核心组件默认配置（单一数据源）
+    │   │   └── index.ts            # barrel re-export
+    │   └── chart/                  # tessera.chart.{line,bar,gauge,rose,radar}
     │       ├── loader.ts           # ECharts 懒加载（<script> 注入）
     │       ├── shared.ts           # createChartBase 公共生命周期
-    │       ├── config.ts           # 4 个图表默认配置（mono 色板）
-    │       └── line/bar/gauge/rose.ts
+    │       ├── config.ts           # 5 个图表默认配置（mono 色板）
+    │       ├── index.ts            # createChartGroup 工厂
+    │       └── line/bar/gauge/rose/radar.ts
     ├── src/settings/               # 设置系统（fields/types/settings-tab/i18n）
     ├── src/i18n/{en,ja,zh}.json
     ├── src/utils/dom.ts            # createElement 等 DOM 工具
@@ -272,7 +278,7 @@ CSS 变量约定：`--ts-<component>-<key>-light/-dark` + `--ts-<component>-<key
 |--------|------|
 | 生命周期/命名空间挂载 | `src/main.ts` |
 | 版本门槛/深合并加载 | `src/main.ts` loadSettings / deepMerge |
-| 组件默认配置（单一数据源） | `src/components/{card,heatmap,progressbar,chart}/config.ts` |
+| 组件默认配置（单一数据源） | `src/components/{core,chart}/config.ts` |
 | DOM 工具/主题色合并 | `src/utils/dom.ts` |
 | 设置字段定义 | `src/settings/fields.ts`（GROUPS / COMPONENTS / DEFAULT_SETTINGS） |
 | 设置面板渲染 | `src/settings/settings-tab.ts` |
