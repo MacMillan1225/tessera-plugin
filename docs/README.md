@@ -269,6 +269,15 @@ const card = tessera.core.card({
 dv.container.appendChild(card);
 ```
 
+## 示例看板
+
+想看实际效果？[examples/DASHBOARDS.md](../examples/DASHBOARDS.md) 包含 4 个可直接运行的看板：
+
+- **个人效率中心**：统计卡 + 活动热力图 + 今日待办 + 周目标进度
+- **学习与技能仪表盘**：技能雷达 + 月度产出柱状 + 主题标签 + 最近更新
+- **项目进度总览**：进度量表 + 燃尽折线 + 任务分布玫瑰 + 里程碑列表
+- **静态演示看板**：纯静态数据，无需库结构，开箱即跑
+
 ## 检查状态
 
 命令面板运行 **Check status** 可查看 Dataview 与各组件启用状态。
@@ -277,7 +286,7 @@ dv.container.appendChild(card);
 
 - 架构：见 [ARCHITECTURE.md](./ARCHITECTURE.md)
 - 新组件开发：见 [COMPONENT_DEVELOPMENT_GUIDE.md](./COMPONENT_DEVELOPMENT_GUIDE.md)
-- 配置系统：见 [CONFIGURATION.md](./CONFIGURATION.md)
+- 配置系统（全部字段）：见 [CONFIGURATION.md](./CONFIGURATION.md)
 - 构建与调试：见 [DEVELOPMENT.md](./DEVELOPMENT.md)
 - 设计决策：见 [decisions/](./decisions/)
 
