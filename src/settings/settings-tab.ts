@@ -33,6 +33,12 @@ export class TesseraSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 		this.t = getTranslations();
 
+		// All groups and components start collapsed (expanded on demand)
+		this.collapsedSections = new Set([
+			...GROUPS.map((group) => group.key),
+			...GROUPS.flatMap((group) => group.components),
+		]);
+
 		// Log validation warnings on first load
 		logValidationWarnings(COMPONENTS);
 	}

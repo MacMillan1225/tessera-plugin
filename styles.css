@@ -806,11 +806,7 @@ body.theme-dark .ts-tags {
 }
 
 .tessera-reload-section {
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 8px;
 	margin-bottom: 12px;
-	overflow: hidden;
-	background: var(--background-secondary);
 }
 
 .tessera-reload-section .setting-item {
@@ -818,16 +814,17 @@ body.theme-dark .ts-tags {
 }
 
 .tessera-settings-section {
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 8px;
-	margin-bottom: 12px;
-	overflow: hidden;
+	margin-bottom: 4px;
 }
 
-/* Core group is the top-level hierarchy node (ADR-0004) */
-.tessera-core-section .tessera-settings-content {
-	margin: 0 8px;
-	border-left: 2px solid var(--background-modifier-border);
+/* Nested component sections indent under their group (replaces border hierarchy) */
+.tessera-core-section .tessera-settings-section {
+	margin-left: 16px;
+}
+
+/* Component field blocks sit flush under their section header */
+.tessera-settings-content {
+	padding: 0 0 8px;
 }
 
 /* Inline alpha slider next to a color picker (ADR-0004): compact width */
@@ -852,14 +849,6 @@ body.theme-dark .ts-tags {
 
 .tessera-collapse-btn:hover {
 	color: var(--text-normal);
-}
-
-.tessera-settings-content {
-	padding: 0 16px 16px;
-}
-
-.tessera-settings-content .setting-item {
-	border-top: 1px solid var(--background-modifier-border);
 }
 
 .tessera-group-header {
