@@ -15,6 +15,7 @@ export default tseslint.config(
 		'package-lock.json',
 		'tsconfig.json',
 		'docs/**',  // Ignore reference documentation
+		'reference/**',  // Ignore design reference assets & example skills
 	]),
 	{
 		languageOptions: {

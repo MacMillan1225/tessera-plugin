@@ -103,9 +103,8 @@ export const COMPONENTS: Record<ComponentKey, ComponentDefinition> = {
 		componentKey: "progressbar",
 		fields: [
 			// Basic
+			{ key: "value", type: "number", placeholder: "0.5", description: "tooltip.progressbar.value" },
 			{ key: "labelFormat", type: "text", placeholder: "{value}%", description: "tooltip.progressbar.labelFormat" },
-			{ key: "min", type: "number", description: "tooltip.progressbar.min" },
-			{ key: "max", type: "number", description: "tooltip.progressbar.max" },
 			// Flags
 			{ key: "flags.showLabel", type: "toggle", description: "tooltip.progressbar.showLabel" },
 			{ key: "flags.showStriped", type: "toggle", description: "tooltip.progressbar.showStriped" },

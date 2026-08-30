@@ -7,9 +7,9 @@
  */
 
 export const PROGRESSBAR_DEFAULTS = {
+	/** Progress value as a ratio 0..1 (e.g. 0.5 = 50%). */
 	value: 0,
-	max: 100,
-	min: 0,
+	/** Label template. {value} = integer percent (50), {raw} = raw ratio (0.5). */
 	labelFormat: "{value}%",
 	flags: {
 		showLabel: true,

@@ -11,9 +11,9 @@ import { createElement } from "../../utils/dom";
 // ============================================================================
 
 export interface ProgressbarOptions {
+	/** Progress value as a ratio 0..1 (e.g. 0.5 = 50%). */
 	value?: number;
-	max?: number;
-	min?: number;
+	/** Label template. {value} = integer percent (50), {raw} = raw ratio (0.5). */
 	labelFormat?: string;
 	flags?: {
 		showLabel?: boolean;
@@ -54,24 +54,27 @@ function clamp(value: number, min: number, max: number): number {
 	return Math.min(max, Math.max(min, value));
 }
 
-function resolveProgress(value: number, min: number, max: number): { ratio: number; percent: number } {
+/**
+ * Resolve progress from a ratio 0..1.
+ * value 0.5 → ratio 0.5 → percent 50.
+ */
+function resolveProgress(value: number): { ratio: number; percent: number } {
 	if (!Number.isFinite(value)) {
 		return { ratio: 0, percent: 0 };
 	}
 
-	if (max > min) {
-		const ratio = clamp((value - min) / (max - min), 0, 1);
-		return {
-			ratio,
-			percent: Math.round(ratio * 100),
-		};
-	}
-
-	const fallbackRatio = value > 1 ? clamp(value / 100, 0, 1) : clamp(value, 0, 1);
+	const ratio = clamp(value, 0, 1);
 	return {
-		ratio: fallbackRatio,
-		percent: Math.round(fallbackRatio * 100),
+		ratio,
+		percent: Math.round(ratio * 100),
 	};
+}
+
+/** Fill label template tokens: {value} → integer percent, {raw} → raw ratio. */
+function formatLabel(template: string, ratio: number, percent: number): string {
+	return template
+		.replace(/\{value\}/g, String(percent))
+		.replace(/\{raw\}/g, String(Math.round(ratio * 1000) / 1000));
 }
 
 // ============================================================================
@@ -79,12 +82,8 @@ function resolveProgress(value: number, min: number, max: number): { ratio: numb
 // ============================================================================
 
 export interface ProgressbarInstance extends HTMLElement {
-	/** Progress value. Updates fill width and ARIA attributes. */
+	/** Progress value as a ratio 0..1. Updates fill width and ARIA attributes. */
 	value: number;
-	/** Maximum value. Recalculates progress ratio. */
-	max: number;
-	/** Minimum value. Recalculates progress ratio. */
-	min: number;
 	/** Exposed parts for direct DOM access. */
 	parts: { fill: HTMLElement };
 }
@@ -95,8 +94,6 @@ export interface ProgressbarInstance extends HTMLElement {
 
 export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstance {
 	let _value = options.value ?? PROGRESSBAR_DEFAULTS.value;
-	let _max = options.max ?? PROGRESSBAR_DEFAULTS.max;
-	let _min = options.min ?? PROGRESSBAR_DEFAULTS.min;
 	const flags = { ...PROGRESSBAR_DEFAULTS.flags, ...options.flags };
 	const layout = { ...PROGRESSBAR_DEFAULTS.layout, ...options.layout };
 	const colors = {
@@ -106,7 +103,7 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 	const styles = options.styles || {};
 
 	// Calculate progress
-	const progress = resolveProgress(_value, _min, _max);
+	const progress = resolveProgress(_value);
 
 	// Create fill element
 	const fill = createElement("div", {
@@ -133,7 +130,7 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 		].filter(Boolean) as string[],
 		attrs: {
 			role: "progressbar",
-			"aria-label": options.labelFormat || "Progress",
+			"aria-label": formatLabel(options.labelFormat ?? PROGRESSBAR_DEFAULTS.labelFormat, progress.ratio, progress.percent),
 			"aria-valuemin": 0,
 			"aria-valuemax": 100,
 			"aria-valuenow": progress.percent,
@@ -163,10 +160,14 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 
 	// ---- Reactive update function -----------------------------------------
 	function updateProgress(): void {
-		const progress = resolveProgress(_value, _min, _max);
+		const progress = resolveProgress(_value);
 		fill.style.width = `${progress.percent}%`;
 		fill.style.minWidth = progress.percent > 0 ? "2px" : "0";
 		root.setAttribute("aria-valuenow", String(progress.percent));
+		root.setAttribute(
+			"aria-label",
+			formatLabel(options.labelFormat ?? PROGRESSBAR_DEFAULTS.labelFormat, progress.ratio, progress.percent),
+		);
 	}
 
 	// ---- Reactive property accessors --------------------------------------
@@ -174,18 +175,6 @@ export function progressbar(options: ProgressbarOptions = {}): ProgressbarInstan
 	Object.defineProperty(result, "value", {
 		get: () => _value,
 		set(v: number) { _value = v; updateProgress(); },
-		enumerable: true, configurable: true,
-	});
-
-	Object.defineProperty(result, "max", {
-		get: () => _max,
-		set(v: number) { _max = v; updateProgress(); },
-		enumerable: true, configurable: true,
-	});
-
-	Object.defineProperty(result, "min", {
-		get: () => _min,
-		set(v: number) { _min = v; updateProgress(); },
 		enumerable: true, configurable: true,
 	});
 
