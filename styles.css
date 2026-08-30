@@ -396,18 +396,18 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 	white-space: pre-wrap;
 }
 
-/* Heatmap Tooltip — restrained, flat shadow */
+/* Heatmap Tooltip — Lieflat paper/ink card, matches chart tooltips */
 .ts-heatmap-tooltip {
-	--ts-heatmap-tooltip-fg: #ffffff;
-	--ts-heatmap-tooltip-bg: #1c1917;
+	--ts-heatmap-tooltip-fg: #1C1C1A;
+	--ts-heatmap-tooltip-bg: #F0EFEB;
 	position: fixed !important;
 	z-index: 9999;
 	padding: 8px 12px;
-	border-radius: 8px;
+	border-radius: 12px;
 	background-color: var(--ts-heatmap-tooltip-bg);
 	color: var(--ts-heatmap-tooltip-fg);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	border: 0;
 	font-size: 12px;
 	font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
 	line-height: 1.4;
@@ -432,7 +432,7 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 .ts-heatmap-tooltip__date {
 	margin-top: 4px;
 	padding-top: 4px;
-	border-top: 1px solid rgba(255, 255, 255, 0.15);
+	border-top: 1px solid color-mix(in srgb, var(--ts-heatmap-tooltip-fg) 15%, transparent);
 	font-family: var(--ts-font-mono, var(--font-monospace));
 	opacity: 0.82;
 }

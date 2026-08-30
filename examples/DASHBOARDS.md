@@ -13,11 +13,12 @@
 
 ````dataviewjs
 // ===== 个人效率中心 =====
+const today = dv.luxon.DateTime.now();          // 今天（luxon）
 const tasks = dv.pages('"tasks"');
 const all = tasks.file.tasks;                     // 全部任务
 const done = all.where(t => t.completed);
-const today = all.where(t => t.text && (t.completed ? t.completed.toFormat('yyyy-MM-dd') : false) === dv.date.today.toFormat('yyyy-MM-dd'));
-const dueToday = all.where(t => !t.completed && t.due && t.due.hasSame(dv.date.today, 'day'));
+const todayCompleted = all.where(t => t.text && t.completed && t.completed.toFormat('yyyy-MM-dd') === today.toFormat('yyyy-MM-dd'));
+const dueToday = all.where(t => !t.completed && t.due && t.due.hasSame(today, 'day'));
 const total = all.length;
 const completedCount = done.length;
 const pct = total ? Math.round(completedCount / total * 100) : 0;
@@ -67,7 +68,7 @@ dv.container.appendChild(tessera.core.card({
 }));
 
 // --- 周目标进度 ---
-const weekTasks = all.filter(t => t.due && t.due.weekNumber === dv.date.today.weekNumber);
+const weekTasks = all.filter(t => t.due && t.due.weekNumber === today.weekNumber);
 const weekDone = weekTasks.where(t => t.completed);
 const weekPct = weekTasks.length ? weekDone.length / weekTasks.length : 0;
 dv.container.appendChild(tessera.core.progressbar({
@@ -146,6 +147,7 @@ dv.container.appendChild(tessera.core.card({
 
 ````dataviewjs
 // ===== 项目进度总览 =====
+const today = dv.luxon.DateTime.now();          // 今天（luxon）
 const proj = dv.pages('"projects"');
 const stories = proj.file.tasks;
 
@@ -162,15 +164,23 @@ dv.container.appendChild(tessera.core.card({
   }),
 }));
 
-// --- 燃尽趋势折线（按天统计累计剩余）---
+// --- 燃尽趋势折线（近 7 天每日剩余任务数）---
 const days = [];
 const remaining = [];
-// 简化：用最近 7 天每天新增的任务数模拟（可替换为真实燃尽数据）
+let remainingCount = totalStories;
+// 先按完成日期统计，再倒推每日剩余
+const doneByDay = new Map();
+for (const t of stories) {
+  if (!t.completed) continue;
+  const key = t.completed.toFormat('yyyy-MM-dd');
+  doneByDay.set(key, (doneByDay.get(key) ?? 0) + 1);
+}
 for (let i = 6; i >= 0; i--) {
-  const d = dv.date.today.minus({ days: i });
-  const added = stories.filter(t => t.section === d.toFormat('yyyy-MM-dd')).length;
+  const d = today.minus({ days: i });
+  const key = d.toFormat('yyyy-MM-dd');
+  remainingCount -= doneByDay.get(key) ?? 0;
   days.push(d.toFormat('MM-dd'));
-  remaining.push(totalStories - added * (7 - i) / 7);
+  remaining.push(Math.max(0, remainingCount));
 }
 dv.container.appendChild(tessera.core.card({
   title: '燃尽趋势',

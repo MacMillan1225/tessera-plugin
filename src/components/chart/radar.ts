@@ -76,6 +76,26 @@ function niceMax(values: number[], explicit?: number): number {
 	return step * magnitude;
 }
 
+function htmlEscape(value: unknown): string {
+	const str = value == null ? "" : typeof value === "string" ? value : typeof value === "number" || typeof value === "boolean" ? String(value) : JSON.stringify(value);
+	return str
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
+}
+
+function valueToText(value: unknown): string {
+	if (value == null) return "-";
+	if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return String(value);
+	try {
+		return JSON.stringify(value) ?? "-";
+	} catch {
+		return "-";
+	}
+}
+
 function buildRadarOption(
 	data: ChartData,
 	max: number | undefined,
@@ -131,10 +151,38 @@ function buildRadarOption(
 			data: [{ value: data.values, name: "Series" }],
 		}];
 
+	// Tooltip: show the hovered vertex's own dimension only (not the whole series).
+	// ECharts radar exposes `dimensionIndex` on vertex hover; fall back to the
+	// indicator name if unavailable, then to a full-dimension list.
+	function radarTooltipFormatter(params: unknown): string {
+		const p = params as { dimensionIndex?: number; name?: string; value?: unknown };
+		const values = Array.isArray(p.value) ? (p.value as unknown[]) : [];
+
+		let idx = typeof p.dimensionIndex === "number" ? p.dimensionIndex : -1;
+		if (idx < 0 && typeof p.name === "string") {
+			idx = data.labels.indexOf(p.name);
+		}
+
+		if (idx >= 0 && idx < data.labels.length && idx < values.length) {
+			return `${htmlEscape(data.labels[idx])}<br/>${htmlEscape(valueToText(values[idx]))}`;
+		}
+
+		// Fallback (hover on polygon body): list all dimensions
+		return data.labels
+			.map((label, i) => `${htmlEscape(label)}: ${htmlEscape(valueToText(values[i]))}`)
+			.join("<br/>");
+	}
+
 	return {
 		animationDuration: 700,
 		animationEasing: "cubicOut",
-		tooltip: flags.showTooltip === false ? undefined : { ...lieflatTooltip(theme), trigger: "item" },
+		tooltip: flags.showTooltip === false
+			? undefined
+			: {
+				...lieflatTooltip(theme),
+				trigger: "item",
+				formatter: radarTooltipFormatter,
+			},
 		legend: flags.showLegend
 			? {
 				top: 0,
