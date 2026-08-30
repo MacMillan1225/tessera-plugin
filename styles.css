@@ -675,10 +675,12 @@ body.theme-dark .ts-list {
 
 .ts-list__value {
 	flex: 0 0 auto;
+	margin-left: auto;
 	font-size: 0.85em;
 	font-weight: 600;
 	color: var(--ts-text-muted, var(--text-muted));
 	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
 }
 
 .ts-list__empty {
@@ -932,4 +934,32 @@ body.theme-dark .ts-tags {
 /* Chart tooltip uses inline ECharts styling; ensure it doesn't leak outside the vault */
 .ts-chart svg {
 	display: block;
+}
+
+/* Radar vertex tooltip (zrender-driven, Lieflat paper card) */
+.ts-chart-radar-tooltip {
+	position: fixed;
+	z-index: 9999;
+	pointer-events: none;
+	background: var(--ts-radar-tooltip-bg, #F0EFEB);
+	color: var(--ts-radar-tooltip-fg, #1C1C1A);
+	border-radius: 12px;
+	padding: 8px 12px;
+	font-size: 12px;
+	line-height: 1.5;
+	font-family: var(--font-interface);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+.ts-chart-radar-tooltip.is-active {
+	opacity: 1;
+}
+.ts-chart-radar-tooltip__label {
+	font-size: 0.9em;
+	opacity: 0.75;
+}
+.ts-chart-radar-tooltip__value {
+	font-weight: 700;
+	margin-top: 2px;
 }

@@ -6,7 +6,8 @@
 
 import type { EChartsOption } from "echarts";
 import { RADAR_DEFAULTS } from "./config";
-import { createChartBase, chartThemeColors, lieflatTooltip, type ChartData, type ChartColors } from "./shared";
+import { createChartBase, chartThemeColors, type ChartData, type ChartColors } from "./shared";
+import { createElement } from "../../utils/dom";
 
 // ============================================================================
 // Types
@@ -44,6 +45,8 @@ export interface RadarInstance extends HTMLElement {
 	max: number | undefined;
 	refresh: () => Promise<void>;
 	destroy: () => void;
+	/** ECharts instance (null until lazy load completes). */
+	chart: import("echarts").EChartsType | null;
 	parts: { canvas: HTMLElement };
 }
 
@@ -74,16 +77,6 @@ function niceMax(values: number[], explicit?: number): number {
 	else step = 10;
 
 	return step * magnitude;
-}
-
-function htmlEscape(value: unknown): string {
-	const str = value == null ? "" : typeof value === "string" ? value : typeof value === "number" || typeof value === "boolean" ? String(value) : JSON.stringify(value);
-	return str
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#39;");
 }
 
 function valueToText(value: unknown): string {
@@ -151,38 +144,15 @@ function buildRadarOption(
 			data: [{ value: data.values, name: "Series" }],
 		}];
 
-	// Tooltip: show the hovered vertex's own dimension only (not the whole series).
-	// ECharts radar exposes `dimensionIndex` on vertex hover; fall back to the
-	// indicator name if unavailable, then to a full-dimension list.
-	function radarTooltipFormatter(params: unknown): string {
-		const p = params as { dimensionIndex?: number; name?: string; value?: unknown };
-		const values = Array.isArray(p.value) ? (p.value as unknown[]) : [];
-
-		let idx = typeof p.dimensionIndex === "number" ? p.dimensionIndex : -1;
-		if (idx < 0 && typeof p.name === "string") {
-			idx = data.labels.indexOf(p.name);
-		}
-
-		if (idx >= 0 && idx < data.labels.length && idx < values.length) {
-			return `${htmlEscape(data.labels[idx])}<br/>${htmlEscape(valueToText(values[idx]))}`;
-		}
-
-		// Fallback (hover on polygon body): list all dimensions
-		return data.labels
-			.map((label, i) => `${htmlEscape(label)}: ${htmlEscape(valueToText(values[i]))}`)
-			.join("<br/>");
-	}
+	// Tooltip: ECharts radar tooltips can't report which vertex is hovered
+	// (getDataParams has no dimension info), so we handle hover via zrender
+	// events in the component function and never configure a native tooltip.
+	const tooltip = undefined;
 
 	return {
 		animationDuration: 700,
 		animationEasing: "cubicOut",
-		tooltip: flags.showTooltip === false
-			? undefined
-			: {
-				...lieflatTooltip(theme),
-				trigger: "item",
-				formatter: radarTooltipFormatter,
-			},
+		tooltip,
 		legend: flags.showLegend
 			? {
 				top: 0,
@@ -231,6 +201,125 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 		colors,
 		buildOption: (theme) => buildRadarOption(_data, _max, flags, layout, chartThemeColors(colors, theme), theme),
 	}) as unknown as RadarInstance;
+
+	// ========================================================================
+	// Vertex tooltip via zrender events.
+	// ECharts radar tooltips cannot report the hovered vertex (getDataParams
+	// carries no dimension index), so we listen on the zrender layer and read
+	// the vertex element's __dimIdx (set by RadarView for each symbol).
+	// ========================================================================
+	if (flags.showTooltip !== false) {
+		const tooltipEl = createElement("div", { className: "ts-chart-radar-tooltip" });
+		// eslint-disable-next-line obsidianmd/prefer-active-doc
+		document.body.appendChild(tooltipEl);
+
+		let bindTimer: number | null = null;
+		let bound = false;
+		let hideTimeout: number | null = null;
+
+		const hideTooltip = (): void => {
+			if (hideTimeout) {
+				window.clearTimeout(hideTimeout);
+				hideTimeout = null;
+			}
+			hideTimeout = window.setTimeout(() => {
+				tooltipEl.classList.remove("is-active");
+				hideTimeout = null;
+			}, 50);
+		};
+
+		const showTooltip = (label: string, seriesName: string | undefined, valueText: string, x: number, y: number): void => {
+			if (hideTimeout) {
+				window.clearTimeout(hideTimeout);
+				hideTimeout = null;
+			}
+			// Theme-aware paper/ink colors
+			// eslint-disable-next-line obsidianmd/prefer-active-doc
+			const dark = document.body.classList.contains("theme-dark");
+			const paper = dark ? "#1C1C1A" : "#F0EFEB";
+			const ink = dark ? "#F0EFEB" : "#1C1C1A";
+			tooltipEl.style.setProperty("--ts-radar-tooltip-bg", paper);
+			tooltipEl.style.setProperty("--ts-radar-tooltip-fg", ink);
+
+			// Build content with text nodes (no innerHTML)
+			tooltipEl.replaceChildren(
+				createElement("div", { className: "ts-chart-radar-tooltip__label", text: label }),
+				createElement("div", { className: "ts-chart-radar-tooltip__value", text: `${seriesName ? `${seriesName} · ` : ""}${valueText}` }),
+			);
+
+			const canvasRect = instance.parts.canvas.getBoundingClientRect();
+			let left = canvasRect.left + x + 12;
+			let top = canvasRect.top + y + 12;
+			const tipRect = tooltipEl.getBoundingClientRect();
+			if (left + tipRect.width > window.innerWidth - 10) {
+				left = canvasRect.left + x - tipRect.width - 12;
+			}
+			if (top + tipRect.height > window.innerHeight - 10) {
+				top = canvasRect.top + y - tipRect.height - 12;
+			}
+			tooltipEl.style.left = `${left}px`;
+			tooltipEl.style.top = `${top}px`;
+			tooltipEl.classList.add("is-active");
+		};
+
+		const bindZr = (): void => {
+			const chart = instance.chart;
+			if (!chart || bound) return;
+			bound = true;
+			if (bindTimer) {
+				window.clearInterval(bindTimer);
+				bindTimer = null;
+			}
+
+			const zr = chart.getZr();
+			zr.on("mousemove", (event: unknown) => {
+				const e = event as { target?: { __dimIdx?: number } | null; offsetX?: number; offsetY?: number };
+				const target = e.target;
+				const dimIdx = typeof target?.__dimIdx === "number" ? target.__dimIdx : -1;
+				if (dimIdx < 0 || dimIdx >= _data.labels.length) {
+					hideTooltip();
+					return;
+				}
+
+				const label = _data.labels[dimIdx] ?? "";
+				// Single series → values[dimIdx]; multi series → first series' value
+				const values = _data.series?.length ? _data.series[0]?.values : _data.values;
+				const value = values?.[dimIdx];
+				const seriesName = _data.series?.length ? _data.series[0]?.name : undefined;
+				showTooltip(label, seriesName, valueToText(value), e.offsetX ?? 0, e.offsetY ?? 0);
+			});
+			zr.on("mouseout", () => {
+				hideTooltip();
+			});
+		};
+
+		// Chart initializes asynchronously (lazy ECharts load) — poll until ready.
+		bindTimer = window.setInterval(bindZr, 150);
+		bindZr();
+
+		const originalDestroy = instance.destroy;
+		instance.destroy = () => {
+			if (bindTimer) {
+				window.clearInterval(bindTimer);
+				bindTimer = null;
+			}
+			if (bound) {
+				const chart = instance.chart;
+				if (chart) {
+					const zr = chart.getZr();
+					zr.off("mousemove");
+					zr.off("mouseout");
+				}
+				bound = false;
+			}
+			if (hideTimeout) {
+				window.clearTimeout(hideTimeout);
+				hideTimeout = null;
+			}
+			tooltipEl.remove();
+			originalDestroy();
+		};
+	}
 
 	// Reactive data / max
 	Object.defineProperty(instance, "data", {
