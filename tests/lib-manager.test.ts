@@ -15,6 +15,7 @@ vi.mock("obsidian", () => ({
 // structural LibManagerOptions["adapter"] contract without friction.
 type AdapterFns = {
 	exists: (path: string) => Promise<boolean>;
+	mkdir: (path: string) => Promise<void>;
 	writeBinary: (path: string, data: ArrayBuffer) => Promise<void>;
 	read: (path: string) => Promise<string>;
 	remove: (path: string) => Promise<void>;
@@ -25,6 +26,7 @@ function makeAdapter(initial: Record<string, ArrayBuffer | string> = {}): Adapte
 	const files = new Map<string, ArrayBuffer | string>(Object.entries(initial));
 	return {
 		exists: vi.fn(async (path: string) => files.has(path)) as unknown as AdapterFns["exists"],
+		mkdir: vi.fn(async () => {}) as unknown as AdapterFns["mkdir"],
 		writeBinary: vi.fn(async (path: string, data: ArrayBuffer) => {
 			files.set(path, data);
 		}) as unknown as AdapterFns["writeBinary"],
@@ -91,6 +93,9 @@ describe("LibManager", () => {
 
 		expect(requestUrlMock).toHaveBeenCalledWith(
 			expect.objectContaining({ url: expect.stringContaining("cdn.jsdelivr.net") })
+		);
+		expect(adapter.mkdir).toHaveBeenCalledWith(
+			".obsidian/plugins/tessera-plugin/lib"
 		);
 		expect(adapter.writeBinary).toHaveBeenCalledWith(
 			".obsidian/plugins/tessera-plugin/lib/echarts.min.js",

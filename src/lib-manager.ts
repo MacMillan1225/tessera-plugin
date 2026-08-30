@@ -40,9 +40,10 @@ export interface ThirdPartyLib {
 export interface LibManagerOptions {
 	/** Absolute vault path to the plugin directory (this.manifest.dir). */
 	pluginDir: string;
-	/** Vault adapter (this.app.vault.adapter) for exists/read/write/remove. */
+	/** Vault adapter (this.app.vault.adapter) for exists/mkdir/read/write/remove. */
 	adapter: {
 		exists(path: string): Promise<boolean>;
+		mkdir(path: string): Promise<void>;
 		writeBinary(path: string, data: ArrayBuffer): Promise<void>;
 		read(path: string): Promise<string>;
 		remove(path: string): Promise<void>;
@@ -69,6 +70,13 @@ export class LibManager {
 	libPath(lib: ThirdPartyLib): string {
 		const dir = this.options.pluginDir.replace(/^\/+|\/+$/g, "");
 		return dir ? `${dir}/lib/${lib.fileName}` : `lib/${lib.fileName}`;
+	}
+
+	/** Vault-relative path of the lib/ folder itself (created on demand). */
+	libDir(lib: ThirdPartyLib): string {
+		const path = this.libPath(lib);
+		const index = path.lastIndexOf("/");
+		return index > 0 ? path.slice(0, index) : "lib";
 	}
 
 	/** Check whether a library file exists on disk. */
@@ -98,6 +106,10 @@ export class LibManager {
 			throw new Error(`Download failed (HTTP ${response.status}) for ${lib.name} from ${url}`);
 		}
 
+		// The plugin's lib/ folder may not exist yet (Obsidian's community
+		// installer only ships main.js/manifest.json/styles.css), so create it
+		// before writing. mkdir is idempotent when the folder already exists.
+		await this.options.adapter.mkdir(this.libDir(lib));
 		await this.options.adapter.writeBinary(this.libPath(lib), response.arrayBuffer);
 		this.options.onChanged?.(lib);
 	}
