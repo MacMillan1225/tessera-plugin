@@ -39,10 +39,10 @@ tessera.core.progressbar(options)  // → ProgressbarInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `#e7e5e4` | `#44403c` | Track fill |
+| `background` | `#E4E4E7` | `#3F3F46` | Track fill |
 | `border` | `transparent` | same | Track border |
-| `text` | `#1C1C1A` | `#F0EFEB` | Label text |
-| `accent` | `#1C1C1A` | `#F0EFEB` | **Fill color** (default = ink; set this for the pop of color) |
+| `text` | `#18181B` | `#FAFAFA` | Label text |
+| `accent` | `#18181B` | `#FAFAFA` | **Fill color** (default = ink; set this for the pop of color) |
 
 Structure: `colors: { light: {...}, dark: {...} }`; flat `colors.accent`
 overrides both themes.
@@ -67,7 +67,7 @@ dv.container.appendChild(tessera.core.progressbar({ value: 2/3 }));
 const p = dv.page("Projects/MyApp");
 dv.container.appendChild(tessera.core.progressbar({
   value: p.progress ?? 0,
-  colors: { accent: "#1C1C1A" },
+  colors: { accent: "#18181B" },
 }));
 ```
 

@@ -48,17 +48,17 @@ body {
 .ts-card {
 	background: var(
 		--ts-card-background-current,
-		var(--ts-card-background-light, var(--background-secondary))
+		var(--ts-card-background-light, #FFFFFF)
 	);
 	border-radius: var(--ts-card-radius, 14px);
 	padding: var(--ts-card-padding, 16px);
 	border: 1px solid
-		var(--ts-card-border-current, var(--ts-card-border-light, transparent));
+		var(--ts-card-border-current, var(--ts-card-border-light, #E4E4E7));
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	overflow: visible;
-	color: var(--ts-card-text-current, var(--ts-card-text-light, var(--text-normal)));
+	color: var(--ts-card-text-current, var(--ts-card-text-light, #18181B));
 	font-family: var(--ts-font-body, var(--font-text, var(--font-interface)));
 	transition:
 		background-color var(--ts-transition, 0.2s ease),
@@ -68,21 +68,23 @@ body {
 body.theme-light .ts-card {
 	--ts-card-background-current: var(
 		--ts-card-background-light,
-		var(--background-secondary)
+		#FFFFFF
 	);
-	--ts-card-border-current: var(--ts-card-border-light, transparent);
-	--ts-card-text-current: var(--ts-card-text-light, var(--text-normal));
-	--ts-card-accent-current: var(--ts-card-accent-light, var(--text-normal));
+	--ts-card-border-current: var(--ts-card-border-light, #E4E4E7);
+	--ts-card-text-current: var(--ts-card-text-light, #18181B);
+	--ts-card-accent-current: var(--ts-card-accent-light, #18181B);
+	--ts-card-hover-border: #D4D4D8;
 }
 
 body.theme-dark .ts-card {
 	--ts-card-background-current: var(
 		--ts-card-background-dark,
-		var(--background-secondary)
+		#26262B
 	);
-	--ts-card-border-current: var(--ts-card-border-dark, transparent);
-	--ts-card-text-current: var(--ts-card-text-dark, var(--text-normal));
-	--ts-card-accent-current: var(--ts-card-accent-dark, var(--text-normal));
+	--ts-card-border-current: var(--ts-card-border-dark, #3F3F46);
+	--ts-card-text-current: var(--ts-card-text-dark, #FAFAFA);
+	--ts-card-accent-current: var(--ts-card-accent-dark, #FAFAFA);
+	--ts-card-hover-border: #52525B;
 }
 
 /* Card Hover: restrained — subtle border only, no lift, no shadow */
@@ -410,10 +412,10 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 	white-space: pre-wrap;
 }
 
-/* Heatmap Tooltip — Lieflat paper/ink card, matches chart tooltips */
+/* Heatmap Tooltip — inverted ink/paper panel, matches chart tooltips */
 .ts-heatmap-tooltip {
-	--ts-heatmap-tooltip-fg: #1C1C1A;
-	--ts-heatmap-tooltip-bg: #F0EFEB;
+	--ts-heatmap-tooltip-fg: #FAFAFA;
+	--ts-heatmap-tooltip-bg: #18181B;
 	position: fixed !important;
 	z-index: 9999;
 	padding: 8px 12px;
@@ -474,7 +476,7 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 .ts-progressbar__track {
 	background: var(
 		--ts-progressbar-background-current,
-		var(--ts-progressbar-background-light, #e7e5e4)
+		var(--ts-progressbar-background-light, #E4E4E7)
 	);
 	border: 1px solid
 		var(
@@ -491,7 +493,7 @@ body.theme-dark .ts-heatmap__cell.is-level-8,
 body.theme-light .ts-progressbar {
 	--ts-progressbar-background-current: var(
 		--ts-progressbar-background-light,
-		#e7e5e4
+		#E4E4E7
 	);
 	--ts-progressbar-border-current: var(
 		--ts-progressbar-border-light,
@@ -504,7 +506,7 @@ body.theme-light .ts-progressbar {
 body.theme-dark .ts-progressbar {
 	--ts-progressbar-background-current: var(
 		--ts-progressbar-background-dark,
-		#44403c
+		#3F3F46
 	);
 	--ts-progressbar-border-current: var(
 		--ts-progressbar-border-dark,
@@ -587,29 +589,29 @@ body.theme-dark .ts-progressbar {
 .ts-list {
 	background: var(
 		--ts-list-background-current,
-		var(--ts-list-light-background, var(--background-secondary))
+		var(--ts-list-light-background, #FFFFFF)
 	);
 	border: 1px solid
-		var(--ts-list-border-current, var(--ts-list-light-border, transparent));
+		var(--ts-list-border-current, var(--ts-list-light-border, #E4E4E7));
 	border-radius: var(--ts-list-radius, 12px);
 	padding: var(--ts-list-padding, 14px);
-	color: var(--ts-list-text-current, var(--ts-list-light-text, var(--text-normal)));
+	color: var(--ts-list-text-current, var(--ts-list-light-text, #18181B));
 	font-family: var(--ts-font-ui, var(--font-interface));
 	max-width: 100%;
 }
 
 body.theme-light .ts-list {
-	--ts-list-background-current: var(--ts-list-light-background, var(--background-secondary));
-	--ts-list-border-current: var(--ts-list-light-border, transparent);
-	--ts-list-text-current: var(--ts-list-light-text, var(--text-normal));
-	--ts-list-accent-current: var(--ts-list-light-accent, var(--text-normal));
+	--ts-list-background-current: var(--ts-list-light-background, #FFFFFF);
+	--ts-list-border-current: var(--ts-list-light-border, #E4E4E7);
+	--ts-list-text-current: var(--ts-list-light-text, #18181B);
+	--ts-list-accent-current: var(--ts-list-light-accent, #18181B);
 }
 
 body.theme-dark .ts-list {
-	--ts-list-background-current: var(--ts-list-dark-background, var(--background-secondary));
-	--ts-list-border-current: var(--ts-list-dark-border, transparent);
-	--ts-list-text-current: var(--ts-list-dark-text, var(--text-normal));
-	--ts-list-accent-current: var(--ts-list-dark-accent, var(--text-normal));
+	--ts-list-background-current: var(--ts-list-dark-background, #26262B);
+	--ts-list-border-current: var(--ts-list-dark-border, #3F3F46);
+	--ts-list-text-current: var(--ts-list-dark-text, #FAFAFA);
+	--ts-list-accent-current: var(--ts-list-dark-accent, #FAFAFA);
 }
 
 /* Double class selector: beats Obsidian's `.markdown-rendered ul` indent,
@@ -693,29 +695,29 @@ body.theme-dark .ts-list {
 .ts-tags {
 	background: var(
 		--ts-tags-background-current,
-		var(--ts-tags-light-background, var(--background-secondary))
+		var(--ts-tags-light-background, #FFFFFF)
 	);
 	border: 1px solid
-		var(--ts-tags-border-current, var(--ts-tags-light-border, transparent));
+		var(--ts-tags-border-current, var(--ts-tags-light-border, #E4E4E7));
 	border-radius: var(--ts-tags-radius, 12px);
 	padding: var(--ts-tags-padding, 12px);
-	color: var(--ts-tags-text-current, var(--ts-tags-light-text, var(--text-normal)));
+	color: var(--ts-tags-text-current, var(--ts-tags-light-text, #18181B));
 	font-family: var(--ts-font-ui, var(--font-interface));
 	max-width: 100%;
 }
 
 body.theme-light .ts-tags {
-	--ts-tags-background-current: var(--ts-tags-light-background, var(--background-secondary));
-	--ts-tags-border-current: var(--ts-tags-light-border, transparent);
-	--ts-tags-text-current: var(--ts-tags-light-text, var(--text-normal));
-	--ts-tags-accent-current: var(--ts-tags-light-accent, var(--text-normal));
+	--ts-tags-background-current: var(--ts-tags-light-background, #FFFFFF);
+	--ts-tags-border-current: var(--ts-tags-light-border, #E4E4E7);
+	--ts-tags-text-current: var(--ts-tags-light-text, #18181B);
+	--ts-tags-accent-current: var(--ts-tags-light-accent, #18181B);
 }
 
 body.theme-dark .ts-tags {
-	--ts-tags-background-current: var(--ts-tags-dark-background, var(--background-secondary));
-	--ts-tags-border-current: var(--ts-tags-dark-border, transparent);
-	--ts-tags-text-current: var(--ts-tags-dark-text, var(--text-normal));
-	--ts-tags-accent-current: var(--ts-tags-dark-accent, var(--text-normal));
+	--ts-tags-background-current: var(--ts-tags-dark-background, #26262B);
+	--ts-tags-border-current: var(--ts-tags-dark-border, #3F3F46);
+	--ts-tags-text-current: var(--ts-tags-dark-text, #FAFAFA);
+	--ts-tags-accent-current: var(--ts-tags-dark-accent, #FAFAFA);
 }
 
 .ts-tags__chips {
@@ -955,8 +957,8 @@ body.theme-dark .ts-tags {
 	position: fixed;
 	z-index: 9999;
 	pointer-events: none;
-	background: var(--ts-radar-tooltip-bg, #F0EFEB);
-	color: var(--ts-radar-tooltip-fg, #1C1C1A);
+	background: var(--ts-radar-tooltip-bg, #18181B);
+	color: var(--ts-radar-tooltip-fg, #FAFAFA);
 	border-radius: 12px;
 	padding: 8px 12px;
 	font-size: 12px;

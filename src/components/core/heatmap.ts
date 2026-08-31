@@ -325,14 +325,15 @@ function positionTooltipAtCell(id: string, cell: HTMLElement): void {
 }
 
 function applyTooltipTheme(tooltip: HTMLElement): void {
-	// Lieflat paper/ink, detected from the live theme. Tooltip colors are a
-	// design-system constant on purpose: saved settings can go stale (Obsidian
-	// rewrites data.json from in-memory state), and the tooltip must stay
-	// consistent with the chart tooltips regardless.
+	// Inverted panel (ink-on-paper on light, paper-on-ink on dark), detected
+	// from the live theme. Tooltip colors are a design-system constant on
+	// purpose: saved settings can go stale (Obsidian rewrites data.json from
+	// in-memory state), and the tooltip must stay consistent with the chart
+	// tooltips regardless. Inverted = readable on ANY card/page background.
 	// eslint-disable-next-line obsidianmd/prefer-active-doc
 	const dark = document.body.classList.contains("theme-dark");
-	tooltip.style.setProperty("--ts-heatmap-tooltip-fg", dark ? "#F0EFEB" : "#1C1C1A");
-	tooltip.style.setProperty("--ts-heatmap-tooltip-bg", dark ? "#1C1C1A" : "#F0EFEB");
+	tooltip.style.setProperty("--ts-heatmap-tooltip-fg", dark ? "#18181B" : "#FAFAFA");
+	tooltip.style.setProperty("--ts-heatmap-tooltip-bg", dark ? "#FAFAFA" : "#18181B");
 }
 
 function defaultTooltipRenderer(context: HeatmapCellContext & { visual: HeatmapCellStyle }): string {

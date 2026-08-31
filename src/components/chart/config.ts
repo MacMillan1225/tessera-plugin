@@ -1,12 +1,12 @@
 /**
  * TesseraScript Chart Component Defaults (ADR-0005)
- * Lieflat mono style: INK #1C1C1A / PAPER #F0EFEB / MUTED #8F8E88 / GRID #DEDDD6
- * Dark: bg #1C1C1A / ink #F0EFEB / muted #8F8E88 / grid #2E2D29
+ * Minimal black & white (zinc neutral): INK #18181B / PAPER #FFFFFF / MUTED #71717A / GRID #E4E4E7
+ * Dark: card #26262B / ink #FAFAFA / muted #A1A1AA / grid #3F3F46
  */
 
-// Shared mono palette tokens (from lieflat-charts mono-tokens.js)
-const LIGHT_SERIES = ["#1C1C1A", "#8F8E88", "#B0AFA9", "#D8D7D1", "#6A6963"];
-const DARK_SERIES = ["#F0EFEB", "#8F8E88", "#B0AFA9", "#55554F", "#C6C5BF"];
+// Shared neutral palette tokens (premium monochrome, zinc scale)
+const LIGHT_SERIES = ["#18181B", "#71717A", "#A1A1AA", "#D4D4D8", "#52525B"];
+const DARK_SERIES = ["#FAFAFA", "#A1A1AA", "#71717A", "#52525B", "#D4D4D8"];
 
 export const LINE_DEFAULTS = {
 	data: { labels: [] as string[], values: [] as number[] },
@@ -32,15 +32,15 @@ export const LINE_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			text: "#8F8E88",
-			grid: "#DEDDD6",
-			accent: "#1C1C1A",
+			text: "#71717A",
+			grid: "#E4E4E7",
+			accent: "#18181B",
 			series: LIGHT_SERIES,
 		},
 		dark: {
-			text: "#8F8E88",
-			grid: "#2E2D29",
-			accent: "#F0EFEB",
+			text: "#A1A1AA",
+			grid: "#3F3F46",
+			accent: "#FAFAFA",
 			series: DARK_SERIES,
 		},
 	},
@@ -68,15 +68,15 @@ export const BAR_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			text: "#8F8E88",
-			grid: "#DEDDD6",
-			accent: "#1C1C1A",
+			text: "#71717A",
+			grid: "#E4E4E7",
+			accent: "#18181B",
 			series: LIGHT_SERIES,
 		},
 		dark: {
-			text: "#8F8E88",
-			grid: "#2E2D29",
-			accent: "#F0EFEB",
+			text: "#A1A1AA",
+			grid: "#3F3F46",
+			accent: "#FAFAFA",
 			series: DARK_SERIES,
 		},
 	},
@@ -98,14 +98,14 @@ export const GAUGE_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			text: "#8F8E88",
-			track: "#DEDDD6",
-			accent: "#1C1C1A",
+			text: "#71717A",
+			track: "#E4E4E7",
+			accent: "#18181B",
 		},
 		dark: {
-			text: "#8F8E88",
-			track: "#2E2D29",
-			accent: "#F0EFEB",
+			text: "#A1A1AA",
+			track: "#3F3F46",
+			accent: "#FAFAFA",
 		},
 	},
 } as const;
@@ -123,13 +123,13 @@ export const ROSE_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			text: "#8F8E88",
-			accent: "#1C1C1A",
+			text: "#71717A",
+			accent: "#18181B",
 			series: LIGHT_SERIES,
 		},
 		dark: {
-			text: "#8F8E88",
-			accent: "#F0EFEB",
+			text: "#A1A1AA",
+			accent: "#FAFAFA",
 			series: DARK_SERIES,
 		},
 	},
@@ -156,15 +156,15 @@ export const RADAR_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			text: "#8F8E88",
-			grid: "#DEDDD6",
-			accent: "#1C1C1A",
+			text: "#71717A",
+			grid: "#E4E4E7",
+			accent: "#18181B",
 			series: LIGHT_SERIES,
 		},
 		dark: {
-			text: "#8F8E88",
-			grid: "#2E2D29",
-			accent: "#F0EFEB",
+			text: "#A1A1AA",
+			grid: "#3F3F46",
+			accent: "#FAFAFA",
 			series: DARK_SERIES,
 		},
 	},

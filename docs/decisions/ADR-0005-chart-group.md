@@ -11,7 +11,7 @@
 > "我想加入一些新的图标（统计图表）进 tessera.chart 分组… 总体来说需要一些圆角，优雅的效果，悬浮可查看等… 我认为需要折线图/柱状图/Tick Gauge量表/Petal Rose玫瑰图，不需要自动切换的动效… 需要注意的是，假设要用到外部库，为了节约，在不开启chart时外部库不需要被加载。"
 
 - 需求组件：折线图（line）、柱状图（bar）、Tick Gauge（gauge）、Petal Rose（rose）
-- 视觉基准：lieflat-charts 的 mono 风格（INK #1C1C1A / PAPER #F0EFEB / MUTED #8F8E88 / GRID #DEDDD6，圆角、克制、悬浮查看）
+- 视觉基准：中性锌灰阶黑白风（INK #18181B / PAPER #FFFFFF / MUTED #71717A / GRID #E4E4E7，圆角、克制、悬浮查看；2026-08-31 起取代暖调 stone 色板）
 - 硬性约束：外部图表库必须**懒加载**——chart 分组关闭时零加载
 
 ## 决策
@@ -23,7 +23,7 @@
    - ECharts 支持按需 init 与 dispose，适合懒加载模型
 3. **懒加载机制**: `lib/echarts.min.js`（~1MB）作为独立资源放插件目录，**不打包进 main.js**。首次实际调用图表组件时由 `loader.ts` 动态注入 `<script>` 标签，成功后 `echarts.init` 渲染；`echartsPromise` 单例缓存，失败重置允许重试。类型仅用 `import type`（esbuild 擦除）。
 4. **共享生命周期** `createChartBase`（shared.ts）：懒加载 → init(SVG) → setOption → ResizeObserver → 主题 MutationObserver（切主题 `setOption(notMerge)`）→ destroy(dispose)。所有图表组件复用，不重复样板。
-5. **统一 tooltip** `lieflatTooltip(theme)`：纸底墨字（暗 `#1C1C1A`/`#F0EFEB`，亮 `#F0EFEB`/`#1C1C1A`）、圆角 12、无边框、柔和阴影——贴合 Lieflat 悬浮查看需求。
+5. **统一 tooltip** `lieflatTooltip(theme)`：反转面板（亮 `#18181B` 底/`#FAFAFA` 字，暗 `#FAFAFA` 底/`#18181B` 字）、圆角 12、无边框、柔和阴影——任何背景下可读性最大化。
 6. **颜色**沿用 mono 语义键（text/grid/track/accent/series），深浅主题分离；系列色板 `LIGHT_SERIES`/`DARK_SERIES` 取自 lieflat mono-tokens。
 
 ## 后果

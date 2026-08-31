@@ -253,11 +253,11 @@ export function radar(options: RadarOptions = {}): RadarInstance {
 				window.clearTimeout(hideTimeout);
 				hideTimeout = null;
 			}
-			// Theme-aware paper/ink colors
+			// Theme-aware inverted tooltip colors (ink panel on light, paper panel on dark)
 			// eslint-disable-next-line obsidianmd/prefer-active-doc
 			const dark = document.body.classList.contains("theme-dark");
-			const paper = dark ? "#1C1C1A" : "#F0EFEB";
-			const ink = dark ? "#F0EFEB" : "#1C1C1A";
+			const paper = dark ? "#FAFAFA" : "#18181B";
+			const ink = dark ? "#18181B" : "#FAFAFA";
 			tooltipEl.style.setProperty("--ts-radar-tooltip-bg", paper);
 			tooltipEl.style.setProperty("--ts-radar-tooltip-fg", ink);
 

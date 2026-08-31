@@ -51,10 +51,10 @@ tessera.chart.bar(options)  // → BarInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `text` | `#8F8E88` | `#8F8E88` | Axis labels |
-| `grid` | `#DEDDD6` | `#2E2D29` | Grid lines |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Default bar fill |
-| `series` | `["#1C1C1A","#8F8E88","#B0AFA9","#D8D7D1","#6A6963"]` | `["#F0EFEB","#8F8E88","#B0AFA9","#55554F","#C6C5BF"]` | Single-series per-column palette / multi-series palette |
+| `text` | `#71717A` | `#A1A1AA` | Axis labels |
+| `grid` | `#E4E4E7` | `#3F3F46` | Grid lines |
+| `accent` | `#18181B` | `#FAFAFA` | Default bar fill |
+| `series` | `["#18181B","#71717A","#A1A1AA","#D4D4D8","#52525B"]` | `["#FAFAFA","#A1A1AA","#71717A","#52525B","#D4D4D8"]` | Single-series per-column palette / multi-series palette |
 
 ### className
 

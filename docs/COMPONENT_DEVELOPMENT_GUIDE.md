@@ -68,7 +68,7 @@ export const BADGE_DEFAULTS = {
 要点：
 - **统一语义键**（ADR-0002）：颜色键必须是 `background / border / text / accent`（需要额外键时先讨论，如 heatmap 的 tooltip/levels）
 - `as const` 保证类型精确
-- 默认值即 Lieflat mono 风格（见 ADR-0001）：无边框靠背景色差、克制色
+- 默认值即中性锌灰阶黑白风：发丝边框分层（页面背景不可控，边框保证任何背景下浮起）、克制无彩
 
 ### 步骤 2：创建 index.ts（组件工厂）
 
@@ -288,7 +288,7 @@ function buildPieOption(data: ChartData, flags: NonNullable<PieOptions["flags"]>
 		series: [{
 			type: "pie",
 			radius: ["40%", "70%"],
-			itemStyle: { borderRadius: 8, borderColor: theme === "dark" ? "#1C1C1A" : "#F0EFEB", borderWidth: 3 },
+			itemStyle: { borderRadius: 8, borderColor: theme === "dark" ? "#26262B" : "#FFFFFF", borderWidth: 3 },
 			data: data.labels.map((label, i) => ({
 				name: label,
 				value: data.values[i] ?? 0,
@@ -377,7 +377,7 @@ export function pie(options: PieOptions = {}): PieInstance {
 ### 2. 颜色处理
 - 必须用语义键 `background/border/text/accent`（ADR-0002），禁止硬编码组件独有键名
 - 深浅主题都提供默认值；扁平共享键经 `resolveThemeColors` 同时作用于两主题
-- 风格默认值参考 Lieflat mono：浅 `#F0EFEB` 底/`#1C1C1A` 墨，暗 `#1C1C1A` 底/`#F0EFEB` 墨（ADR-0001）
+- 风格默认值参考中性锌灰阶：浅 `#FFFFFF` 底/`#18181B` 墨（发丝边框 `#E4E4E7`），暗 `#26262B` 底/`#FAFAFA` 墨（边框 `#3F3F46`）
 
 ### 3. 配置优先级
 调用 options > 设置 config > 组件 DEFAULTS（main.ts 深合并实现）。组件内用**三段合并**（flags/layout/colors 分别 `{...DEFAULTS.X, ...options.X}`），colors 分 light/dark 再合并。

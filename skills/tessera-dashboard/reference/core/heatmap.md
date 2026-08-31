@@ -47,7 +47,7 @@ resolution order: custom `getCellStyle` → `completed/total` ratio → `level`
 | `locale` | `"zh-CN"` | Tooltip date locale |
 | `monthNames` | `["1月", ..., "12月"]` | Month label strings |
 | `weekLabels` | `["一","","三","","五","","日"]` | Weekday label strings |
-| `legend` | `"少 $#e7e5e4$$#a8a29e$$#57534e$$#1c1917$ 多"` | Legend text; `$#hex$` tokens become color swatches |
+| `legend` | `"少 $#E4E4E7$$#A1A1AA$$#52525B$$#18181B$ 多"` | Legend text; `$#hex$` tokens become color swatches |
 | `tooltipId` | `"ts-heatmap-tooltip"` | Shared tooltip element id |
 
 ### layout
@@ -62,12 +62,12 @@ resolution order: custom `getCellStyle` → `completed/total` ratio → `level`
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `#fafaf9` | `#1c1917` | Empty-day cell color |
-| `text` | `#8F8E88` | `#8F8E88` | Month/week label color |
+| `background` | `#E4E4E7` | `#2E2E33` | Empty-day cell color |
+| `text` | `#71717A` | `#A1A1AA` | Month/week label color |
 | `levels` | 9-step gray gradient light→dark | 9-step dark→light | Cell intensity ramp, `levels[0]` = empty |
 
-> Tooltip colors are hardcoded to Lieflat paper/ink (light: `#F0EFEB` bg /
-> `#1C1C1A` text, dark inverted) and are NOT configurable — they stay
+> Tooltip colors are hardcoded to an inverted ink/paper panel (light: `#18181B` bg /
+> `#FAFAFA` text, dark: `#FAFAFA` bg / `#18181B` text) and are NOT configurable — they stay
 > consistent with chart tooltips.
 
 ### styles
@@ -120,6 +120,6 @@ dv.container.appendChild(tessera.core.heatmap({
 // Custom legend text
 dv.container.appendChild(tessera.core.heatmap({
   data: { "2026-08-01": 4, "2026-08-02": 2 },
-  settings: { legend: "弱 $#e7e5e4$$#57534e$$#1c1917$ 强" },
+  settings: { legend: "弱 $#E4E4E7$$#52525B$$#18181B$ 强" },
 }));
 ```

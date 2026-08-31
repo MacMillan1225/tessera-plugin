@@ -13,7 +13,7 @@
 | **图表组件 (Chart Components)** | 分组 `chart` 下的组件：line（折线）、bar（柱状）、gauge（刻度量表）、rose（玫瑰图）。基于 ECharts，懒加载。 |
 | **ECharts 懒加载 (Lazy Loading)** | `lib/echarts.min.js` 独立于 bundle，首次实际调用图表组件时才以 `<script>` 注入（`loader.ts`）；chart 分组关闭时完全零加载。 |
 | **ChartData** | 图表组件统一数据格式：`{ labels: string[], values: number[], series?: {name, values}[] }`。单系列用 labels+values，多系列用 series。 |
-| **Lieflat mono tokens** | 图表默认色板，取自 lieflat-charts 的 mono-tokens.js：INK #1C1C1A、PAPER #F0EFEB、MUTED #8F8E88、GRID #DEDDD6（暗色 #2E2D29）；系列色板 LIGHT_SERIES/DARK_SERIES 各 5 色灰阶。 |
+| **中性锌灰阶 tokens** | 组件与图表默认色板（简约黑白高级感）：INK #18181B、PAPER #FFFFFF、MUTED #71717A、GRID #E4E4E7（暗色卡片 #26262B、GRID #3F3F46）；系列色板 LIGHT_SERIES/DARK_SERIES 各 5 色灰阶。 |
 
 ## 配置体系
 

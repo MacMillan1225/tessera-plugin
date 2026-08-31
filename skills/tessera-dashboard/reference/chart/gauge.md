@@ -40,9 +40,9 @@ tessera.chart.gauge(options)  // → GaugeInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `text` | `#8F8E88` | `#8F8E88` | Ticks + sub-label |
-| `track` | `#DEDDD6` | `#2E2D29` | Unfilled arc track |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Progress arc + big number |
+| `text` | `#71717A` | `#A1A1AA` | Ticks + sub-label |
+| `track` | `#E4E4E7` | `#3F3F46` | Unfilled arc track |
+| `accent` | `#18181B` | `#FAFAFA` | Progress arc + big number |
 
 ### className
 
@@ -85,7 +85,7 @@ dv.container.appendChild(tessera.chart.gauge({
 dv.container.appendChild(tessera.chart.gauge({
   value: 0.82,
   label: "Vault health",
-  colors: { light: { accent: "#1C1C1A" }, dark: { accent: "#F0EFEB" } },
+  colors: { light: { accent: "#18181B" }, dark: { accent: "#FAFAFA" } },
 }));
 ```
 

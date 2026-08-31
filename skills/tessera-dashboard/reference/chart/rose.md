@@ -51,9 +51,9 @@ tessera.chart.rose(options)  // → RoseInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `text` | `#8F8E88` | `#8F8E88` | Labels |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Base petal color |
-| `series` | `["#1C1C1A","#8F8E88","#B0AFA9","#D8D7D1","#6A6963"]` | `["#F0EFEB","#8F8E88","#B0AFA9","#55554F","#C6C5BF"]` | Tier palette (lightest used for small values) |
+| `text` | `#71717A` | `#A1A1AA` | Labels |
+| `accent` | `#18181B` | `#FAFAFA` | Base petal color |
+| `series` | `["#18181B","#71717A","#A1A1AA","#D4D4D8","#52525B"]` | `["#FAFAFA","#A1A1AA","#71717A","#52525B","#D4D4D8"]` | Tier palette (lightest used for small values) |
 
 ### className
 

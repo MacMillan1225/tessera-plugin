@@ -212,7 +212,7 @@ radar `.data/.max`. See each reference file for exact shapes.
   `levels`, gauge: `text / track / accent`).
 - Light and dark themes are separate objects: `colors: { light: {...},
   dark: {...} }`. Flat overrides at `colors.<key>` apply to both.
-- Defaults are monochrome (INK #1C1C1A / PAPER #F0EFEB). Change `accent` to
+- Defaults are monochrome (INK #18181B / PAPER #FFFFFF). Change `accent` to
   give a component its single pop of color. Restraint is the aesthetic —
   one accent per component, no gradients/glows.
 - Fonts are managed by CSS variables `--ts-font-{ui,body,title,mono}` (CJK

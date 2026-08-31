@@ -232,7 +232,7 @@ tessera.chart.line({...})
 | gauge | startAngle 210/endAngle -30；progress 圆帽宽 14 accent；track 同宽；axisTick 10 等分；detail 30px/800 显示 `Math.round(p)%`；title 显示 label 或 `{remaining} TO GO` |
 | rose | 三层 pie：底色盘（14%-92% 圆角16）→ roseType:"area" 花瓣（14%-88%，明度按 t>0.8/0.6/0.35 分档）→ 透明标签层（outside 标签 `name value`） |
 
-tooltip 统一 `lieflatTooltip(theme)`：浅色纸底 `#F0EFEB`/墨字，暗色 `#1C1C1A`/纸字，圆角 12、无边框、柔和阴影。
+tooltip 统一 `lieflatTooltip(theme)`：反转面板——浅色墨底 `#18181B`/纸字，暗色纸底 `#FAFAFA`/墨字（任何背景下可读性最大化），圆角 12、无边框、柔和阴影。
 
 ## 8. 主题适配机制
 

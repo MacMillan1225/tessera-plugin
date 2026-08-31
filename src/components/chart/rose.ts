@@ -42,7 +42,7 @@ export interface RoseInstance extends HTMLElement {
 function petalColor(value: number, max: number, seriesColors: string[]): string {
 	const t = max > 0 ? value / max : 0;
 	const tier = t > 0.8 ? 0 : t > 0.6 ? 1 : t > 0.35 ? 2 : 3;
-	return seriesColors[tier % seriesColors.length] ?? "#8F8E88";
+	return seriesColors[tier % seriesColors.length] ?? "#71717A";
 }
 
 function buildRoseOption(
@@ -61,7 +61,7 @@ function buildRoseOption(
 		value: data.values[i] ?? 0,
 	}));
 
-	const baseDiscColor = theme === "dark" ? "#2E2D29" : "#DEDDD6";
+	const baseDiscColor = theme === "dark" ? "#3F3F46" : "#E4E4E7";
 
 	return {
 		animationDuration: 700,
@@ -93,7 +93,7 @@ function buildRoseOption(
 				radius: ["14%", "88%"],
 				itemStyle: {
 					borderRadius: 14,
-					borderColor: theme === "dark" ? "#1C1C1A" : "#F0EFEB",
+					borderColor: theme === "dark" ? "#26262B" : "#FFFFFF",
 					borderWidth: 4,
 				},
 				label: { show: false },

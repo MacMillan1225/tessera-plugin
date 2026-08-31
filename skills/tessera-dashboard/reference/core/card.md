@@ -47,10 +47,10 @@ tessera.core.card(options)  // → CardInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `#F0EFEB` | `#1C1C1A` | Card fill (no border by default) |
-| `border` | `transparent` | same | Card border |
-| `text` | `#1C1C1A` | `#F0EFEB` | Default text color |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Value color + hover accent |
+| `background` | `#FFFFFF` | `#26262B` | Card fill (hairline border by default) |
+| `border` | `#E4E4E7` | `#3F3F46` | Card border |
+| `text` | `#18181B` | `#FAFAFA` | Default text color |
+| `accent` | `#18181B` | `#FAFAFA` | Value color + hover accent |
 
 Structure: `colors: { light: {...}, dark: {...} }`. Flat `colors.background`
 etc. overrides both themes. Defaults are monochrome; set `accent` for the
@@ -110,7 +110,7 @@ dv.container.appendChild(tessera.core.card({
   title: "Sprint",
   meta: "WEEK 34",
   value: "68%",
-  colors: { light: { accent: "#1C1C1A" }, dark: { accent: "#F0EFEB" } },
+  colors: { light: { accent: "#18181B" }, dark: { accent: "#FAFAFA" } },
   layout: { radius: "16px" },
 }));
 ```

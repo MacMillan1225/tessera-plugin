@@ -23,16 +23,16 @@ export const CARD_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "#F0EFEB",
-			border: "transparent",
-			text: "#1C1C1A",
-			accent: "#1C1C1A",
+			background: "#FFFFFF",
+			border: "#E4E4E7",
+			text: "#18181B",
+			accent: "#18181B",
 		},
 		dark: {
-			background: "#1C1C1A",
-			border: "transparent",
-			text: "#F0EFEB",
-			accent: "#F0EFEB",
+			background: "#26262B",
+			border: "#3F3F46",
+			text: "#FAFAFA",
+			accent: "#FAFAFA",
 		},
 	},
 } as const;
@@ -61,7 +61,7 @@ export const HEATMAP_DEFAULTS = {
 		locale: "zh-CN",
 		monthNames: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
 		weekLabels: ["一", "", "三", "", "五", "", "日"],
-		legend: "少 $#e7e5e4$$#a8a29e$$#57534e$$#1c1917$ 多",
+		legend: "少 $#E4E4E7$$#A1A1AA$$#52525B$$#18181B$ 多",
 		tooltipId: "ts-heatmap-tooltip",
 	},
 	layout: {
@@ -82,14 +82,14 @@ export const HEATMAP_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "#fafaf9",
-			text: "#8F8E88",
-			levels: ["#fafaf9", "#f5f5f4", "#e7e5e4", "#d6d3d1", "#a8a29e", "#78716c", "#57534e", "#292524", "#1c1917"],
+			background: "#E4E4E7",
+			text: "#71717A",
+			levels: ["#E4E4E7", "#D4D4D8", "#A1A1AA", "#71717A", "#52525B", "#3F3F46", "#27272A", "#18181B", "#09090B"],
 		},
 		dark: {
-			background: "#1c1917",
-			text: "#8F8E88",
-			levels: ["#1c1917", "#292524", "#44403c", "#57534e", "#78716c", "#a8a29e", "#d6d3d1", "#e7e5e4", "#fafaf9"],
+			background: "#2E2E33",
+			text: "#A1A1AA",
+			levels: ["#2E2E33", "#3F3F46", "#52525B", "#6E6E77", "#8E8E97", "#A1A1AA", "#C4C4CC", "#E4E4E7", "#FAFAFA"],
 		},
 	},
 	styles: {
@@ -127,16 +127,16 @@ export const PROGRESSBAR_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "#e7e5e4",
+			background: "#E4E4E7",
 			border: "transparent",
-			text: "#1C1C1A",
-			accent: "#1C1C1A",
+			text: "#18181B",
+			accent: "#18181B",
 		},
 		dark: {
-			background: "#44403c",
+			background: "#3F3F46",
 			border: "transparent",
-			text: "#F0EFEB",
-			accent: "#F0EFEB",
+			text: "#FAFAFA",
+			accent: "#FAFAFA",
 		},
 	},
 } as const;
@@ -166,16 +166,16 @@ export const LIST_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "#F0EFEB",
-			border: "transparent",
-			text: "#1C1C1A",
-			accent: "#1C1C1A",
+			background: "#FFFFFF",
+			border: "#E4E4E7",
+			text: "#18181B",
+			accent: "#18181B",
 		},
 		dark: {
-			background: "#1C1C1A",
-			border: "transparent",
-			text: "#F0EFEB",
-			accent: "#F0EFEB",
+			background: "#26262B",
+			border: "#3F3F46",
+			text: "#FAFAFA",
+			accent: "#FAFAFA",
 		},
 	},
 } as const;
@@ -211,16 +211,16 @@ export const TAGS_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "#F0EFEB",
-			border: "transparent",
-			text: "#1C1C1A",
-			accent: "#1C1C1A",
+			background: "#FFFFFF",
+			border: "#E4E4E7",
+			text: "#18181B",
+			accent: "#18181B",
 		},
 		dark: {
-			background: "#1C1C1A",
-			border: "transparent",
-			text: "#F0EFEB",
-			accent: "#F0EFEB",
+			background: "#26262B",
+			border: "#3F3F46",
+			text: "#FAFAFA",
+			accent: "#FAFAFA",
 		},
 	},
 } as const;

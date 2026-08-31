@@ -59,21 +59,22 @@ export function chartThemeColors(colors: ChartColors, theme: "light" | "dark"): 
 }
 
 // ============================================================================
-// Shared Tooltip Style (Lieflat: paper card, 12px radius, ink text)
+// Shared Tooltip Style (inverted panel: ink-on-paper ↔ paper-on-ink, 12px radius)
+// Inverted tooltips stay maximally readable on ANY card/page background.
 // ============================================================================
 
 export function lieflatTooltip(theme: "light" | "dark"): Record<string, unknown> {
-	const paper = theme === "dark" ? "#1C1C1A" : "#F0EFEB";
-	const ink = theme === "dark" ? "#F0EFEB" : "#1C1C1A";
+	const panel = theme === "dark" ? "#FAFAFA" : "#18181B";
+	const text = theme === "dark" ? "#18181B" : "#FAFAFA";
 	return {
-		backgroundColor: paper,
+		backgroundColor: panel,
 		borderWidth: 0,
 		padding: [8, 12],
 		textStyle: {
-			color: ink,
+			color: text,
 			fontSize: 12,
 		},
-		extraCssText: "border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);",
+		extraCssText: "border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.18);",
 	};
 }
 

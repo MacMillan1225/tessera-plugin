@@ -326,7 +326,7 @@ export const GROUPS: { key: "core" | "chart"; enabledKey: "coreEnabled" | "chart
  * References component config files as single source of truth
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
-	version: 5,
+	version: 6,
 	coreEnabled: true,
 	chartEnabled: true,
 	card: {

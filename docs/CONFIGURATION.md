@@ -77,10 +77,10 @@ dv.container.appendChild(tessera.core.card({
 | layout | radius | string | "14px" | 圆角 |
 | layout | gap | string | "14px" | 头部/正文间距 |
 | layout | bodyGap | string | "12px" | 正文内部间距 |
-| colors.light/dark | background | string | 见下 | 卡片底色 |
-| colors.light/dark | border | string | transparent | 边框色（默认无边框） |
-| colors.light/dark | text | string | var(--text-normal) | 文字色 |
-| colors.light/dark | accent | string | var(--text-normal) | 强调色（value 用） |
+| colors.light/dark | background | string | #FFFFFF / #26262B | 卡片底色 |
+| colors.light/dark | border | string | #E4E4E7 / #3F3F46 | 边框色（发丝边框，任何页面背景下分层） |
+| colors.light/dark | text | string | #18181B / #FAFAFA | 文字色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 强调色（value 用） |
 | styles | card/header/title/meta/body/value/empty | object | — | 内联样式覆盖（CSS 属性映射） |
 
 默认底色：light `rgba(245,248,252,0.9)` / dark `rgba(30,41,59,0.72)`（Lieflat 风格靠背景色差分层，无边框无阴影）。
@@ -127,12 +127,11 @@ dv.container.appendChild(tessera.core.heatmap({
 | layout | monthLabelHeight / monthOffset / gridTopOffset | string | 18px/28px/4px | 月标签布局 |
 | layout | monthLabelSize / weekLabelSize | string | 9px / 9px | 标签字号 |
 | layout | legendGap / legendTop / legendSwatchSize | string | 3px/6px/9px | 图例布局 |
-| colors.light/dark | background | string | #fafaf9 / #1c1917 | 空单元格底色 |
-| colors.light/dark | text | string | var(--text-muted) | 标签文字色 |
-| colors.light/dark | tooltip / tooltipBg | string | 白/深 | tooltip 色 |
+| colors.light/dark | background | string | #E4E4E7 / #2E2E33 | 空单元格底色 |
+| colors.light/dark | text | string | #71717A / #A1A1AA | 标签文字色 |
 | colors.light/dark | levels | string[9] | 灰阶梯度 | 分级色（Lv0..Lv8） |
 
-值分级：`{total,completed}` → 完成比例 `ceil(ratio*8)`；纯数字 → `ceil(value)`（>0）；`level` 键直接取。levels 默认灰阶（light `#fafaf9→#1c1917`，dark 反转），Lieflat 单色风。
+值分级：`{total,completed}` → 完成比例 `ceil(ratio*8)`；纯数字 → `ceil(value)`（>0）；`level` 键直接取。levels 默认中性锌灰阶（light `#E4E4E7→#09090B`，dark `#2E2E33→#FAFAFA`），黑白高级感、克制无彩。tooltip 色为反转面板硬编码（浅色墨底/纸字，暗色纸底/墨字），不可配置。
 
 ### progressbar
 
@@ -156,10 +155,10 @@ dv.container.appendChild(tessera.core.progressbar({
 | layout | width | string | "100%" | 宽度 |
 | layout | height | string | "8px" | 高度 |
 | layout | radius | string | "4px" | 圆角 |
-| colors.light/dark | background | string | #e7e5e4 / #44403c | 轨道色 |
+| colors.light/dark | background | string | #E4E4E7 / #3F3F46 | 轨道色 |
 | colors.light/dark | border | string | transparent | 边框 |
-| colors.light/dark | text | string | var(--text-normal) | 标签文字色 |
-| colors.light/dark | accent | string | var(--text-normal) | 填充色（强调色） |
+| colors.light/dark | text | string | #18181B / #FAFAFA | 标签文字色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 填充色（强调色） |
 
 > **v3 变更**（任务需求）：`value` 语义从"绝对值+min/max"改为 **0..1 比例**。旧 `max/min` 字段已移除。`labelFormat` 现同时支持 `{value}`（整数百分比，如 50）与 `{raw}`（原始小数，如 0.5）。
 
@@ -193,10 +192,10 @@ dv.container.appendChild(tessera.core.list({
 | layout | gap | string | "8px" | 行间距 |
 | layout | bulletSize | string | "5px" | 圆点直径 |
 | layout | indent | string | "20px" | 文本相对圆点的缩进 |
-| colors.light/dark | background | string | var(--background-secondary) | 卡片底色 |
-| colors.light/dark | border | string | transparent | 边框色 |
-| colors.light/dark | text | string | var(--text-normal) | 文字色 |
-| colors.light/dark | accent | string | var(--text-normal) | 圆点色 |
+| colors.light/dark | background | string | #FFFFFF / #26262B | 容器底色 |
+| colors.light/dark | border | string | #E4E4E7 / #3F3F46 | 边框色（发丝边框） |
+| colors.light/dark | text | string | #18181B / #FAFAFA | 文字色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 圆点色 |
 | styles | root/list/item/bullet/label/value/empty | object | — | 内联样式覆盖 |
 
 响应式：`items` 属性可运行时改写并自动重绘。
@@ -234,10 +233,10 @@ dv.container.appendChild(tessera.core.tags({
 | layout | tagRadius | string | "999px" | 单标签圆角 |
 | layout | tagPadding | string | "4px 10px" | 单标签内边距 |
 | layout | tagFontSize | string | "12px" | 单标签字号 |
-| colors.light/dark | background | string | var(--background-secondary) | 容器底色 |
-| colors.light/dark | border | string | transparent | 容器边框 |
-| colors.light/dark | text | string | var(--text-normal) | 文字色 |
-| colors.light/dark | accent | string | var(--text-normal) | 标签强调色 |
+| colors.light/dark | background | string | #FFFFFF / #26262B | 容器底色 |
+| colors.light/dark | border | string | #E4E4E7 / #3F3F46 | 边框色（发丝边框） |
+| colors.light/dark | text | string | #18181B / #FAFAFA | 文字色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 标签强调色 |
 | styles | root/tags/tag/empty | object | — | 内联样式覆盖 |
 
 变体优先级：逐标签 `variant` > 容器 `flags`。逐标签 `color` 通过 `--ts-tags-tag-accent` 覆盖，保留形状只换色。
@@ -281,9 +280,9 @@ dv.container.appendChild(tessera.chart.bar({
 | layout(共用) | gridTop / gridBottom | number | 28 / 4 | **轴距画布上下边缘距离（px）** |
 | layout | maxWidth | string | "100%" | 最大宽度 |
 | layout | height | string | "240px" | 画布高度 |
-| colors.light/dark | text | string | #8F8E88 | 轴文字 |
-| colors.light/dark | grid | string | #DEDDD6 / #2E2D29 | 网格线 |
-| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 主色（单系列） |
+| colors.light/dark | text | string | #71717A / #A1A1AA | 轴文字 |
+| colors.light/dark | grid | string | #E4E4E7 / #3F3F46 | 网格线 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 主色（单系列） |
 | colors.light/dark | series | string[] | mono 色板 | 系列色板（多系列轮转；bar 单系列逐柱取色） |
 
 ### gauge
@@ -306,9 +305,9 @@ dv.container.appendChild(tessera.chart.gauge({
 | flags | showTooltip | boolean | true | 悬浮提示 |
 | layout | maxWidth | string | "100%" | 最大宽度 |
 | layout | height | string | "220px" | 画布高度 |
-| colors.light/dark | text | string | #8F8E88 | 刻度/标签色 |
-| colors.light/dark | track | string | #DEDDD6 / #2E2D29 | 轨道色 |
-| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 进度弧色 |
+| colors.light/dark | text | string | #71717A / #A1A1AA | 刻度/标签色 |
+| colors.light/dark | track | string | #E4E4E7 / #3F3F46 | 轨道色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 进度弧色 |
 
 响应式：`value` / `label` 属性可运行时改写并自动刷新。
 
@@ -329,8 +328,8 @@ dv.container.appendChild(tessera.chart.rose({
 | flags | showLabels | boolean | true | 花瓣外标签 `name value` |
 | layout | maxWidth | string | "100%" | 最大宽度 |
 | layout | height | string | "240px" | 画布高度 |
-| colors.light/dark | text | string | #8F8E88 | 标签文字色 |
-| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 花瓣基色 |
+| colors.light/dark | text | string | #71717A / #A1A1AA | 标签文字色 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 花瓣基色 |
 | colors.light/dark | series | string[] | mono 色板 | 花瓣分档色板（t>0.8/0.6/0.35 取前 4 档） |
 
 ### radar
@@ -361,9 +360,9 @@ dv.container.appendChild(tessera.chart.radar({
 | layout | height | string | "260px" | 画布高度 |
 | layout | lineWidth | number | 2 | 多边形描边宽（px），留空=自动 |
 | layout | symbolSize | number | 3 | 顶点圆点直径（px），留空=自动 |
-| colors.light/dark | text | string | #8F8E88 | 维度标签色 |
-| colors.light/dark | grid | string | #DEDDD6 / #2E2D29 | 雷达网格线 |
-| colors.light/dark | accent | string | #1C1C1A / #F0EFEB | 单系列主色 |
+| colors.light/dark | text | string | #71717A / #A1A1AA | 维度标签色 |
+| colors.light/dark | grid | string | #E4E4E7 / #3F3F46 | 雷达网格线 |
+| colors.light/dark | accent | string | #18181B / #FAFAFA | 单系列主色 |
 | colors.light/dark | series | string[] | mono 色板 | 多系列色板轮转 |
 
 响应式：`data` / `max` 属性可运行时改写并自动刷新。

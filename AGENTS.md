@@ -76,7 +76,7 @@ examples/DASHBOARDS.md         # 可直接运行的完整看板示例
 ### 配置与版本
 - 配置优先级：`options > 插件设置 > DEFAULT_SETTINGS`（main.ts 包装层深合并）
 - `PluginSettings.version` 是**破坏性变更门槛**：字段结构变化时必须递增，旧配置整体重置
-- 当前 version：**4**（core 重构后）；manifest 版本 1.25.3
+- 当前 version：**6**（zinc 配色重置后）；manifest 版本 1.26.0
 - `data.json` 由 Obsidian 管理（gitignore），只存被修改过的字段
 
 ### 样式约定

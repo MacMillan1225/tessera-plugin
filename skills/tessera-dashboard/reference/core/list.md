@@ -47,10 +47,10 @@ right-aligned in mono, perfect for counts/status.
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `#F0EFEB` | `#1C1C1A` | Container fill |
-| `border` | `transparent` | same | Container border |
-| `text` | `#1C1C1A` | `#F0EFEB` | Label text |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Bullet dots (set for the pop of color) |
+| `background` | `#FFFFFF` | `#26262B` | Container fill |
+| `border` | `#E4E4E7` | `#3F3F46` | Container border |
+| `text` | `#18181B` | `#FAFAFA` | Label text |
+| `accent` | `#18181B` | `#FAFAFA` | Bullet dots (set for the pop of color) |
 
 ### styles
 
@@ -97,7 +97,7 @@ dv.container.appendChild(tessera.core.list({
     { label: "v2.0 planning", value: "todo" },
   ],
   flags: { showDividers: true },
-  colors: { light: { accent: "#1C1C1A" }, dark: { accent: "#F0EFEB" } },
+  colors: { light: { accent: "#18181B" }, dark: { accent: "#FAFAFA" } },
 }));
 ```
 

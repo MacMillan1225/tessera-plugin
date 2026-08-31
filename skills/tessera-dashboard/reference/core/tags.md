@@ -50,10 +50,10 @@ flags/colors.
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `#F0EFEB` | `#1C1C1A` | Container fill |
-| `border` | `transparent` | same | Container border |
-| `text` | `#1C1C1A` | `#F0EFEB` | Chip label text |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Chip fill/outline default |
+| `background` | `#FFFFFF` | `#26262B` | Container fill |
+| `border` | `#E4E4E7` | `#3F3F46` | Container border |
+| `text` | `#18181B` | `#FAFAFA` | Chip label text |
+| `accent` | `#18181B` | `#FAFAFA` | Chip fill/outline default |
 
 ### styles
 
@@ -84,9 +84,9 @@ dv.container.appendChild(tessera.core.tags({
 // Per-tag colors and variants mixed
 dv.container.appendChild(tessera.core.tags({
   tags: [
-    { label: "Urgent", variant: "soft", color: "#1C1C1A" },
+    { label: "Urgent", variant: "soft", color: "#18181B" },
     { label: "Design", variant: "outlined" },
-    { label: "Frontend", color: "#8F8E88" },
+    { label: "Frontend", color: "#71717A" },
     "Backlog",
   ],
 }));

@@ -54,10 +54,10 @@ tessera.chart.line(options)  // → LineInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `text` | `#8F8E88` | `#8F8E88` | Axis labels / legend text |
-| `grid` | `#DEDDD6` | `#2E2D29` | Grid lines |
-| `accent` | `#1C1C1A` | `#F0EFEB` | Single-series line color |
-| `series` | `["#1C1C1A","#8F8E88","#B0AFA9","#D8D7D1","#6A6963"]` | `["#F0EFEB","#8F8E88","#B0AFA9","#55554F","#C6C5BF"]` | Multi-series palette (rotated) |
+| `text` | `#71717A` | `#A1A1AA` | Axis labels / legend text |
+| `grid` | `#E4E4E7` | `#3F3F46` | Grid lines |
+| `accent` | `#18181B` | `#FAFAFA` | Single-series line color |
+| `series` | `["#18181B","#71717A","#A1A1AA","#D4D4D8","#52525B"]` | `["#FAFAFA","#A1A1AA","#71717A","#52525B","#D4D4D8"]` | Multi-series palette (rotated) |
 
 ### className
 
@@ -107,6 +107,6 @@ dv.container.appendChild(tessera.chart.line({
 dv.container.appendChild(tessera.chart.line({
   data: { labels: ["A","B","C"], values: [4, 7, 3] },
   layout: { lineWidth: 3, symbolSize: 8, height: "200px" },
-  colors: { light: { accent: "#1C1C1A" }, dark: { accent: "#F0EFEB" } },
+  colors: { light: { accent: "#18181B" }, dark: { accent: "#FAFAFA" } },
 }));
 ```
