@@ -184,8 +184,6 @@ body.theme-dark .ts-card {
 .ts-heatmap {
 	--ts-heatmap-background-current: var(--ts-heatmap-light-background);
 	--ts-heatmap-text-current: var(--ts-heatmap-light-text, var(--text-muted));
-	--ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
-	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
 	display: flex;
 	flex-direction: column;
 	width: 100%;
@@ -197,22 +195,16 @@ body.theme-dark .ts-card {
 .ts-heatmap.theme-dark {
 	--ts-heatmap-background-current: var(--ts-heatmap-dark-background);
 	--ts-heatmap-text-current: var(--ts-heatmap-dark-text, var(--text-muted));
-	--ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
-	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
 }
 
 body.theme-light .ts-heatmap {
 	--ts-heatmap-background-current: var(--ts-heatmap-light-background);
 	--ts-heatmap-text-current: var(--ts-heatmap-light-text, var(--text-muted));
-	--ts-heatmap-tooltip-current: var(--ts-heatmap-light-tooltip);
-	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-light-tooltip-bg);
 }
 
 body.theme-dark .ts-heatmap {
 	--ts-heatmap-background-current: var(--ts-heatmap-dark-background);
 	--ts-heatmap-text-current: var(--ts-heatmap-dark-text, var(--text-muted));
-	--ts-heatmap-tooltip-current: var(--ts-heatmap-dark-tooltip);
-	--ts-heatmap-tooltip-bg-current: var(--ts-heatmap-dark-tooltip-bg);
 }
 
 /* Heatmap Months */

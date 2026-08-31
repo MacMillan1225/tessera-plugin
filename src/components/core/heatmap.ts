@@ -40,15 +40,11 @@ export interface ThemeColors {
 	light: {
 		background: string;
 		text: string;
-		tooltip: string;
-		tooltipBg: string;
 		levels: string[];
 	};
 	dark: {
 		background: string;
 		text: string;
-		tooltip: string;
-		tooltipBg: string;
 		levels: string[];
 	};
 }
@@ -101,21 +97,15 @@ export interface HeatmapOptions {
 		light?: {
 			background?: string;
 			text?: string;
-			tooltip?: string;
-			tooltipBg?: string;
 			levels?: string[];
 		};
 		dark?: {
 			background?: string;
 			text?: string;
-			tooltip?: string;
-			tooltipBg?: string;
 			levels?: string[];
 		};
 		background?: string;
 		text?: string;
-		tooltip?: string;
-		tooltipBg?: string;
 		levels?: string[];
 	};
 	styles?: {
@@ -501,14 +491,6 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 		colors.light.text = options.colors.text;
 		colors.dark.text = options.colors.text;
 	}
-	if (options.colors?.tooltip) {
-		colors.light.tooltip = options.colors.tooltip;
-		colors.dark.tooltip = options.colors.tooltip;
-	}
-	if (options.colors?.tooltipBg) {
-		colors.light.tooltipBg = options.colors.tooltipBg;
-		colors.dark.tooltipBg = options.colors.tooltipBg;
-	}
 
 	const locale = settings.locale;
 	const tooltipId = settings.tooltipId || HEATMAP_DEFAULTS.settings.tooltipId;
@@ -577,10 +559,6 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 			"--ts-heatmap-dark-background": colors.dark.background,
 			"--ts-heatmap-light-text": colors.light.text,
 			"--ts-heatmap-dark-text": colors.dark.text,
-			"--ts-heatmap-light-tooltip": colors.light.tooltip,
-			"--ts-heatmap-dark-tooltip": colors.dark.tooltip,
-			"--ts-heatmap-light-tooltip-bg": colors.light.tooltipBg,
-			"--ts-heatmap-dark-tooltip-bg": colors.dark.tooltipBg,
 		},
 	});
 
@@ -772,8 +750,18 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 
 		// Adaptive mode
 		const cellPitch = (layout.cellSize || 11) + (layout.cellGap || 2);
-		const width = root.clientWidth || root.parentElement?.clientWidth || 0;
-		const maxWeeks = Math.max(settings.minWeeks || 12, Math.round((Math.max(width, 280) - 40) / cellPitch));
+		// Measure the real available width. clientWidth can be 0 before layout
+		// (e.g. first render inside a dataviewjs container); fall back to the
+		// widest ancestor, then to minWeeks so the ResizeObserver re-render
+		// picks up the real width once the container is laid out.
+		let width = root.getBoundingClientRect().width || root.clientWidth || 0;
+		if (width <= 0 && root.parentElement) {
+			width = root.parentElement.getBoundingClientRect().width || root.parentElement.clientWidth || 0;
+		}
+
+		const maxWeeks = width > 0
+			? Math.max(settings.minWeeks || 12, Math.floor((width - 40) / cellPitch))
+			: settings.minWeeks || 12;
 		const rawStart = addDays(end, -(maxWeeks * 7));
 		const start = mondayFirst ? alignToMonday(rawStart) : rawStart;
 
@@ -1014,6 +1002,16 @@ export function heatmap(options: HeatmapOptions = {}): HeatmapInstance {
 	// Initial render
 	window.requestAnimationFrame(() => {
 		void renderGrid();
+
+		// Adaptive mode safety net: if the container had no width yet (e.g.
+		// rendered inside a still-hidden dataviewjs container), retry once
+		// after layout settles so the range fills the real parent width.
+		if (settings.rangeMode === "adaptive" && !root.getBoundingClientRect().width) {
+			window.setTimeout(() => {
+				if (renderState.destroyed) return;
+				void renderGrid();
+			}, 250);
+		}
 	});
 
 	return result;

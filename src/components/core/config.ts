@@ -23,16 +23,16 @@ export const CARD_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "var(--background-secondary)",
+			background: "#F0EFEB",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#1C1C1A",
+			accent: "#1C1C1A",
 		},
 		dark: {
-			background: "var(--background-secondary)",
+			background: "#1C1C1A",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#F0EFEB",
+			accent: "#F0EFEB",
 		},
 	},
 } as const;
@@ -83,16 +83,12 @@ export const HEATMAP_DEFAULTS = {
 	colors: {
 		light: {
 			background: "#fafaf9",
-			text: "var(--text-muted)",
-			tooltip: "#1C1C1A",
-			tooltipBg: "#F0EFEB",
+			text: "#8F8E88",
 			levels: ["#fafaf9", "#f5f5f4", "#e7e5e4", "#d6d3d1", "#a8a29e", "#78716c", "#57534e", "#292524", "#1c1917"],
 		},
 		dark: {
 			background: "#1c1917",
-			text: "var(--text-muted)",
-			tooltip: "#F0EFEB",
-			tooltipBg: "#1C1C1A",
+			text: "#8F8E88",
 			levels: ["#1c1917", "#292524", "#44403c", "#57534e", "#78716c", "#a8a29e", "#d6d3d1", "#e7e5e4", "#fafaf9"],
 		},
 	},
@@ -133,14 +129,14 @@ export const PROGRESSBAR_DEFAULTS = {
 		light: {
 			background: "#e7e5e4",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#1C1C1A",
+			accent: "#1C1C1A",
 		},
 		dark: {
 			background: "#44403c",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#F0EFEB",
+			accent: "#F0EFEB",
 		},
 	},
 } as const;
@@ -170,16 +166,16 @@ export const LIST_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "var(--background-secondary)",
+			background: "#F0EFEB",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#1C1C1A",
+			accent: "#1C1C1A",
 		},
 		dark: {
-			background: "var(--background-secondary)",
+			background: "#1C1C1A",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#F0EFEB",
+			accent: "#F0EFEB",
 		},
 	},
 } as const;
@@ -215,16 +211,16 @@ export const TAGS_DEFAULTS = {
 	},
 	colors: {
 		light: {
-			background: "var(--background-secondary)",
+			background: "#F0EFEB",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#1C1C1A",
+			accent: "#1C1C1A",
 		},
 		dark: {
-			background: "var(--background-secondary)",
+			background: "#1C1C1A",
 			border: "transparent",
-			text: "var(--text-normal)",
-			accent: "var(--text-normal)",
+			text: "#F0EFEB",
+			accent: "#F0EFEB",
 		},
 	},
 } as const;
