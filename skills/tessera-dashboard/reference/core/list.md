@@ -47,10 +47,10 @@ right-aligned in mono, perfect for counts/status.
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `var(--background-secondary)` | same | Container fill |
+| `background` | `#F0EFEB` | `#1C1C1A` | Container fill |
 | `border` | `transparent` | same | Container border |
-| `text` | `var(--text-normal)` | same | Label text |
-| `accent` | `var(--text-normal)` | same | Bullet dots (set for the pop of color) |
+| `text` | `#1C1C1A` | `#F0EFEB` | Label text |
+| `accent` | `#1C1C1A` | `#F0EFEB` | Bullet dots (set for the pop of color) |
 
 ### styles
 

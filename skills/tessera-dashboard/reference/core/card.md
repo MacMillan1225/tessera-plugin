@@ -47,10 +47,10 @@ tessera.core.card(options)  // → CardInstance (an HTMLElement)
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `var(--background-secondary)` | same | Card fill (no border by default) |
+| `background` | `#F0EFEB` | `#1C1C1A` | Card fill (no border by default) |
 | `border` | `transparent` | same | Card border |
-| `text` | `var(--text-normal)` | same | Default text color |
-| `accent` | `var(--text-normal)` | same | Value color + hover accent |
+| `text` | `#1C1C1A` | `#F0EFEB` | Default text color |
+| `accent` | `#1C1C1A` | `#F0EFEB` | Value color + hover accent |
 
 Structure: `colors: { light: {...}, dark: {...} }`. Flat `colors.background`
 etc. overrides both themes. Defaults are monochrome; set `accent` for the

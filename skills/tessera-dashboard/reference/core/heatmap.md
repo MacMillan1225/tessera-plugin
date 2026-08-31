@@ -63,10 +63,12 @@ resolution order: custom `getCellStyle` → `completed/total` ratio → `level`
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
 | `background` | `#fafaf9` | `#1c1917` | Empty-day cell color |
-| `text` | `var(--text-muted)` | same | Labels / tooltip text |
-| `tooltip` | `#1C1C1A` | `#F0EFEB` | Tooltip foreground (hardcoded paper/ink, not user-configurable via settings) |
-| `tooltipBg` | `#F0EFEB` | `#1C1C1A` | Tooltip background |
+| `text` | `#8F8E88` | `#8F8E88` | Month/week label color |
 | `levels` | 9-step gray gradient light→dark | 9-step dark→light | Cell intensity ramp, `levels[0]` = empty |
+
+> Tooltip colors are hardcoded to Lieflat paper/ink (light: `#F0EFEB` bg /
+> `#1C1C1A` text, dark inverted) and are NOT configurable — they stay
+> consistent with chart tooltips.
 
 ### styles
 

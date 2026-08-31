@@ -50,10 +50,10 @@ flags/colors.
 
 | Key | Light default | Dark default | Role |
 |---|---|---|---|
-| `background` | `var(--background-secondary)` | same | Container fill |
+| `background` | `#F0EFEB` | `#1C1C1A` | Container fill |
 | `border` | `transparent` | same | Container border |
-| `text` | `var(--text-normal)` | same | Chip label text |
-| `accent` | `var(--text-normal)` | same | Chip fill/outline default |
+| `text` | `#1C1C1A` | `#F0EFEB` | Chip label text |
+| `accent` | `#1C1C1A` | `#F0EFEB` | Chip fill/outline default |
 
 ### styles
 

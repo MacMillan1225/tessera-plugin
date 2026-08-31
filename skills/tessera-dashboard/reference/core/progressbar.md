@@ -41,8 +41,8 @@ tessera.core.progressbar(options)  // → ProgressbarInstance (an HTMLElement)
 |---|---|---|---|
 | `background` | `#e7e5e4` | `#44403c` | Track fill |
 | `border` | `transparent` | same | Track border |
-| `text` | `var(--text-normal)` | same | Label text |
-| `accent` | `var(--text-normal)` | same | **Fill color** (default = ink; set this for the pop of color) |
+| `text` | `#1C1C1A` | `#F0EFEB` | Label text |
+| `accent` | `#1C1C1A` | `#F0EFEB` | **Fill color** (default = ink; set this for the pop of color) |
 
 Structure: `colors: { light: {...}, dark: {...} }`; flat `colors.accent`
 overrides both themes.
